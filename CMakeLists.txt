@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.4)
-project(PacMan)
+project(pacman-mp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 
@@ -14,7 +14,7 @@ file(GLOB PAC_SRC_FILES
 
 add_definitions(-std=c++11)
 
-add_executable(PacMan ${PAC_SRC_FILES})
+add_executable(pacman-mp ${PAC_SRC_FILES})
 
 # sfml-system sfml-window sfml-graphics sfml-network sfml-audio
-target_link_libraries(PacMan sfml-graphics)
+target_link_libraries(pacman-mp sfml-graphics)
