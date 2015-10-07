@@ -3,9 +3,9 @@ project(PacMan)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 
-add_subdirectory(SFML-2.3.2)
-include_directories(SFML-2.3.2/include)
-link_directories(SFML-2.3.2/lib)
+add_subdirectory(SFML)
+include_directories(SFML/include)
+link_directories(SFML/lib)
 
 file(GLOB PAC_SRC_FILES
 	"*.h"
