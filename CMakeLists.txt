@@ -2,12 +2,21 @@ cmake_minimum_required(VERSION 3.0.2)
 set(PROJECT_NAME pacman-mp)
 project(${PROJECT_NAME})
 
-include_directories(SFML/include)
-set(SFML_LIBS )
-if (WIN32)
-	link_directories(SFML/lib_win32d)
+include_directories(include)
+set(EXT_LIBS )
+if (CMAKE_COMPILER_IS_GNUCXX)
+	link_directories(gcc/lib)
+elseif (MSVC)
+	if (MSVC11)
+		set(MSVC_DIR msvc11)
+	elseif (MSVC12)
+		set(MSVC_DIR msvc12)
+	else()
+		set(MSVC_DIR msvc14)
+	endif()
+	link_directories(${MSVC_DIR}/lib)
 	file(GLOB SFML_LIBS
-		"SFML/lib_win32d/*.dll"
+		"${MSVC_DIR}/bin/*.dll"
 		)
 endif()
 
