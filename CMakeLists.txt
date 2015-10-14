@@ -1,20 +1,33 @@
-cmake_minimum_required(VERSION 2.8.4)
-project(pacman-mp)
+cmake_minimum_required(VERSION 3.0.2)
+set(PROJECT_NAME pacman-mp)
+project(${PROJECT_NAME})
 
-set(SFML_STATIC_LIBRARIES TRUE)
-
-add_subdirectory(SFML)
 include_directories(SFML/include)
-link_directories(SFML/lib)
+set(SFML_LIBS )
+if (WIN32)
+	link_directories(SFML/lib_win32d)
+	file(GLOB SFML_LIBS
+		"SFML/lib_win32d/*.dll"
+		)
+endif()
 
 file(GLOB PAC_SRC_FILES
 	"*.h"
 	"*.cpp"
 	)
 
-add_definitions(-std=c++11)
+add_executable(${PROJECT_NAME} ${PAC_SRC_FILES})
 
-add_executable(pacman-mp ${PAC_SRC_FILES})
+target_link_libraries(${PROJECT_NAME}
+	sfml-system-d
+	sfml-window-d
+	sfml-graphics-d
+	sfml-network-d
+	sfml-audio-d)
 
-# sfml-system sfml-window sfml-graphics sfml-network sfml-audio
-target_link_libraries(pacman-mp sfml-graphics)
+foreach(lib ${SFML_LIBS})
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		"${lib}"
+		$<TARGET_FILE_DIR:${PROJECT_NAME}>)
+endforeach(lib)
