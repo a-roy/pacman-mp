@@ -45,7 +45,8 @@ int main()
 			}
 		}
 	}
-	Game g(f, {{ Player(Player::Pacman) }});
+	std::vector<Player> p(1, Player(Player::Pacman));
+	Game g(f, p);
 
     while (window.isOpen())
     {
