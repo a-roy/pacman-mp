@@ -1,33 +1,27 @@
 //! \file
 //! Entry point
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include "SFData.h"
 #include "Game.h"
-#include "SFAnimation.h"
+#include "Renderer.h"
+#include "Sprite.h"
+#include "Animation.h"
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");
-	window.setFramerateLimit(60);
-	sf::CircleShape shape(20.f);
-	shape.setFillColor(sf::Color::Yellow);
+	Renderer::Scale = 8.0f;
+	Renderer::CreateWindow(1280, 720, "My window");
 
-	sf::Texture texture;
-	if (!texture.loadFromFile("../pacman.png"))
-	{
-		return 1;
-	}
+	Sprite sprite;
+	sprite.Index = Renderer::CreateSprite("../pacman.png");
 
-	sf::Sprite sprite;
-	sprite.setTexture(texture);
-	sprite.setScale(sf::Vector2f(-2.0f, 2.0f));
-	sprite.setOrigin(sf::Vector2f(16, 16));
-
-	SFAnimation pac_move(4);
-	pac_move.Frames.push_back(sf::IntRect(34, 170, 32, 32));
-	pac_move.Frames.push_back(sf::IntRect(1, 170, 32, 32));
-	pac_move.Frames.push_back(sf::IntRect(34, 170, 32, 32));
-	pac_move.Frames.push_back(sf::IntRect(67, 170, 32, 32));
+	Animation pac_move(4);
+	pac_move.AddFrame(34, 170, 32, 32);
+	pac_move.AddFrame(1, 170, 32, 32);
+	pac_move.AddFrame(34, 170, 32, 32);
+	pac_move.AddFrame(67, 170, 32, 32);
+	sprite.Animations.push_back(pac_move);
 	int frame = 0;
 
 	Field f;
@@ -48,10 +42,10 @@ int main()
 	std::vector<Player> p(1, Player(Player::Pacman));
 	Game g(f, p);
 
-    while (window.isOpen())
+    while (SFData::Window->isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event))
+        while (SFData::Window->pollEvent(event))
         {
 			switch (event.type)
 			{
@@ -73,21 +67,18 @@ int main()
 					}
 					break;
 				case sf::Event::Closed:
-					window.close();
-					break;
+					Renderer::Deinit();
+					return 0;
 			}
         }
 
 		g.update();
-		sprite.setTextureRect(pac_move.getRect(frame++));
-		sprite.setPosition(g.Players[0].XPos * 8.f, g.Players[0].YPos * 8.f);
-		sprite.setRotation(g.Players[0].CurrentDir * -90);
-        window.clear();
+		Renderer::Clear();
 
 		// draw
-		window.draw(sprite);
+		Renderer::DrawSprite(sprite, g.Players[0].XPos, g.Players[0].YPos, g.Players[0].CurrentDir * -90, 0, frame++);
 
-        window.display();
+		Renderer::Display();
     }
 
     return 0;
