@@ -15,7 +15,7 @@ elseif (MSVC)
 		set(MSVC_DIR msvc14)
 	endif()
 	link_directories(${MSVC_DIR}/lib)
-	file(GLOB SFML_LIBS
+	file(GLOB EXT_LIBS
 		"${MSVC_DIR}/bin/*.dll"
 		)
 endif()
@@ -34,7 +34,7 @@ target_link_libraries(${PROJECT_NAME}
 	sfml-network-d
 	sfml-audio-d)
 
-foreach(lib ${SFML_LIBS})
+foreach(lib ${EXT_LIBS})
 	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
 		"${lib}"
