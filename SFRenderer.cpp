@@ -10,6 +10,11 @@ void Renderer::CreateWindow(int width, int height, std::string title)
 	SFData::Window->setFramerateLimit(60);
 }
 
+bool Renderer::WindowOpen()
+{
+	return SFData::Window->isOpen();
+}
+
 int Renderer::CreateSprite(std::string texpath)
 {
 	sf::Sprite sprite;

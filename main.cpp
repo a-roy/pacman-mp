@@ -1,7 +1,6 @@
 //! \file
 //! Entry point
 
-#include "SFData.h"
 #include "Game.h"
 #include "Renderer.h"
 #include "InputHandler.h"
@@ -42,7 +41,7 @@ int main()
 	std::vector<Player> p(1, Player(Player::Pacman));
 	Game g(f, p);
 
-    while (SFData::Window->isOpen())
+    while (Renderer::WindowOpen())
     {
 		InputHandler::PollEvents();
 		g.Players[0].NextDir = InputHandler::LastInput;
