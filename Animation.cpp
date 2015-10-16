@@ -7,7 +7,8 @@ Animation::Animation(int delay)
 
 void Animation::AddFrame(int x, int y, int width, int height)
 {
-	Frames.push_back({x, y, width, height});
+	Rectangle r = {x, y, width, height};
+	Frames.push_back(r);
 }
 
 void Animation::GetRect(int frame, int &x, int &y, int& width, int& height) const
