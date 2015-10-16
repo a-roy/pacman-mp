@@ -1,6 +1,8 @@
 //! \file
 //! Player class declaration
 
+#pragma once
+
 class Player
 {
 public:
