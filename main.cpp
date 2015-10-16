@@ -6,9 +6,27 @@
 #include "InputHandler.h"
 #include "Sprite.h"
 #include "Animation.h"
+#include "MenuItem.h"
 
 int main()
 {
+	std::vector<std::string> Menu_EN;
+	Menu_EN.push_back("Host game");
+	Menu_EN.push_back("Join game");
+	Menu_EN.push_back("Quit");
+
+	Menu menu;
+	MenuItem item1, item2, item3;
+	item1.Text = 0;
+	item1.Function = Host;
+	menu.push_back(item1);
+	item2.Text = 1;
+	item2.Function = Join;
+	menu.push_back(item2);
+	item3.Text = 2;
+	item3.Function = Exiting;
+	menu.push_back(item3);
+
 	Renderer::Scale = 8.0f;
 	Renderer::CreateWindow(1280, 720, "My window");
 
@@ -38,6 +56,9 @@ int main()
 			}
 		}
 	}
+
+	//! \todo Display the menu here
+
 	std::vector<Player> p(1, Player(Player::Pacman));
 	Game g(f, p);
 
