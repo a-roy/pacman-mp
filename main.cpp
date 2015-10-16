@@ -1,10 +1,9 @@
 //! \file
 //! Entry point
 
-#include <SFML/Window.hpp>
-#include "SFData.h"
 #include "Game.h"
 #include "Renderer.h"
+#include "InputHandler.h"
 #include "Sprite.h"
 #include "Animation.h"
 
@@ -42,35 +41,15 @@ int main()
 	std::vector<Player> p(1, Player(Player::Pacman));
 	Game g(f, p);
 
-    while (SFData::Window->isOpen())
+    while (Renderer::WindowOpen())
     {
-        sf::Event event;
-        while (SFData::Window->pollEvent(event))
-        {
-			switch (event.type)
-			{
-				case sf::Event::KeyPressed:
-					switch (event.key.code)
-					{
-						case sf::Keyboard::W:
-							g.Players[0].NextDir = Player::Up;
-							break;
-						case sf::Keyboard::A:
-							g.Players[0].NextDir = Player::Left;
-							break;
-						case sf::Keyboard::S:
-							g.Players[0].NextDir = Player::Down;
-							break;
-						case sf::Keyboard::D:
-							g.Players[0].NextDir = Player::Right;
-							break;
-					}
-					break;
-				case sf::Event::Closed:
-					Renderer::Deinit();
-					return 0;
-			}
-        }
+		InputHandler::PollEvents();
+		g.Players[0].NextDir = InputHandler::LastInput;
+		if (InputHandler::WindowClosed)
+		{
+			Renderer::Deinit();
+			return 0;
+		}
 
 		g.update();
 		Renderer::Clear();

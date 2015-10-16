@@ -19,6 +19,8 @@ class Renderer
 		static void Display();
 		//! Create a window
 		static void CreateWindow(int width, int height, std::string title);
+		//! Check if the window is still open
+		static bool WindowOpen();
 		//! Create a sprite
 		//!
 		//! \param texpath The path to the corresponding texture file
