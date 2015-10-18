@@ -27,6 +27,19 @@ int Renderer::CreateSprite(std::string texpath)
 	return index;
 }
 
+int Renderer::CreateText(std::string fontpath, std::string string, int size)
+{
+	sf::Text text;
+	text.setFont(SFData::GetFont(fontpath));
+	text.setString(string);
+	text.setCharacterSize(size);
+	text.setColor(sf::Color::White);
+
+	int index = SFData::Texts.size();
+	SFData::Texts.push_back(text);
+	return index;
+}
+
 void Renderer::Clear()
 {
 	SFData::Window->clear();
@@ -46,6 +59,13 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta, int anim, 
 	sprite.setPosition(x * Scale, y * Scale);
 	sprite.setRotation(theta);
 	SFData::Window->draw(sprite);
+}
+
+void Renderer::DrawText(int t, int x, int y)
+{
+	sf::Text &text = SFData::Texts[t];
+	text.setPosition(x * Scale, y * Scale);
+	SFData::Window->draw(text);
 }
 
 void Renderer::Deinit()
