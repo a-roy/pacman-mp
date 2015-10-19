@@ -1,6 +1,10 @@
 //! \file
 //! Entry point
 
+#include <map>
+#include <string>
+#include <vector>
+#include "MainState.h"
 #include "Game.h"
 #include "Renderer.h"
 #include "InputHandler.h"
@@ -15,6 +19,14 @@ int main()
 	Menu_EN.push_back("Join game");
 	Menu_EN.push_back("Quit");
 
+	std::string font = "../prstartk.ttf";
+
+	std::map<std::string, int> TextMap;
+	for (unsigned int i = 0; i < Menu_EN.size(); i++)
+	{
+		std::string string = Menu_EN[i];
+		TextMap[string] = Renderer::CreateText(font, string, 24);
+	}
 	Menu menu;
 	MenuItem item1, item2, item3;
 	item1.Text = 0;
@@ -33,7 +45,7 @@ int main()
 	Sprite sprite;
 	sprite.Index = Renderer::CreateSprite("../pacman.png");
 
-	int text = Renderer::CreateText("../prstartk.ttf", "TESTING", 24);
+	int text = Renderer::CreateText(font, "TESTING", 24);
 
 	Animation pac_move(4);
 	pac_move.AddFrame(34, 170, 32, 32);
@@ -59,6 +71,8 @@ int main()
 		}
 	}
 
+	MainState state = MainMenu;
+
 	//! \todo Display the menu here
 
 	std::vector<Player> p(1, Player(Player::Pacman));
@@ -74,13 +88,35 @@ int main()
 			return 0;
 		}
 
-		g.update();
-		Renderer::Clear();
+		switch (state)
+		{
+			case MainMenu:
+				if (g.Players[0].NextDir == Player::Down)
+				{
+					state = Gameplay;
+				}
+				else
+				{
+					for (unsigned int i = 0; i < menu.size(); i++)
+					{
+						Renderer::DrawText(
+								TextMap[Menu_EN[menu[i].Text]], 2, 10 + 6 * i);
+					}
+				}
+				break;
+			case Gameplay:
+				g.update();
+				Renderer::Clear();
 
-		// draw
-		Renderer::DrawSprite(sprite, g.Players[0].XPos, g.Players[0].YPos, g.Players[0].CurrentDir * -90, 0, frame++);
-		Renderer::DrawText(text, 10, 2);
-
+				// draw
+				Renderer::DrawSprite(
+						sprite,
+						g.Players[0].XPos, g.Players[0].YPos,
+						g.Players[0].CurrentDir * -90.f,
+						0, frame++);
+				Renderer::DrawText(text, 10, 2);
+				break;
+		}
 		Renderer::Display();
     }
 
