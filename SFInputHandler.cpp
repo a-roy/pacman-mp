@@ -14,7 +14,7 @@ void InputHandler::PollEvents()
 		switch (event.type)
 		{
 			case sf::Event::KeyPressed:
-				Player::Direction newInput = -1;
+				Player::Direction newInput = (Player::Direction)-1;
 				switch (event.key.code)
 				{
 					case sf::Keyboard::W:
@@ -32,11 +32,8 @@ void InputHandler::PollEvents()
 					default:
 						continue;
 				}
-				if (newInput != LastInput)
-				{
-					LastInput = newInput;
-					InputTime = -1;
-				}
+				LastInput = newInput;
+				InputTime = -1;
 				break;
 			case sf::Event::Closed:
 				WindowClosed = true;
