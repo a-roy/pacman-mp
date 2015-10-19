@@ -3,6 +3,7 @@
 #include "SFData.h"
 
 Player::Direction InputHandler::LastInput;
+int InputHandler::InputTime;
 bool InputHandler::WindowClosed = false;
 
 void InputHandler::PollEvents()
@@ -13,20 +14,28 @@ void InputHandler::PollEvents()
 		switch (event.type)
 		{
 			case sf::Event::KeyPressed:
+				Player::Direction newInput = -1;
 				switch (event.key.code)
 				{
 					case sf::Keyboard::W:
-						LastInput = Player::Up;
+						newInput = Player::Up;
 						break;
 					case sf::Keyboard::A:
-						LastInput = Player::Left;
+						newInput = Player::Left;
 						break;
 					case sf::Keyboard::S:
-						LastInput = Player::Down;
+						newInput = Player::Down;
 						break;
 					case sf::Keyboard::D:
-						LastInput = Player::Right;
+						newInput = Player::Right;
 						break;
+					default:
+						continue;
+				}
+				if (newInput != LastInput)
+				{
+					LastInput = newInput;
+					InputTime = -1;
 				}
 				break;
 			case sf::Event::Closed:
@@ -34,4 +43,5 @@ void InputHandler::PollEvents()
 				break;
 		}
 	}
+	InputTime++;
 }
