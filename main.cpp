@@ -33,6 +33,8 @@ int main()
 	Sprite sprite;
 	sprite.Index = Renderer::CreateSprite("../pacman.png");
 
+	int text = Renderer::CreateText("../prstartk.ttf", "TESTING", 24);
+
 	Animation pac_move(4);
 	pac_move.AddFrame(34, 170, 32, 32);
 	pac_move.AddFrame(1, 170, 32, 32);
@@ -77,6 +79,7 @@ int main()
 
 		// draw
 		Renderer::DrawSprite(sprite, g.Players[0].XPos, g.Players[0].YPos, g.Players[0].CurrentDir * -90, 0, frame++);
+		Renderer::DrawText(text, 10, 2);
 
 		Renderer::Display();
     }
