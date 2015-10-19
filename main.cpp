@@ -22,6 +22,7 @@ int main()
 	std::string font = "../prstartk.ttf";
 
 	std::map<std::string, int> TextMap;
+	TextMap[">"] = Renderer::CreateText(font, ">", 24);
 	for (unsigned int i = 0; i < Menu_EN.size(); i++)
 	{
 		std::string string = Menu_EN[i];
@@ -38,6 +39,8 @@ int main()
 	item3.Text = 2;
 	item3.Function = Exiting;
 	menu.push_back(item3);
+
+	unsigned int index = 0;
 
 	Renderer::Scale = 8.0f;
 	Renderer::CreateWindow(1280, 720, "My window");
@@ -81,7 +84,6 @@ int main()
     while (Renderer::WindowOpen())
     {
 		InputHandler::PollEvents();
-		g.Players[0].NextDir = InputHandler::LastInput;
 		if (InputHandler::WindowClosed)
 		{
 			Renderer::Deinit();
@@ -91,20 +93,52 @@ int main()
 		switch (state)
 		{
 			case MainMenu:
-				if (g.Players[0].NextDir == Player::Down)
+				if (InputHandler::InputTime == 0)
 				{
-					state = Gameplay;
+					switch (InputHandler::LastInput)
+					{
+						case Player::Up:
+							if (index > 0)
+							{
+								index--;
+							}
+							break;
+						case Player::Down:
+							if (index < menu.size() - 1)
+							{
+								index++;
+							}
+							break;
+						case Player::Right:
+							MainState newState = menu[index].Function;
+							if (newState == Host)
+							{
+								state = Gameplay;
+							}
+							else if (newState == Exiting)
+							{
+								state = Exiting;
+							}
+							break;
+					}
 				}
 				else
 				{
+					Renderer::Clear();
 					for (unsigned int i = 0; i < menu.size(); i++)
 					{
 						Renderer::DrawText(
-								TextMap[Menu_EN[menu[i].Text]], 2, 10 + 6 * i);
+								TextMap[Menu_EN[menu[i].Text]], 6, 10 + 6 * i);
+						if (i == index)
+						{
+							Renderer::DrawText(
+									TextMap[">"], 2, 10 + 6 * i);
+						}
 					}
 				}
 				break;
 			case Gameplay:
+				g.Players[0].NextDir = InputHandler::LastInput;
 				g.update();
 				Renderer::Clear();
 
@@ -116,6 +150,9 @@ int main()
 						0, frame++);
 				Renderer::DrawText(text, 10, 2);
 				break;
+			case Exiting:
+				Renderer::Deinit();
+				return 0;
 		}
 		Renderer::Display();
     }

@@ -11,10 +11,10 @@ void InputHandler::PollEvents()
     sf::Event event;
     while (SFData::Window->pollEvent(event))
     {
+		Player::Direction newInput = (Player::Direction)-1;
 		switch (event.type)
 		{
 			case sf::Event::KeyPressed:
-				Player::Direction newInput = (Player::Direction)-1;
 				switch (event.key.code)
 				{
 					case sf::Keyboard::W:
