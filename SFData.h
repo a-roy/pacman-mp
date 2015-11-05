@@ -14,6 +14,8 @@ class SFData
 	public:
 		//! SFML RenderWindow
 		static sf::RenderWindow *Window;
+		//!
+		static sf::UdpSocket Socket;
 		//! SFML Texture database, where keys are file paths
 		static std::map<std::string, sf::Texture> Textures;
 		//! SFML Sprite database
