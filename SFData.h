@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 
 //! Contains data loaded by SFML
 class SFData
