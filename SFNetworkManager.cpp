@@ -20,3 +20,17 @@ void NetworkManager::Receive(char *data, std::size_t &received)
 		// do something
 	}
 }
+
+void NetworkManager::Send(MessageType mtype, char *data, std::size_t size,
+		std::string address, unsigned short port)
+{
+	sf::IpAddress recipient = address;
+	SFData::Socket.send(data, size, recipient, port);
+}
+
+void NetworkManager::Broadcast(MessageType mtype, char *data, std::size_t size,
+		unsigned short port)
+{
+	sf::IpAddress recipient = sf::IpAddress::Broadcast;
+	SFData::Socket.send(data, size, recipient, port);
+}
