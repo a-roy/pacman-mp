@@ -30,4 +30,5 @@ class NetworkManager
 				std::string address, unsigned short port);
 		void Broadcast(MessageType mtype, char *data, std::size_t size,
 				unsigned short port);
+		unsigned short GetPort();
 };
