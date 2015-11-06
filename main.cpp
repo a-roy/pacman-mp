@@ -137,6 +137,16 @@ int main()
 					}
 				}
 				break;
+			case Host:
+				// TODO: display IP address and port
+				// TODO: wait for connection requests
+				// TODO: start gameplay
+				break;
+			case Join:
+				// TODO: prompt for IP address and port
+				// TODO: send connection request
+				// TODO: parse server messages
+				break;
 			case Gameplay:
 				g.Players[0].NextDir = InputHandler::LastInput;
 				g.update();
