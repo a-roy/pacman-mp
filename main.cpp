@@ -139,13 +139,78 @@ int main()
 				break;
 			case Host:
 				// TODO: display IP address and port
-				// TODO: wait for connection requests
-				// TODO: start gameplay
+				// handle incoming network traffic
+				char data[100];
+				std::size_t received;
+				NetworkManager::Receive(data, received);
+				if (received > 1)
+				{
+					switch ((NetworkManager::MessageType)data[1])
+					{
+						case NetworkManager::RequestServer:
+							// TODO: add identity to lobby
+							break;
+						case NetworkManager::PingServer:
+							// TODO: confirm identity, reset timeout
+							break;
+						case NetworkManager::DisconnectServer:
+							// TODO: remove identity from lobby
+							break;
+					}
+				}
+				if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
+				{
+					// TODO: start gameplay
+				}
+				else
+				{
+					// TODO: ping all clients
+				}
 				break;
 			case Join:
-				// TODO: prompt for IP address and port
-				// TODO: send connection request
-				// TODO: parse server messages
+				// TODO: check connection status
+				bool connection_waiting = false;
+				std::string address;
+				unsigned short port;
+				// parse server messages
+				char data[100];
+				std::size_t received;
+				NetworkManager::Receive(data, received);
+				if (received > 1)
+				{
+					switch ((NetworkManager::MessageType)data[1])
+					{
+						case NetworkManager::ConfirmClient:
+							// TODO: display confirmation
+							break;
+						case NetworkManager::PingClient:
+							// TODO: reset timeout
+							break;
+						case NetworkManager::DisconnectClient:
+							// TODO: exit lobby
+							break;
+					}
+				}
+				if (connection_waiting)
+				{
+					bool timeout = false;
+					if (timeout)
+					{
+						// TODO cancel connection
+					}
+					else
+					{
+						// send connection request
+						char data[2];
+						data[1] = NetworkManager::RequestServer;
+						NetworkManager::Send(NetworkManager::RequestServer, data, 2, address, port);
+					}
+				}
+				else
+				{
+					// TODO: prompt for IP address and port
+				}
+				// TODO: ping server
 				break;
 			case Gameplay:
 				g.Players[0].NextDir = InputHandler::LastInput;

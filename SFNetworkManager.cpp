@@ -15,9 +15,9 @@ void NetworkManager::Receive(char *data, std::size_t &received)
 	if (SFData::Socket.receive(data, 100, received, sender, port) ==
 			sf::Socket::Done)
 	{
-		// confirm first byte
-		// decode second byte
-		// do something
+		// TODO: confirm first byte
+		// TODO: confirm identity of sender
+		// TODO: overwrite `received` if invalid
 	}
 }
 
@@ -25,6 +25,7 @@ void NetworkManager::Send(MessageType mtype, char *data, std::size_t size,
 		std::string address, unsigned short port)
 {
 	sf::IpAddress recipient = address;
+	// TODO: insert correct header
 	SFData::Socket.send(data, size, recipient, port);
 }
 
