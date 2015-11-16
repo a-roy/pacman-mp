@@ -36,6 +36,12 @@ void NetworkManager::Broadcast(MessageType mtype, char *data, std::size_t size,
 	SFData::Socket.send(data, size, recipient, port);
 }
 
+std::string NetworkManager::GetAddress()
+{
+	// TODO: get public address
+	return sf::IpAddress::getLocalAddress().toString();
+}
+
 unsigned short NetworkManager::GetPort()
 {
 	return SFData::Socket.getLocalPort();
