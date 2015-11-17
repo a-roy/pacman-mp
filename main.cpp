@@ -8,6 +8,7 @@
 #include "Game.h"
 #include "Renderer.h"
 #include "InputHandler.h"
+#include "NetworkManager.h"
 #include "Sprite.h"
 #include "Animation.h"
 #include "MenuItem.h"
@@ -93,66 +94,162 @@ int main()
 		switch (state)
 		{
 			case MainMenu:
-				if (InputHandler::InputTime == 0)
 				{
-					switch (InputHandler::LastInput)
+					if (InputHandler::InputTime == 0)
 					{
-						case Player::Up:
-							if (index > 0)
-							{
-								index--;
-							}
-							break;
-						case Player::Down:
-							if (index < menu.size() - 1)
-							{
-								index++;
-							}
-							break;
-						case Player::Right:
-							MainState newState = menu[index].Function;
-							if (newState == Host)
-							{
-								state = Gameplay;
-							}
-							else if (newState == Exiting)
-							{
-								state = Exiting;
-							}
-							break;
+						switch (InputHandler::LastInput)
+						{
+							case Player::Up:
+								if (index > 0)
+								{
+									index--;
+								}
+								break;
+							case Player::Down:
+								if (index < menu.size() - 1)
+								{
+									index++;
+								}
+								break;
+							case Player::Right:
+								MainState newState = menu[index].Function;
+								if (newState == Host)
+								{
+									state = Gameplay;
+								}
+								else if (newState == Exiting)
+								{
+									state = Exiting;
+								}
+								break;
+						}
 					}
-				}
-				else
-				{
-					Renderer::Clear();
-					for (unsigned int i = 0; i < menu.size(); i++)
+					else
 					{
-						Renderer::DrawText(
-								TextMap[Menu_EN[menu[i].Text]], 6, 10 + 6 * i);
-						if (i == index)
+						Renderer::Clear();
+						for (unsigned int i = 0; i < menu.size(); i++)
 						{
 							Renderer::DrawText(
-									TextMap[">"], 2, 10 + 6 * i);
+									TextMap[Menu_EN[menu[i].Text]], 6, 10 + 6 * i);
+							if (i == index)
+							{
+								Renderer::DrawText(
+										TextMap[">"], 2, 10 + 6 * i);
+							}
 						}
 					}
 				}
 				break;
+			case Host:
+				{
+					// TODO: display IP address and port
+					// handle incoming network traffic
+					NetworkManager::MessageType client_msg;
+					std::vector<char> client_data(0, 0);
+					unsigned int id;
+					NetworkManager::Receive(client_msg, client_data, id);
+					// TODO: check if we received a valid packet
+					if (true)
+					{
+						switch (client_msg)
+						{
+							case NetworkManager::RequestServer:
+								{
+									// TODO: add identity to lobby
+									std::vector<char> d(0, 0);
+									NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
+								}
+								break;
+							case NetworkManager::PingServer:
+								// TODO: confirm identity, reset timeout
+								break;
+							case NetworkManager::DisconnectServer:
+								// TODO: remove identity from lobby
+								break;
+						}
+					}
+					if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
+					{
+						// TODO: start gameplay
+					}
+					else
+					{
+						// TODO: ping all clients
+					}
+				}
+				break;
+			case Join:
+				{
+					// TODO: check connection status
+					index = 0;
+					bool connection_waiting = false;
+					std::string address = "127.0.0.1";
+					unsigned short port = 0;
+					// parse server messages
+					NetworkManager::MessageType server_msg;
+					std::vector<char> server_data(0, 0);
+					unsigned int sender;
+					NetworkManager::Receive(server_msg, server_data, sender);
+					// TODO: check if we received a valid packet
+					if (true)
+					{
+						switch (server_msg)
+						{
+							case NetworkManager::ConfirmClient:
+								// TODO: display confirmation
+								break;
+							case NetworkManager::PingClient:
+								// TODO: reset timeout
+								break;
+							case NetworkManager::DisconnectClient:
+								// TODO: exit lobby
+								break;
+						}
+					}
+					if (connection_waiting)
+					{
+						bool timeout = false;
+						if (timeout)
+						{
+							// TODO cancel connection
+						}
+						else
+						{
+							// send connection request
+							std::vector<char> d(0, 0);
+							NetworkManager::Send(NetworkManager::RequestServer, d, 0);
+						}
+					}
+					else
+					{
+						// TODO: prompt for IP address and port
+						NetworkManager::ResetConnections();
+						NetworkManager::GetConnection(address, port);
+					}
+					// TODO: ping server
+				}
+				break;
 			case Gameplay:
-				g.Players[0].NextDir = InputHandler::LastInput;
-				g.update();
-				Renderer::Clear();
+				{
+					g.Players[0].NextDir = InputHandler::LastInput;
+					g.update();
+					Renderer::Clear();
 
-				// draw
-				Renderer::DrawSprite(
-						sprite,
-						g.Players[0].XPos, g.Players[0].YPos,
-						g.Players[0].CurrentDir * -90.f,
-						0, frame++);
-				Renderer::DrawText(text, 10, 2);
+					// draw
+					Renderer::DrawSprite(
+							sprite,
+							g.Players[0].XPos, g.Players[0].YPos,
+							g.Players[0].CurrentDir * -90.f,
+							0, frame++);
+					Renderer::DrawText(text, 10, 2);
+				}
 				break;
 			case Exiting:
-				Renderer::Deinit();
-				return 0;
+				{
+					Renderer::Deinit();
+					return 0;
+				}
+				break;
 		}
 		Renderer::Display();
     }

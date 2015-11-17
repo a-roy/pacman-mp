@@ -1,6 +1,7 @@
 #include "SFData.h"
 
 sf::RenderWindow *SFData::Window;
+sf::UdpSocket SFData::Socket;
 std::map<std::string, sf::Texture> SFData::Textures;
 std::vector<sf::Sprite> SFData::Sprites;
 std::map<std::string, sf::Font> SFData::Fonts;
