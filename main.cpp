@@ -23,7 +23,7 @@ Game* game;
 Field f;
 std::map<std::string, int> TextMap;
 std::vector<std::string> Menu_EN;
-unsigned char ip1, ip2, ip3, ip4;
+unsigned char ip[4];
 unsigned short port;
 Sprite sprite;
 int frame;
@@ -37,6 +37,19 @@ int main()
 	Menu_EN.push_back("Quit");
 
 	std::string font = "../prstartk.ttf";
+
+	TextMap["."] = Renderer::CreateText(font, ".", 24);
+	TextMap[":"] = Renderer::CreateText(font, ":", 24);
+	TextMap["0"] = Renderer::CreateText(font, "0", 24);
+	TextMap["1"] = Renderer::CreateText(font, "1", 24);
+	TextMap["2"] = Renderer::CreateText(font, "2", 24);
+	TextMap["3"] = Renderer::CreateText(font, "3", 24);
+	TextMap["4"] = Renderer::CreateText(font, "4", 24);
+	TextMap["5"] = Renderer::CreateText(font, "5", 24);
+	TextMap["6"] = Renderer::CreateText(font, "6", 24);
+	TextMap["7"] = Renderer::CreateText(font, "7", 24);
+	TextMap["8"] = Renderer::CreateText(font, "8", 24);
+	TextMap["9"] = Renderer::CreateText(font, "9", 24);
 
 	TextMap[">"] = Renderer::CreateText(font, ">", 24);
 	for (unsigned int i = 0; i < Menu_EN.size(); i++)
@@ -140,6 +153,10 @@ static void update(MainState &state)
 								{
 									change(state, Gameplay);
 								}
+								else if (newState == Join)
+								{
+									change(state, Join);
+								}
 								else if (newState == Exiting)
 								{
 									change(state, Exiting);
@@ -190,21 +207,144 @@ static void update(MainState &state)
 			break;
 		case Join:
 			{
+				if (InputHandler::InputTime == 0)
+				{
+					switch (InputHandler::LastInput)
+					{
+						case Player::Left:
+							{
+								if (index > 0)
+								{
+									index--;
+								}
+							}
+							break;
+						case Player::Right:
+							{
+								if (index < 16)
+								{
+									index++;
+								}
+							}
+							break;
+						case Player::Up:
+							{
+								if (index <= 11)
+								{
+									unsigned char &byte = ip[index / 3];
+									unsigned char byte_max = 255;
+									if (index % 3 == 0 && byte < byte_max - 100)
+									{
+										byte += 100;
+									}
+									else if (index % 3 == 1 && byte < byte_max - 10)
+									{
+										byte += 10;
+									}
+									else if (index % 3 == 2 && byte < byte_max - 1)
+									{
+										byte += 1;
+									}
+									else
+									{
+										byte = byte_max;
+									}
+								}
+								else
+								{
+									unsigned short port_max = 65535;
+									if (index - 12 == 0 && port < port_max - 10000)
+									{
+										port += 10000;
+									}
+									else if (index - 12 == 1 && port < port_max - 1000)
+									{
+										port += 1000;
+									}
+									else if (index - 12 == 2 && port < port_max - 100)
+									{
+										port += 100;
+									}
+									else if (index - 12 == 3 && port < port_max - 10)
+									{
+										port += 10;
+									}
+									else if (index - 12 == 4 && port < port_max - 1)
+									{
+										port += 1;
+									}
+									else
+									{
+										port = port_max;
+									}
+								}
+							}
+							break;
+						case Player::Down:
+							{
+								if (index <= 11)
+								{
+									unsigned char &byte = ip[index / 3];
+									if (index % 3 == 0 && byte > 100)
+									{
+										byte -= 100;
+									}
+									else if (index % 3 == 1 && byte > 10)
+									{
+										byte -= 10;
+									}
+									else if (index % 3 == 2 && byte > 1)
+									{
+										byte -= 1;
+									}
+									else
+									{
+										byte = 0;
+									}
+								}
+								else
+								{
+									if (index - 12 == 0 && port > 10000)
+									{
+										port -= 10000;
+									}
+									else if (index - 12 == 1 && port > 1000)
+									{
+										port -= 1000;
+									}
+									else if (index - 12 == 2 && port > 100)
+									{
+										port -= 100;
+									}
+									else if (index - 12 == 3 && port > 10)
+									{
+										port -= 10;
+									}
+									else if (index - 12 == 4 && port > 1)
+									{
+										port -= 1;
+									}
+									else
+									{
+										port = 0;
+									}
+								}
+							}
+							break;
+					}
+				}
 				// TODO: check connection status
-				index = 0;
 				bool connection_waiting = false;
 				char addr[16];
-				sprintf(addr, "%d.%d.%d.%d", ip1, ip2, ip3, ip4);
+				sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 				std::string address = addr;
-				char disp[22];
-				sprintf(disp, "%03d.%03d.%03d.%03d:%04d", ip1, ip2, ip3, ip4, port);
 				// parse server messages
 				NetworkManager::MessageType mtype;
 				std::vector<char> data;
 				unsigned int sender;
 				NetworkManager::Receive(mtype, data, sender);
 				// TODO: check if we received a valid packet
-				if (true)
+				if (false)
 				{
 					switch (mtype)
 					{
@@ -254,7 +394,7 @@ static void update(MainState &state)
 	}
 }
 
-static void render(MainState state)
+static void render(const MainState &state)
 {
 	Renderer::Clear();
 
@@ -281,7 +421,13 @@ static void render(MainState state)
 			break;
 		case Join:
 			{
-				// TODO
+				char disp[22];
+				sprintf(disp, "%03d.%03d.%03d.%03d:%05d", ip[0], ip[1], ip[2], ip[3], port);
+				for (unsigned int i = 0; i < 21; i++)
+				{
+					std::string s({ disp[i] });
+					Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
+				}
 			}
 			break;
 		case Gameplay:
@@ -319,7 +465,10 @@ static void change(MainState &state, MainState nextState)
 		case Join:
 			{
 				index = 0;
-				ip1 = 127, ip2 = 0, ip3 = 0, ip4 = 1;
+				ip[0] = 127;
+				ip[1] = 0;
+				ip[2] = 0;
+				ip[3] = 1;
 				port = 1;
 			}
 			break;

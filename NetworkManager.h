@@ -20,6 +20,7 @@ class NetworkManager
 
 		enum MessageType : unsigned char
 		{
+			None,
 			ConfirmClient,
 			PingClient,
 			StartGame,
