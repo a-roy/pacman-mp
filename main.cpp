@@ -185,6 +185,7 @@ static void update(MainState &state)
 								// TODO: add identity to lobby
 								std::vector<char> d(0);
 								NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
+								change(state, Gameplay);
 							}
 							break;
 						case NetworkManager::PingServer:
@@ -224,6 +225,15 @@ static void update(MainState &state)
 								if (index < 16)
 								{
 									index++;
+								}
+								else
+								{
+									char addr[16];
+									sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+									std::string address = addr;
+									unsigned int server = NetworkManager::GetConnection(addr, port);
+									std::vector<char> data(0);
+									NetworkManager::Send(NetworkManager::RequestServer, data, server);
 								}
 							}
 							break;
@@ -349,6 +359,7 @@ static void update(MainState &state)
 					{
 						case NetworkManager::ConfirmClient:
 							// TODO: display confirmation
+							change(state, Gameplay);
 							break;
 						case NetworkManager::PingClient:
 							// TODO: reset timeout
