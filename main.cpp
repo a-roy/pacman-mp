@@ -100,6 +100,8 @@ int main()
 
 	MainState state = MainMenu;
 
+	NetworkManager::Init();
+
     while (Renderer::WindowOpen())
     {
 		InputHandler::PollEvents();
@@ -151,7 +153,7 @@ static void update(MainState &state)
 								MainState newState = menu[index].Function;
 								if (newState == Host)
 								{
-									change(state, Gameplay);
+									change(state, Host);
 								}
 								else if (newState == Join)
 								{
@@ -169,14 +171,12 @@ static void update(MainState &state)
 			break;
 		case Host:
 			{
-				// TODO: display IP address and port
 				// handle incoming network traffic
 				NetworkManager::MessageType mtype;
 				std::vector<char> data;
 				unsigned int id;
 				NetworkManager::Receive(mtype, data, id);
-				// TODO: check if we received a valid packet
-				if (true)
+				if (mtype != NetworkManager::None)
 				{
 					switch (mtype)
 					{
@@ -197,7 +197,7 @@ static void update(MainState &state)
 				}
 				if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
 				{
-					// TODO: start gameplay
+					change(state, Gameplay);
 				}
 				else
 				{
@@ -343,8 +343,7 @@ static void update(MainState &state)
 				std::vector<char> data;
 				unsigned int sender;
 				NetworkManager::Receive(mtype, data, sender);
-				// TODO: check if we received a valid packet
-				if (false)
+				if (mtype != NetworkManager::None)
 				{
 					switch (mtype)
 					{
@@ -416,7 +415,15 @@ static void render(const MainState &state)
 			break;
 		case Host:
 			{
-				// TODO
+				std::string address = NetworkManager::GetAddress();
+				unsigned short port = NetworkManager::GetPort();
+				char disp[22];
+				sprintf(disp, "%s:%d", address.c_str(), port);
+				for (unsigned int i = 0; disp[i] != '\0'; i++)
+				{
+					std::string s({ disp[i] });
+					Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
+				}
 			}
 			break;
 		case Join:
