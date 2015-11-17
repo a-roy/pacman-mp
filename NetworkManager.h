@@ -5,12 +5,18 @@
 
 #include <cstddef>
 #include <string>
-#include <map>
+#include <vector>
 
 class NetworkManager
 {
 	public:
-		std::map<std::string, int> ConnectionAddresses;
+		struct Connection
+		{
+			std::string Address;
+			unsigned short Port;
+			unsigned int Lag;
+		};
+		static std::vector<Connection> CurrentConnections;
 
 		enum MessageType : unsigned char
 		{
@@ -28,12 +34,16 @@ class NetworkManager
 			DisconnectServer
 		};
 
-		void Init();
-		void Receive(char *data, std::size_t &received);
-		void Send(MessageType mtype, char *data, std::size_t size,
-				std::string address, unsigned short port);
-		void Broadcast(MessageType mtype, char *data, std::size_t size,
-				unsigned short port);
-		std::string GetAddress();
-		unsigned short GetPort();
+		static void Init();
+		static void Receive(MessageType &mtype, std::vector<char>& data,
+				unsigned int &sender);
+		static void Send(MessageType mtype, const std::vector<char> &data,
+				unsigned int recipient);
+		static void Broadcast(MessageType mtype, const std::vector<char> &data);
+		static bool HasConnection(std::string address, unsigned short port);
+		static unsigned int
+			GetConnection(std::string address, unsigned short port);
+		static void ResetConnections();
+		static std::string GetAddress();
+		static unsigned short GetPort();
 };
