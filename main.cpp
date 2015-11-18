@@ -16,6 +16,7 @@
 static void update(MainState &state);
 static void render(const MainState &state);
 static void change(MainState &state, MainState nextState);
+static void addrIncrement(unsigned int digit, int amount);
 
 Menu menu;
 unsigned int index = 0;
@@ -176,25 +177,24 @@ static void update(MainState &state)
 				std::vector<char> data;
 				unsigned int id;
 				NetworkManager::Receive(mtype, data, id);
-				if (mtype != NetworkManager::None)
+				switch (mtype)
 				{
-					switch (mtype)
-					{
-						case NetworkManager::RequestServer:
-							{
-								// TODO: add identity to lobby
-								std::vector<char> d(0);
-								NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
-								change(state, Gameplay);
-							}
-							break;
-						case NetworkManager::PingServer:
-							// TODO: confirm identity, reset timeout
-							break;
-						case NetworkManager::DisconnectServer:
-							// TODO: remove identity from lobby
-							break;
-					}
+					case NetworkManager::None:
+						break;
+					case NetworkManager::RequestServer:
+						{
+							// TODO: add identity to lobby
+							std::vector<char> d(0);
+							NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
+							change(state, Gameplay);
+						}
+						break;
+					case NetworkManager::PingServer:
+						// TODO: confirm identity, reset timeout
+						break;
+					case NetworkManager::DisconnectServer:
+						// TODO: remove identity from lobby
+						break;
 				}
 				if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
 				{
@@ -231,7 +231,9 @@ static void update(MainState &state)
 									char addr[16];
 									sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 									std::string address = addr;
+									NetworkManager::ResetConnections();
 									unsigned int server = NetworkManager::GetConnection(addr, port);
+									// TODO: set connection to waiting
 									std::vector<char> data(0);
 									NetworkManager::Send(NetworkManager::RequestServer, data, server);
 								}
@@ -239,124 +241,30 @@ static void update(MainState &state)
 							break;
 						case Player::Up:
 							{
-								if (index <= 11)
-								{
-									unsigned char &byte = ip[index / 3];
-									unsigned char byte_max = 255;
-									if (index % 3 == 0 && byte < byte_max - 100)
-									{
-										byte += 100;
-									}
-									else if (index % 3 == 1 && byte < byte_max - 10)
-									{
-										byte += 10;
-									}
-									else if (index % 3 == 2 && byte < byte_max - 1)
-									{
-										byte += 1;
-									}
-									else
-									{
-										byte = byte_max;
-									}
-								}
-								else
-								{
-									unsigned short port_max = 65535;
-									if (index - 12 == 0 && port < port_max - 10000)
-									{
-										port += 10000;
-									}
-									else if (index - 12 == 1 && port < port_max - 1000)
-									{
-										port += 1000;
-									}
-									else if (index - 12 == 2 && port < port_max - 100)
-									{
-										port += 100;
-									}
-									else if (index - 12 == 3 && port < port_max - 10)
-									{
-										port += 10;
-									}
-									else if (index - 12 == 4 && port < port_max - 1)
-									{
-										port += 1;
-									}
-									else
-									{
-										port = port_max;
-									}
-								}
+								addrIncrement(index, 1);
 							}
 							break;
 						case Player::Down:
 							{
-								if (index <= 11)
-								{
-									unsigned char &byte = ip[index / 3];
-									if (index % 3 == 0 && byte > 100)
-									{
-										byte -= 100;
-									}
-									else if (index % 3 == 1 && byte > 10)
-									{
-										byte -= 10;
-									}
-									else if (index % 3 == 2 && byte > 1)
-									{
-										byte -= 1;
-									}
-									else
-									{
-										byte = 0;
-									}
-								}
-								else
-								{
-									if (index - 12 == 0 && port > 10000)
-									{
-										port -= 10000;
-									}
-									else if (index - 12 == 1 && port > 1000)
-									{
-										port -= 1000;
-									}
-									else if (index - 12 == 2 && port > 100)
-									{
-										port -= 100;
-									}
-									else if (index - 12 == 3 && port > 10)
-									{
-										port -= 10;
-									}
-									else if (index - 12 == 4 && port > 1)
-									{
-										port -= 1;
-									}
-									else
-									{
-										port = 0;
-									}
-								}
+								addrIncrement(index, -1);
 							}
 							break;
 					}
 				}
 				// TODO: check connection status
 				bool connection_waiting = false;
-				char addr[16];
-				sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-				std::string address = addr;
 				// parse server messages
 				NetworkManager::MessageType mtype;
 				std::vector<char> data;
 				unsigned int sender;
 				NetworkManager::Receive(mtype, data, sender);
-				if (mtype != NetworkManager::None)
+				if (sender == 0)
 				{
 					switch (mtype)
 					{
+						case NetworkManager::None:
+							// ignore
+							break;
 						case NetworkManager::ConfirmClient:
 							// TODO: display confirmation
 							change(state, Gameplay);
@@ -382,12 +290,6 @@ static void update(MainState &state)
 						std::vector<char> data(0);
 						NetworkManager::Send(NetworkManager::RequestServer, data, 0);
 					}
-				}
-				else
-				{
-					// TODO: prompt for IP address and port
-					NetworkManager::ResetConnections();
-					NetworkManager::GetConnection(address, port);
 				}
 				// TODO: ping server
 			}
@@ -499,5 +401,41 @@ static void change(MainState &state, MainState nextState)
 			break;
 		case Exiting:
 			break;
+	}
+}
+
+static void addrIncrement(unsigned int digit, int amount)
+{
+	int delta = amount;
+	if (digit < 12)
+	{
+		for (unsigned int i = digit % 3; i < 2; i++)
+		{
+			delta *= 10;
+		}
+		unsigned char &selected = ip[digit / 3];
+		if (selected + delta == (int)(unsigned char)(selected + delta))
+		{
+			selected += delta;
+		}
+		else
+		{
+			selected = (amount > 0) ? 255 : 0;
+		}
+	}
+	else
+	{
+		for (unsigned int i = digit - 12; i < 4; i++)
+		{
+			delta *= 10;
+		}
+		if (port + delta == (int)(unsigned short)(port + delta))
+		{
+			port += delta;
+		}
+		else
+		{
+			port = (amount > 0) ? 65535 : 0;
+		}
 	}
 }
