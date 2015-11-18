@@ -146,18 +146,7 @@ static void update(MainState &state)
 			else if (InputHandler::LastInput == Player::Right)
 			{
 				MainState newState = menu[index].Function;
-				if (newState == Host)
-				{
-					change(state, Host);
-				}
-				else if (newState == Join)
-				{
-					change(state, Join);
-				}
-				else if (newState == Exiting)
-				{
-					change(state, Exiting);
-				}
+				change(state, newState);
 			}
 		}
 	}
@@ -168,14 +157,12 @@ static void update(MainState &state)
 		std::vector<char> data;
 		unsigned int id;
 		NetworkManager::Receive(mtype, data, id);
-		if (mtype == NetworkManager::None)
-		{}
-		else if (mtype == NetworkManager::RequestServer)
+		if (mtype == NetworkManager::RequestServer)
 		{
 			// TODO: add identity to lobby
 			std::vector<char> d(0);
+			// TODO: add player information
 			NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
-			change(state, Gameplay);
 		}
 		else if (mtype == NetworkManager::PingServer)
 		{
@@ -185,9 +172,16 @@ static void update(MainState &state)
 		{
 			// TODO: remove identity from lobby
 		}
+
 		if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
 		{
-			change(state, Gameplay);
+			for (unsigned int client = 0,
+					size = NetworkManager::CurrentConnections.size();
+					client < size; client++)
+			{
+				std::vector<char> d(0);
+				NetworkManager::Send(NetworkManager::StartGame, d, client);
+			}
 		}
 		else
 		{
@@ -217,10 +211,8 @@ static void update(MainState &state)
 					sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 					std::string address = addr;
 					NetworkManager::ResetConnections();
-					unsigned int server = NetworkManager::GetConnection(addr, port);
-					// TODO: set connection to waiting
-					std::vector<char> data(0);
-					NetworkManager::Send(NetworkManager::RequestServer, data, server);
+					NetworkManager::GetConnection(addr, port);
+					change(state, ClientWaiting);
 				}
 			}
 			else if (InputHandler::LastInput == Player::Up)
@@ -232,48 +224,68 @@ static void update(MainState &state)
 				addrIncrement(index, -1);
 			}
 		}
-		// TODO: check connection status
-		bool connection_waiting = false;
-		// parse server messages
+	}
+	else if (state == ClientWaiting)
+	{
 		NetworkManager::MessageType mtype;
 		std::vector<char> data;
 		unsigned int sender;
 		NetworkManager::Receive(mtype, data, sender);
 		if (sender == 0)
 		{
-			if (mtype == NetworkManager::None)
-			{
-				// ignore the packet
-			}
-			else if (mtype == NetworkManager::ConfirmClient)
+			if (mtype == NetworkManager::ConfirmClient)
 			{
 				// TODO: display confirmation
-				change(state, Gameplay);
+				change(state, ClientConnected);
 			}
-			else if (mtype == NetworkManager::PingClient)
+		}
+		else
+		{
+			// There can be only one
+			NetworkManager::CurrentConnections.resize(1);
+		}
+		bool timeout = false;
+		if (timeout)
+		{
+			// TODO cancel connection
+		}
+		else
+		{
+			std::vector<char> data(0);
+			NetworkManager::Send(NetworkManager::RequestServer, data, 0);
+		}
+	}
+	else if (state == ClientConnected)
+	{
+		NetworkManager::MessageType mtype;
+		std::vector<char> data;
+		unsigned int sender;
+		NetworkManager::Receive(mtype, data, sender);
+		if (sender == 0)
+		{
+			if (mtype == NetworkManager::PingClient)
 			{
 				// TODO: reset timeout
 			}
 			else if (mtype == NetworkManager::DisconnectClient)
 			{
-				// TODO: exit lobby
+				change(state, Join);
+				return;
+			}
+			else if (mtype == NetworkManager::StartGame)
+			{
+				change(state, Gameplay);
+				return;
 			}
 		}
-		if (connection_waiting)
+		else
 		{
-			bool timeout = false;
-			if (timeout)
-			{
-				// TODO cancel connection
-			}
-			else
-			{
-				// send connection request
-				std::vector<char> data(0);
-				NetworkManager::Send(NetworkManager::RequestServer, data, 0);
-			}
+			// There can be only one
+			NetworkManager::CurrentConnections.resize(1);
 		}
-		// TODO: ping server
+		// ping server
+		std::vector<char> d(0);
+		NetworkManager::Send(NetworkManager::PingServer, d, 0);
 	}
 	else if (state == Gameplay)
 	{
