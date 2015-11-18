@@ -337,6 +337,14 @@ static void render(const MainState &state)
 			Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
 		}
 	}
+	else if (state == ClientWaiting)
+	{
+		// TODO
+	}
+	else if (state == ClientConnected)
+	{
+		// TODO
+	}
 	else if (state == Gameplay)
 	{
 		Renderer::DrawSprite(
@@ -372,6 +380,14 @@ static void change(MainState &state, MainState nextState)
 		ip[2] = 0;
 		ip[3] = 1;
 		port = 1;
+	}
+	else if (state == ClientWaiting)
+	{
+		// TODO
+	}
+	else if (state == ClientConnected)
+	{
+		// TODO
 	}
 	else if (nextState == Gameplay)
 	{
