@@ -13,7 +13,7 @@ void NetworkManager::Init()
 void NetworkManager::Receive(MessageType &mtype, std::vector<char> &data,
 		unsigned int &sender)
 {
-	char *d;
+	char d[100];
 	std::size_t received;
 	sf::IpAddress senderIp;
 	unsigned short port;
@@ -24,16 +24,19 @@ void NetworkManager::Receive(MessageType &mtype, std::vector<char> &data,
 		// TODO: confirm identity of sender & reset timeout
 		if (received > 1)
 		{
-			mtype = (NetworkManager::MessageType)d[1];
+			mtype = (MessageType)d[1];
 			data = std::vector<char>(received - 2);
 			for (std::size_t i = 2; i < received; i++)
 			{
 				data.push_back(d[i]);
 			}
 		}
+		else
+		{
+			mtype = None;
+		}
 	}
 	sender = GetConnection(senderIp.toString(), port);
-	// TODO: return invalid result
 }
 
 void NetworkManager::Send(MessageType mtype, const std::vector<char> &data,
