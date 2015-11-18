@@ -125,184 +125,164 @@ int main()
 
 static void update(MainState &state)
 {
-	switch (state)
+	if (state == MainMenu)
 	{
-		case MainMenu:
+		if (InputHandler::InputTime == 0)
+		{
+			if (InputHandler::LastInput == Player::Up)
 			{
-				if (InputHandler::InputTime == 0)
+				if (index > 0)
 				{
-					switch (InputHandler::LastInput)
-					{
-						case Player::Up:
-							{
-								if (index > 0)
-								{
-									index--;
-								}
-							}
-							break;
-						case Player::Down:
-							{
-								if (index < menu.size() - 1)
-								{
-									index++;
-								}
-							}
-							break;
-						case Player::Right:
-							{
-								MainState newState = menu[index].Function;
-								if (newState == Host)
-								{
-									change(state, Host);
-								}
-								else if (newState == Join)
-								{
-									change(state, Join);
-								}
-								else if (newState == Exiting)
-								{
-									change(state, Exiting);
-								}
-							}
-							break;
-					}
+					index--;
 				}
 			}
-			break;
-		case Host:
+			else if (InputHandler::LastInput == Player::Down)
 			{
-				// handle incoming network traffic
-				NetworkManager::MessageType mtype;
-				std::vector<char> data;
-				unsigned int id;
-				NetworkManager::Receive(mtype, data, id);
-				switch (mtype)
+				if (index < menu.size() - 1)
 				{
-					case NetworkManager::None:
-						break;
-					case NetworkManager::RequestServer:
-						{
-							// TODO: add identity to lobby
-							std::vector<char> d(0);
-							NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
-							change(state, Gameplay);
-						}
-						break;
-					case NetworkManager::PingServer:
-						// TODO: confirm identity, reset timeout
-						break;
-					case NetworkManager::DisconnectServer:
-						// TODO: remove identity from lobby
-						break;
+					index++;
 				}
-				if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
+			}
+			else if (InputHandler::LastInput == Player::Right)
+			{
+				MainState newState = menu[index].Function;
+				if (newState == Host)
 				{
-					change(state, Gameplay);
+					change(state, Host);
+				}
+				else if (newState == Join)
+				{
+					change(state, Join);
+				}
+				else if (newState == Exiting)
+				{
+					change(state, Exiting);
+				}
+			}
+		}
+	}
+	else if (state == Host)
+	{
+		// handle incoming network traffic
+		NetworkManager::MessageType mtype;
+		std::vector<char> data;
+		unsigned int id;
+		NetworkManager::Receive(mtype, data, id);
+		if (mtype == NetworkManager::None)
+		{}
+		else if (mtype == NetworkManager::RequestServer)
+		{
+			// TODO: add identity to lobby
+			std::vector<char> d(0);
+			NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
+			change(state, Gameplay);
+		}
+		else if (mtype == NetworkManager::PingServer)
+		{
+			// TODO: confirm identity, reset timeout
+		}
+		else if (mtype == NetworkManager::DisconnectServer)
+		{
+			// TODO: remove identity from lobby
+		}
+		if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
+		{
+			change(state, Gameplay);
+		}
+		else
+		{
+			// TODO: ping all clients
+		}
+	}
+	else if (state == Join)
+	{
+		if (InputHandler::InputTime == 0)
+		{
+			if (InputHandler::LastInput == Player::Left)
+			{
+				if (index > 0)
+				{
+					index--;
+				}
+			}
+			else if (InputHandler::LastInput == Player::Right)
+			{
+				if (index < 16)
+				{
+					index++;
 				}
 				else
 				{
-					// TODO: ping all clients
+					char addr[16];
+					sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+					std::string address = addr;
+					NetworkManager::ResetConnections();
+					unsigned int server = NetworkManager::GetConnection(addr, port);
+					// TODO: set connection to waiting
+					std::vector<char> data(0);
+					NetworkManager::Send(NetworkManager::RequestServer, data, server);
 				}
 			}
-			break;
-		case Join:
+			else if (InputHandler::LastInput == Player::Up)
 			{
-				if (InputHandler::InputTime == 0)
-				{
-					switch (InputHandler::LastInput)
-					{
-						case Player::Left:
-							{
-								if (index > 0)
-								{
-									index--;
-								}
-							}
-							break;
-						case Player::Right:
-							{
-								if (index < 16)
-								{
-									index++;
-								}
-								else
-								{
-									char addr[16];
-									sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-									std::string address = addr;
-									NetworkManager::ResetConnections();
-									unsigned int server = NetworkManager::GetConnection(addr, port);
-									// TODO: set connection to waiting
-									std::vector<char> data(0);
-									NetworkManager::Send(NetworkManager::RequestServer, data, server);
-								}
-							}
-							break;
-						case Player::Up:
-							{
-								addrIncrement(index, 1);
-							}
-							break;
-						case Player::Down:
-							{
-								addrIncrement(index, -1);
-							}
-							break;
-					}
-				}
-				// TODO: check connection status
-				bool connection_waiting = false;
-				// parse server messages
-				NetworkManager::MessageType mtype;
-				std::vector<char> data;
-				unsigned int sender;
-				NetworkManager::Receive(mtype, data, sender);
-				if (sender == 0)
-				{
-					switch (mtype)
-					{
-						case NetworkManager::None:
-							// ignore
-							break;
-						case NetworkManager::ConfirmClient:
-							// TODO: display confirmation
-							change(state, Gameplay);
-							break;
-						case NetworkManager::PingClient:
-							// TODO: reset timeout
-							break;
-						case NetworkManager::DisconnectClient:
-							// TODO: exit lobby
-							break;
-					}
-				}
-				if (connection_waiting)
-				{
-					bool timeout = false;
-					if (timeout)
-					{
-						// TODO cancel connection
-					}
-					else
-					{
-						// send connection request
-						std::vector<char> data(0);
-						NetworkManager::Send(NetworkManager::RequestServer, data, 0);
-					}
-				}
-				// TODO: ping server
+				addrIncrement(index, 1);
 			}
-			break;
-		case Gameplay:
+			else if (InputHandler::LastInput == Player::Down)
 			{
-				game->Players[0].NextDir = InputHandler::LastInput;
-				game->update();
+				addrIncrement(index, -1);
 			}
-			break;
-		case Exiting:
-			// Don't do anything
-			break;
+		}
+		// TODO: check connection status
+		bool connection_waiting = false;
+		// parse server messages
+		NetworkManager::MessageType mtype;
+		std::vector<char> data;
+		unsigned int sender;
+		NetworkManager::Receive(mtype, data, sender);
+		if (sender == 0)
+		{
+			if (mtype == NetworkManager::None)
+			{
+				// ignore the packet
+			}
+			else if (mtype == NetworkManager::ConfirmClient)
+			{
+				// TODO: display confirmation
+				change(state, Gameplay);
+			}
+			else if (mtype == NetworkManager::PingClient)
+			{
+				// TODO: reset timeout
+			}
+			else if (mtype == NetworkManager::DisconnectClient)
+			{
+				// TODO: exit lobby
+			}
+		}
+		if (connection_waiting)
+		{
+			bool timeout = false;
+			if (timeout)
+			{
+				// TODO cancel connection
+			}
+			else
+			{
+				// send connection request
+				std::vector<char> data(0);
+				NetworkManager::Send(NetworkManager::RequestServer, data, 0);
+			}
+		}
+		// TODO: ping server
+	}
+	else if (state == Gameplay)
+	{
+		game->Players[0].NextDir = InputHandler::LastInput;
+		game->update();
+	}
+	else if (state == Exiting)
+	{
+		// Don't do anything
 	}
 }
 
@@ -310,59 +290,53 @@ static void render(const MainState &state)
 {
 	Renderer::Clear();
 
-	switch (state)
+	if (state == MainMenu)
 	{
-		case MainMenu:
+		for (unsigned int i = 0; i < menu.size(); i++)
+		{
+			Renderer::DrawText(
+					TextMap[Menu_EN[menu[i].Text]], 6, 10 + 6 * i);
+			if (i == index)
 			{
-				for (unsigned int i = 0; i < menu.size(); i++)
-				{
-					Renderer::DrawText(
-							TextMap[Menu_EN[menu[i].Text]], 6, 10 + 6 * i);
-					if (i == index)
-					{
-						Renderer::DrawText(
-								TextMap[">"], 2, 10 + 6 * i);
-					}
-				}
+				Renderer::DrawText(
+						TextMap[">"], 2, 10 + 6 * i);
 			}
-			break;
-		case Host:
-			{
-				std::string address = NetworkManager::GetAddress();
-				unsigned short port = NetworkManager::GetPort();
-				char disp[22];
-				sprintf(disp, "%s:%d", address.c_str(), port);
-				for (unsigned int i = 0; disp[i] != '\0'; i++)
-				{
-					std::string s({ disp[i] });
-					Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
-				}
-			}
-			break;
-		case Join:
-			{
-				char disp[22];
-				sprintf(disp, "%03d.%03d.%03d.%03d:%05d", ip[0], ip[1], ip[2], ip[3], port);
-				for (unsigned int i = 0; i < 21; i++)
-				{
-					std::string s({ disp[i] });
-					Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
-				}
-			}
-			break;
-		case Gameplay:
-			{
-				Renderer::DrawSprite(
-						sprite,
-						game->Players[0].XPos, game->Players[0].YPos,
-						game->Players[0].CurrentDir * -90.f,
-						0, frame++);
-				Renderer::DrawText(text, 10, 2);
-			}
-			break;
-		case Exiting:
-			// Don't do anything
-			break;
+		}
+	}
+	else if (state == Host)
+	{
+		std::string address = NetworkManager::GetAddress();
+		unsigned short port = NetworkManager::GetPort();
+		char disp[22];
+		sprintf(disp, "%s:%d", address.c_str(), port);
+		for (unsigned int i = 0; disp[i] != '\0'; i++)
+		{
+			std::string s({ disp[i] });
+			Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
+		}
+	}
+	else if (state == Join)
+	{
+		char disp[22];
+		sprintf(disp, "%03d.%03d.%03d.%03d:%05d", ip[0], ip[1], ip[2], ip[3], port);
+		for (unsigned int i = 0; i < 21; i++)
+		{
+			std::string s({ disp[i] });
+			Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
+		}
+	}
+	else if (state == Gameplay)
+	{
+		Renderer::DrawSprite(
+				sprite,
+				game->Players[0].XPos, game->Players[0].YPos,
+				game->Players[0].CurrentDir * -90.f,
+				0, frame++);
+		Renderer::DrawText(text, 10, 2);
+	}
+	else if (state == Exiting)
+	{
+		// Don't do anything
 	}
 	Renderer::Display();
 }
@@ -370,37 +344,32 @@ static void render(const MainState &state)
 static void change(MainState &state, MainState nextState)
 {
 	state = nextState;
-	switch (nextState)
+	if (nextState == MainMenu)
 	{
-		case MainMenu:
-			{
-				index = 0;
-			}
-			break;
-		case Host:
-			{
-				// TODO
-			}
-			break;
-		case Join:
-			{
-				index = 0;
-				ip[0] = 127;
-				ip[1] = 0;
-				ip[2] = 0;
-				ip[3] = 1;
-				port = 1;
-			}
-			break;
-		case Gameplay:
-			{
-				std::vector<Player> p(1, Player(Player::Pacman));
-				game = new Game(f, p);
-				// TODO: delete game;
-			}
-			break;
-		case Exiting:
-			break;
+		index = 0;
+	}
+	else if (nextState == Host)
+	{
+		// TODO
+	}
+	else if (nextState == Join)
+	{
+		index = 0;
+		ip[0] = 127;
+		ip[1] = 0;
+		ip[2] = 0;
+		ip[3] = 1;
+		port = 1;
+	}
+	else if (nextState == Gameplay)
+	{
+		std::vector<Player> p(1, Player(Player::Pacman));
+		game = new Game(f, p);
+		// TODO: delete game;
+	}
+	else if (nextState == Exiting)
+	{
+		// Don't do anything
 	}
 }
 
