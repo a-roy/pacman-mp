@@ -215,9 +215,10 @@ static void update(MainState &state)
 			{
 				NetworkManager::CurrentConnections[id].Lag = 0;
 			}
-			std::vector<char> d(2);
+			std::vector<char> d(3);
 			d.push_back(id);
 			d.push_back(data[0]);
+			d.push_back(data[1]);
 			NetworkManager::Broadcast(NetworkManager::OtherInputs, d);
 		}
 
