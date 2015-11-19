@@ -23,6 +23,7 @@ static void addrIncrement(unsigned int digit, int amount);
 Menu menu;
 unsigned int index = 0;
 Game* game;
+Game* sync;
 Field f;
 std::map<std::string, int> TextMap;
 std::vector<std::string> Menu_EN;
@@ -30,6 +31,7 @@ unsigned char ip[4];
 unsigned short port;
 Sprite sprite;
 int frame;
+unsigned int lobby_count = 0;
 
 int text;
 
@@ -163,33 +165,60 @@ static void update(MainState &state)
 		NetworkManager::Receive(mtype, data, id);
 		if (mtype == NetworkManager::RequestServer)
 		{
-			// TODO: add identity to lobby
-			std::vector<char> d(0);
-			// TODO: add player information
-			NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
+			// check if client is already in lobby
+			if (id == lobby_count)
+			{
+				lobby_count++;
+				NetworkManager::CurrentConnections.resize(lobby_count);
+				std::vector<char> d(1);
+				d.push_back(id);
+				NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
+			}
+			else if (id > lobby_count)
+			{
+				// TODO ERROR
+				NetworkManager::CurrentConnections.resize(lobby_count);
+			}
 		}
 		else if (mtype == NetworkManager::PingServer)
 		{
-			// TODO: confirm identity, reset timeout
+			if (id < lobby_count)
+			{
+				NetworkManager::CurrentConnections[id].Lag = 0;
+			}
+			else
+			{
+				NetworkManager::CurrentConnections.resize(lobby_count);
+			}
 		}
 		else if (mtype == NetworkManager::DisconnectServer)
 		{
-			// TODO: remove identity from lobby
+			NetworkManager::CurrentConnections.erase(
+					NetworkManager::CurrentConnections.begin() + id);
+			lobby_count--;
+		}
+
+		// check timeouts
+		for (unsigned int i = 0; i < lobby_count; i++)
+		{
+			if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
+			{
+				NetworkManager::CurrentConnections.erase(
+						NetworkManager::CurrentConnections.begin() + i);
+				lobby_count--;
+				i--;
+			}
 		}
 
 		if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
 		{
-			for (unsigned int client = 0,
-					size = NetworkManager::CurrentConnections.size();
-					client < size; client++)
-			{
-				std::vector<char> d(0);
-				NetworkManager::Send(NetworkManager::StartGame, d, client);
-			}
+			std::vector<char> d(0);
+			NetworkManager::Broadcast(NetworkManager::StartGame, d);
 		}
 		else
 		{
-			// TODO: ping all clients
+			std::vector<char> d(0);
+			NetworkManager::Broadcast(NetworkManager::PingClient, d);
 		}
 	}
 	else if (state == Join)
@@ -242,15 +271,11 @@ static void update(MainState &state)
 				change(state, ClientConnected);
 			}
 		}
-		else
+
+		if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
 		{
-			// There can be only one
-			NetworkManager::CurrentConnections.resize(1);
-		}
-		bool timeout = false;
-		if (timeout)
-		{
-			// TODO cancel connection
+			change(state, Join);
+			return;
 		}
 		else
 		{
@@ -268,7 +293,7 @@ static void update(MainState &state)
 		{
 			if (mtype == NetworkManager::PingClient)
 			{
-				// TODO: reset timeout
+				NetworkManager::CurrentConnections[0].Lag = 0;
 			}
 			else if (mtype == NetworkManager::DisconnectClient)
 			{
@@ -281,11 +306,13 @@ static void update(MainState &state)
 				return;
 			}
 		}
-		else
+
+		if (NetworkManager::CurrentConnection[0].Lag > NetworkTimeout)
 		{
-			// There can be only one
-			NetworkManager::CurrentConnections.resize(1);
+			change(state, Join);
+			return;
 		}
+
 		// ping server
 		std::vector<char> d(0);
 		NetworkManager::Send(NetworkManager::PingServer, d, 0);
