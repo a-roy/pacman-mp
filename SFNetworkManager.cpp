@@ -96,6 +96,14 @@ NetworkManager::GetConnection(std::string address, unsigned short port)
 	return CurrentConnections.size() - 1;
 }
 
+void NetworkManager::LagIncrement()
+{
+	for (unsigned int i = 0, end = CurrentConnections.size(); i < end; i++)
+	{
+		CurrentConnections[i].Lag++;
+	}
+}
+
 void NetworkManager::ResetConnections()
 {
 	CurrentConnections.clear();

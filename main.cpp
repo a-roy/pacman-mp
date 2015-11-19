@@ -127,6 +127,8 @@ int main()
 
 static void update(MainState &state)
 {
+	NetworkManager::LagIncrement();
+
 	if (state == MainMenu)
 	{
 		if (InputHandler::InputTime == 0)
