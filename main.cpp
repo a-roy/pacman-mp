@@ -201,6 +201,17 @@ static void update(MainState &state)
 					NetworkManager::CurrentConnections.begin() + id);
 			lobby_count--;
 		}
+		else if (mtype == NetworkManager::OwnInputs)
+		{
+			if (id < lobby_count)
+			{
+				NetworkManager::CurrentConnections[id].Lag = 0;
+			}
+			std::vector<char> d(2);
+			d.push_back(id);
+			d.push_back(data[0]);
+			NetworkManager::Broadcast(NetworkManager::OtherInputs, d);
+		}
 
 		// check timeouts
 		for (unsigned int i = 0; i < lobby_count; i++)
@@ -343,6 +354,15 @@ static void update(MainState &state)
 	{
 		game->Players[0].NextDir = InputHandler::LastInput;
 		game->update();
+
+		// TODO Receive inputs
+		// TODO Apply inputs to saved state
+		// TODO Save updated state
+		// TODO Reapply own inputs
+
+		std::vector<char> d(1);
+		d.push_back((char)InputHandler::LastInput);
+		NetworkManager::Send(NetworkManager::OwnInputs, d, 0);
 	}
 	else if (state == Exiting)
 	{
