@@ -175,6 +175,7 @@ static void update(MainState &state)
 		std::vector<char> data;
 		unsigned int id;
 		NetworkManager::Receive(mtype, data, id);
+		unsigned int renumber = lobby_count;
 		if (mtype == NetworkManager::RequestServer)
 		{
 			// check if client is already in lobby
@@ -203,6 +204,10 @@ static void update(MainState &state)
 			NetworkManager::CurrentConnections.erase(
 					NetworkManager::CurrentConnections.begin() + id);
 			lobby_count--;
+			if (id < renumber)
+			{
+				renumber = id;
+			}
 		}
 		else if (mtype == NetworkManager::OwnInputs)
 		{
@@ -224,15 +229,27 @@ static void update(MainState &state)
 				NetworkManager::CurrentConnections.erase(
 						NetworkManager::CurrentConnections.begin() + i);
 				lobby_count--;
+				if (i < renumber)
+				{
+					renumber = i;
+				}
 				i--;
 			}
+		}
+
+		for (unsigned int i = renumber; i < lobby_count; i++)
+		{
+			std::vector<char> d(1);
+			d.push_back(i);
+			NetworkManager::Send(NetworkManager::ConfirmClient, d, i);
 		}
 
 		if (InputHandler::InputTime == 0)
 		{
 			if (InputHandler::LastInput == Player::Right)
 			{
-				std::vector<char> d(0);
+				std::vector<char> d(1);
+				d.push_back((char)lobby_count);
 				NetworkManager::Broadcast(NetworkManager::StartGame, d);
 			}
 			else if (InputHandler::LastInput == Player::Left)
@@ -332,6 +349,11 @@ static void update(MainState &state)
 			{
 				NetworkManager::CurrentConnections[0].Lag = 0;
 			}
+			else if (mtype == NetworkManager::ConfirmClient)
+			{
+				playerNumber = data[0];
+				change(state, ClientConnected);
+			}
 			else if (mtype == NetworkManager::DisconnectClient)
 			{
 				change(state, Join);
@@ -339,6 +361,7 @@ static void update(MainState &state)
 			}
 			else if (mtype == NetworkManager::StartGame)
 			{
+				// TODO: Interpret player count
 				change(state, Gameplay);
 				return;
 			}
