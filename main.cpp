@@ -169,16 +169,11 @@ static void update(MainState &state)
 			if (id == lobby_count)
 			{
 				lobby_count++;
-				NetworkManager::CurrentConnections.resize(lobby_count);
-				std::vector<char> d(1);
-				d.push_back(id);
-				NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
 			}
-			else if (id > lobby_count)
-			{
-				// TODO ERROR
-				NetworkManager::CurrentConnections.resize(lobby_count);
-			}
+			NetworkManager::CurrentConnections.resize(lobby_count);
+			std::vector<char> d(1);
+			d.push_back(id);
+			NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
 		}
 		else if (mtype == NetworkManager::PingServer)
 		{
@@ -241,10 +236,14 @@ static void update(MainState &state)
 				else
 				{
 					std::ostringstream ss;
-					ss << ip[0] << ip[1] << ip[2] << ip[3];
+					ss << (unsigned short)ip[0] << "."
+						<< (unsigned short)ip[1] << "."
+						<< (unsigned short)ip[2] << "."
+						<< (unsigned short)ip[3];
 					NetworkManager::ResetConnections();
 					NetworkManager::GetConnection(ss.str(), port);
 					change(state, ClientWaiting);
+					return;
 				}
 			}
 			else if (InputHandler::LastInput == Player::Up)
@@ -269,6 +268,7 @@ static void update(MainState &state)
 			{
 				// TODO: display confirmation
 				change(state, ClientConnected);
+				return;
 			}
 		}
 
@@ -307,7 +307,7 @@ static void update(MainState &state)
 			}
 		}
 
-		if (NetworkManager::CurrentConnection[0].Lag > NetworkTimeout)
+		if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
 		{
 			change(state, Join);
 			return;
@@ -407,7 +407,7 @@ static void change(MainState &state, MainState nextState)
 	}
 	else if (nextState == Host)
 	{
-		// TODO
+		lobby_count = 0;
 	}
 	else if (nextState == Join)
 	{

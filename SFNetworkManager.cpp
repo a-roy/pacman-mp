@@ -35,8 +35,12 @@ void NetworkManager::Receive(MessageType &mtype, std::vector<char> &data,
 		{
 			mtype = None;
 		}
+		sender = GetConnection(senderIp.toString(), port);
 	}
-	sender = GetConnection(senderIp.toString(), port);
+	else
+	{
+		mtype = None;
+	}
 }
 
 void NetworkManager::Send(MessageType mtype, const std::vector<char> &data,
