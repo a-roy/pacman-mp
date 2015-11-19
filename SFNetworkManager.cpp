@@ -42,8 +42,9 @@ void NetworkManager::Receive(MessageType &mtype, std::vector<char> &data,
 void NetworkManager::Send(MessageType mtype, const std::vector<char> &data,
 		unsigned int recipient)
 {
-	sf::IpAddress address = CurrentConnections[recipient].Address;
-	unsigned short port = CurrentConnections[recipient].Port;
+	Connection c = CurrentConnections[recipient];
+	sf::IpAddress &address = SFData::Addresses[c.AddressIndex];
+	unsigned short port = c.Port;
 	std::size_t size = 2 + data.size();
 	char *d = (char *)malloc(size * sizeof(char));
 	// TODO: insert correct header
@@ -90,6 +91,8 @@ NetworkManager::GetConnection(std::string address, unsigned short port)
 	}
 	Connection c;
 	c.Address = address;
+	c.AddressIndex = SFData::Addresses.size();
+	SFData::Addresses.push_back(sf::IpAddress(address));
 	c.Port = port;
 	c.Lag = 0;
 	CurrentConnections.push_back(c);
