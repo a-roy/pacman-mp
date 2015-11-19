@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 #include "MainState.h"
 #include "Game.h"
 #include "Renderer.h"
@@ -207,11 +209,10 @@ static void update(MainState &state)
 				}
 				else
 				{
-					char addr[16];
-					sprintf(addr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-					std::string address = addr;
+					std::ostringstream ss;
+					ss << ip[0] << ip[1] << ip[2] << ip[3];
 					NetworkManager::ResetConnections();
-					NetworkManager::GetConnection(addr, port);
+					NetworkManager::GetConnection(ss.str(), port);
 					change(state, ClientWaiting);
 				}
 			}
@@ -319,19 +320,26 @@ static void render(const MainState &state)
 	{
 		std::string address = NetworkManager::GetAddress();
 		unsigned short port = NetworkManager::GetPort();
-		char disp[22];
-		sprintf(disp, "%s:%d", address.c_str(), port);
-		for (unsigned int i = 0; disp[i] != '\0'; i++)
+		std::ostringstream ss;
+		ss << address << ":" << port;
+		std::string str = ss.str();
+		for (unsigned int i = 0; i < str.size(); i++)
 		{
-			std::string s({ disp[i] });
+			std::string s({ str[i] });
 			Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
 		}
 	}
 	else if (state == Join)
 	{
-		char disp[22];
-		sprintf(disp, "%03d.%03d.%03d.%03d:%05d", ip[0], ip[1], ip[2], ip[3], port);
-		for (unsigned int i = 0; i < 21; i++)
+		std::ostringstream ss;
+		ss.fill('0');
+		ss << std::setw(3) << (unsigned short)ip[0] << "."
+			<< std::setw(3) << (unsigned short)ip[1] << "."
+			<< std::setw(3) << (unsigned short)ip[2] << "."
+			<< std::setw(3) << (unsigned short)ip[3] << ":"
+			<< std::setw(5) << port;
+		std::string disp = ss.str();
+		for (unsigned int i = 0; i < disp.size(); i++)
 		{
 			std::string s({ disp[i] });
 			Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
