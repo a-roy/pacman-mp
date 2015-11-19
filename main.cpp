@@ -34,6 +34,7 @@ int frame;
 unsigned int lobby_count = 0;
 
 int text;
+int clients_text;
 
 int main()
 {
@@ -55,6 +56,7 @@ int main()
 	TextMap["7"] = Renderer::CreateText(font, "7", 24);
 	TextMap["8"] = Renderer::CreateText(font, "8", 24);
 	TextMap["9"] = Renderer::CreateText(font, "9", 24);
+	TextMap["^"] = Renderer::CreateText(font, "^", 24);
 
 	TextMap[">"] = Renderer::CreateText(font, ">", 24);
 	for (unsigned int i = 0; i < Menu_EN.size(); i++)
@@ -78,7 +80,14 @@ int main()
 
 	sprite.Index = Renderer::CreateSprite("../pacman.png");
 
+	clients_text = Renderer::CreateText(font, "Clients connected:", 24);
 	text = Renderer::CreateText(font, "TESTING", 24);
+
+	ip[0] = 127;
+	ip[1] = 0;
+	ip[2] = 0;
+	ip[3] = 1;
+	port = 0;
 
 	Animation pac_move(4);
 	pac_move.AddFrame(34, 170, 32, 32);
@@ -205,10 +214,18 @@ static void update(MainState &state)
 			}
 		}
 
-		if (InputHandler::InputTime == 0 && InputHandler::LastInput == Player::Right)
+		if (InputHandler::InputTime == 0)
 		{
-			std::vector<char> d(0);
-			NetworkManager::Broadcast(NetworkManager::StartGame, d);
+			if (InputHandler::LastInput == Player::Right)
+			{
+				std::vector<char> d(0);
+				NetworkManager::Broadcast(NetworkManager::StartGame, d);
+			}
+			else if (InputHandler::LastInput == Player::Left)
+			{
+				change(state, MainMenu);
+				return;
+			}
 		}
 		else
 		{
@@ -225,6 +242,11 @@ static void update(MainState &state)
 				if (index > 0)
 				{
 					index--;
+				}
+				else
+				{
+					change(state, MainMenu);
+					return;
 				}
 			}
 			else if (InputHandler::LastInput == Player::Right)
@@ -355,7 +377,17 @@ static void render(const MainState &state)
 		for (unsigned int i = 0; i < str.size(); i++)
 		{
 			std::string s({ str[i] });
-			Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
+			Renderer::DrawText(TextMap[s], 10 + 4 * i, 15);
+		}
+
+		Renderer::DrawText(clients_text, 14, 20);
+		ss.str("");
+		ss << lobby_count;
+		str = ss.str();
+		for (unsigned int i = 0; i < str.size(); i++)
+		{
+			std::string s({ str[i] });
+			Renderer::DrawText(TextMap[s], 80 + 4 * i, 20);
 		}
 	}
 	else if (state == Join)
@@ -371,8 +403,14 @@ static void render(const MainState &state)
 		for (unsigned int i = 0; i < disp.size(); i++)
 		{
 			std::string s({ disp[i] });
-			Renderer::DrawText(TextMap[s], 10 + 6 * i, 15);
+			Renderer::DrawText(TextMap[s], 10 + 4 * i, 15);
 		}
+		int iPos = index;
+		if (index > 2) iPos++;
+		if (index > 5) iPos++;
+		if (index > 8) iPos++;
+		if (index > 11) iPos++;
+		Renderer::DrawText(TextMap["^"], 10 + 4 * iPos, 20);
 	}
 	else if (state == ClientWaiting)
 	{
@@ -404,6 +442,7 @@ static void change(MainState &state, MainState nextState)
 	if (nextState == MainMenu)
 	{
 		index = 0;
+		NetworkManager::ResetConnections();
 	}
 	else if (nextState == Host)
 	{
@@ -412,11 +451,6 @@ static void change(MainState &state, MainState nextState)
 	else if (nextState == Join)
 	{
 		index = 0;
-		ip[0] = 127;
-		ip[1] = 0;
-		ip[2] = 0;
-		ip[3] = 1;
-		port = 1;
 	}
 	else if (state == ClientWaiting)
 	{
