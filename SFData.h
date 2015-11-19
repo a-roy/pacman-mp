@@ -25,6 +25,8 @@ class SFData
 		static std::map<std::string, sf::Font> Fonts;
 		//! SFML Text database
 		static std::vector<sf::Text> Texts;
+		//! SFML IP database
+		static std::vector<sf::IpAddress> Addresses;
 
 		//! Get a texture for the image at the given path, loading it into the
 		//! database if it has not already been loaded.

@@ -7,12 +7,15 @@
 #include <string>
 #include <vector>
 
+#define NetworkTimeout 120
+
 class NetworkManager
 {
 	public:
 		struct Connection
 		{
 			std::string Address;
+			unsigned int AddressIndex;
 			unsigned short Port;
 			unsigned int Lag;
 		};
@@ -44,6 +47,7 @@ class NetworkManager
 		static bool HasConnection(std::string address, unsigned short port);
 		static unsigned int
 			GetConnection(std::string address, unsigned short port);
+		static void LagIncrement();
 		static void ResetConnections();
 		static std::string GetAddress();
 		static unsigned short GetPort();
