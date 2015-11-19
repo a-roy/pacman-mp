@@ -30,8 +30,11 @@ std::vector<std::string> Menu_EN;
 unsigned char ip[4];
 unsigned short port;
 Sprite sprite;
-int frame;
+unsigned char frame;
 unsigned int lobby_count = 0;
+unsigned int frame;
+unsigned int playerNumber;
+std::vector<std::vector<Player::Input> > PlayerInputs;
 
 int text;
 int clients_text;
@@ -300,6 +303,7 @@ static void update(MainState &state)
 			if (mtype == NetworkManager::ConfirmClient)
 			{
 				// TODO: display confirmation
+				playerNumber = data[0];
 				change(state, ClientConnected);
 				return;
 			}
@@ -355,13 +359,30 @@ static void update(MainState &state)
 		game->Players[0].NextDir = InputHandler::LastInput;
 		game->update();
 
-		// TODO Receive inputs
-		// TODO Apply inputs to saved state
+		NetworkManager::MessageType mtype;
+		std::vector<char> data;
+		unsigned int sender;
+		NetworkManager::Receive(mtype, data, sender);
+		if (sender == 0)
+		{
+			if (mtype == NetworkManager::OtherInputs)
+			{
+				// TODO Overwrite stored inputs
+				// sync->Players[i].NextDir = <...>;
+				// TODO Apply inputs to saved state
+				// sync->update();
+			}
+		}
 		// TODO Save updated state
+		// *game = *sync;
 		// TODO Reapply own inputs
+		// game->Players[0].NextDir = <...>;
+		// game->update();
 
-		std::vector<char> d(1);
+		std::vector<char> d(2);
+		d.push_back((char)frame);
 		d.push_back((char)InputHandler::LastInput);
+		// TODO: Send more inputs
 		NetworkManager::Send(NetworkManager::OwnInputs, d, 0);
 	}
 	else if (state == Exiting)
@@ -484,6 +505,7 @@ static void change(MainState &state, MainState nextState)
 	{
 		std::vector<Player> p(1, Player(Player::Pacman));
 		game = new Game(f, p);
+		sync = new Game(f, p);
 		// TODO: delete game;
 	}
 	else if (nextState == Exiting)
