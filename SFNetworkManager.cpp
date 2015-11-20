@@ -28,7 +28,7 @@ void NetworkManager::Receive(MessageType &mtype, std::vector<char> &data,
 			data = std::vector<char>(received - 2);
 			for (std::size_t i = 2; i < received; i++)
 			{
-				data.push_back(d[i]);
+				data[i - 2] = d[i];
 			}
 		}
 		else
@@ -94,9 +94,10 @@ NetworkManager::GetConnection(std::string address, unsigned short port)
 		}
 	}
 	Connection c;
-	c.Address = address;
 	c.AddressIndex = SFData::Addresses.size();
-	SFData::Addresses.push_back(sf::IpAddress(address));
+	sf::IpAddress ipAddress = address;
+	SFData::Addresses.push_back(ipAddress);
+	c.Address = ipAddress.toString();
 	c.Port = port;
 	c.Lag = 0;
 	CurrentConnections.push_back(c);
