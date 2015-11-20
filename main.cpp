@@ -30,8 +30,11 @@ std::vector<std::string> Menu_EN;
 unsigned char ip[4];
 unsigned short port;
 Sprite sprite;
-int frame;
+unsigned int frame;
 unsigned int lobby_count = 0;
+unsigned int playerNumber;
+std::vector<std::vector<Player::Direction> > PlayerInputs;
+std::vector<unsigned short> ReceivedFrames;
 
 int text;
 int clients_text;
@@ -165,85 +168,6 @@ static void update(MainState &state)
 			}
 		}
 	}
-	else if (state == Host)
-	{
-		// handle incoming network traffic
-		NetworkManager::MessageType mtype;
-		std::vector<char> data;
-		unsigned int id;
-		NetworkManager::Receive(mtype, data, id);
-		if (mtype == NetworkManager::RequestServer)
-		{
-			// check if client is already in lobby
-			if (id == lobby_count)
-			{
-				lobby_count++;
-			}
-			NetworkManager::CurrentConnections.resize(lobby_count);
-			std::vector<char> d(1);
-			d.push_back(id);
-			NetworkManager::Send(NetworkManager::ConfirmClient, d, id);
-		}
-		else if (mtype == NetworkManager::PingServer)
-		{
-			if (id < lobby_count)
-			{
-				NetworkManager::CurrentConnections[id].Lag = 0;
-			}
-			else
-			{
-				NetworkManager::CurrentConnections.resize(lobby_count);
-			}
-		}
-		else if (mtype == NetworkManager::DisconnectServer)
-		{
-			NetworkManager::CurrentConnections.erase(
-					NetworkManager::CurrentConnections.begin() + id);
-			lobby_count--;
-		}
-		else if (mtype == NetworkManager::OwnInputs)
-		{
-			if (id < lobby_count)
-			{
-				NetworkManager::CurrentConnections[id].Lag = 0;
-			}
-			std::vector<char> d(2);
-			d.push_back(id);
-			d.push_back(data[0]);
-			NetworkManager::Broadcast(NetworkManager::OtherInputs, d);
-		}
-
-		// check timeouts
-		for (unsigned int i = 0; i < lobby_count; i++)
-		{
-			if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
-			{
-				NetworkManager::CurrentConnections.erase(
-						NetworkManager::CurrentConnections.begin() + i);
-				lobby_count--;
-				i--;
-			}
-		}
-
-		if (InputHandler::InputTime == 0)
-		{
-			if (InputHandler::LastInput == Player::Right)
-			{
-				std::vector<char> d(0);
-				NetworkManager::Broadcast(NetworkManager::StartGame, d);
-			}
-			else if (InputHandler::LastInput == Player::Left)
-			{
-				change(state, MainMenu);
-				return;
-			}
-		}
-		else
-		{
-			std::vector<char> d(0);
-			NetworkManager::Broadcast(NetworkManager::PingClient, d);
-		}
-	}
 	else if (state == Join)
 	{
 		if (InputHandler::InputTime == 0)
@@ -289,84 +213,266 @@ static void update(MainState &state)
 			}
 		}
 	}
-	else if (state == ClientWaiting)
+	else if (state == Exiting)
 	{
-		NetworkManager::MessageType mtype;
-		std::vector<char> data;
-		unsigned int sender;
-		NetworkManager::Receive(mtype, data, sender);
-		if (sender == 0)
-		{
-			if (mtype == NetworkManager::ConfirmClient)
-			{
-				// TODO: display confirmation
-				change(state, ClientConnected);
-				return;
-			}
-		}
-
-		if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
-		{
-			change(state, Join);
-			return;
-		}
-		else
-		{
-			std::vector<char> data(0);
-			NetworkManager::Send(NetworkManager::RequestServer, data, 0);
-		}
 	}
-	else if (state == ClientConnected)
+	else
 	{
 		NetworkManager::MessageType mtype;
-		std::vector<char> data;
-		unsigned int sender;
-		NetworkManager::Receive(mtype, data, sender);
-		if (sender == 0)
+		std::vector<char> data_r;
+		unsigned int id;
+		NetworkManager::Receive(mtype, data_r, id);
+		if (state == Host)
 		{
-			if (mtype == NetworkManager::PingClient)
+			unsigned int renumber = lobby_count;
+			while (mtype != NetworkManager::None)
 			{
-				NetworkManager::CurrentConnections[0].Lag = 0;
+				if (id < lobby_count)
+				{
+					NetworkManager::CurrentConnections[id].Lag = 0;
+				}
+				if (mtype == NetworkManager::RequestServer)
+				{
+					// check if client is already in lobby
+					if (id == lobby_count)
+					{
+						lobby_count++;
+					}
+					NetworkManager::CurrentConnections.resize(lobby_count);
+					std::vector<char> data_s(ConfirmClient_size, 0);
+					data_s[ConfirmClient_PlayerNumber] = id;
+					NetworkManager::Send(NetworkManager::ConfirmClient, data_s, id);
+				}
+				else if (mtype == NetworkManager::PingServer)
+				{
+					// No action needed
+				}
+				else if (mtype == NetworkManager::DisconnectServer)
+				{
+					NetworkManager::CurrentConnections.erase(
+							NetworkManager::CurrentConnections.begin() + id);
+					lobby_count--;
+					if (id < renumber)
+					{
+						renumber = id;
+					}
+				}
+				else if (mtype == NetworkManager::OwnInputs)
+				{
+					std::vector<char> data_s(OtherInputs_size, 0);
+					data_s[OtherInputs_PlayerNumber] = id;
+					for (unsigned int i = 0; i < Frame_size; i++)
+					{
+						data_s[OtherInputs_Frame + i] = data_r[OwnInputs_Frame + i];
+					}
+					for (unsigned int i = 0; i < InputData_size; i++)
+					{
+						data_s[OtherInputs_InputData + i] =
+							data_r[OwnInputs_InputData + i];
+					}
+					NetworkManager::Broadcast(NetworkManager::OtherInputs, data_s);
+				}
+				if (id >= lobby_count)
+				{
+					NetworkManager::CurrentConnections.resize(lobby_count);
+				}
+				NetworkManager::Receive(mtype, data_r, id);
 			}
-			else if (mtype == NetworkManager::DisconnectClient)
+
+			for (unsigned int i = 0; i < lobby_count; i++)
+			{
+				if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
+				{
+					NetworkManager::CurrentConnections.erase(
+							NetworkManager::CurrentConnections.begin() + i);
+					lobby_count--;
+					if (i < renumber)
+					{
+						renumber = i;
+					}
+					i--;
+				}
+			}
+
+			for (unsigned int i = renumber; i < lobby_count; i++)
+			{
+				std::vector<char> data_s(ConfirmClient_size, 0);
+				data_s[ConfirmClient_PlayerNumber] = i;
+				NetworkManager::Send(NetworkManager::ConfirmClient, data_s, i);
+			}
+
+			if (InputHandler::InputTime == 0)
+			{
+				if (InputHandler::LastInput == Player::Right)
+				{
+					std::vector<char> data_s(StartGame_size, 0);
+					data_s[StartGame_PlayerCount] = (char)lobby_count;
+					NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
+				}
+				else if (InputHandler::LastInput == Player::Left)
+				{
+					change(state, MainMenu);
+					return;
+				}
+			}
+			else
+			{
+				std::vector<char> data_s(PingClient_size, 0);
+				NetworkManager::Broadcast(NetworkManager::PingClient, data_s);
+			}
+		}
+		else if (state == ClientWaiting)
+		{
+			while (mtype != NetworkManager::None)
+			{
+				if (id == 0)
+				{
+					if (mtype == NetworkManager::ConfirmClient)
+					{
+						// TODO: display confirmation
+						playerNumber = data_r[0];
+						change(state, ClientConnected);
+						return;
+					}
+				}
+				NetworkManager::Receive(mtype, data_r, id);
+			}
+
+			if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
 			{
 				change(state, Join);
 				return;
 			}
-			else if (mtype == NetworkManager::StartGame)
+			else
 			{
-				change(state, Gameplay);
-				return;
+				std::vector<char> data_s(RequestServer_size, 0);
+				NetworkManager::Send(NetworkManager::RequestServer, data_s, 0);
 			}
 		}
-
-		if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
+		else if (state == ClientConnected)
 		{
-			change(state, Join);
-			return;
+			while (mtype != NetworkManager::None)
+			{
+				if (id == 0)
+				{
+					NetworkManager::CurrentConnections[0].Lag = 0;
+					if (mtype == NetworkManager::PingClient)
+					{
+						// No action needed
+					}
+					else if (mtype == NetworkManager::ConfirmClient)
+					{
+						playerNumber = data_r[0];
+						change(state, ClientConnected);
+					}
+					else if (mtype == NetworkManager::DisconnectClient)
+					{
+						change(state, Join);
+						return;
+					}
+					else if (mtype == NetworkManager::StartGame)
+					{
+						unsigned char count = data_r[0];
+						PlayerInputs = std::vector<std::vector<Player::Direction> >(
+								count,
+								std::vector<Player::Direction>(
+									InputData_size, Player::Right));
+						ReceivedFrames = std::vector<unsigned short>(count, 0);
+						change(state, Gameplay);
+						return;
+					}
+				}
+				NetworkManager::Receive(mtype, data_r, id);
+			}
+
+			if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
+			{
+				change(state, Join);
+				return;
+			}
+
+			// ping server
+			std::vector<char> data_s(PingServer_size, 0);
+			NetworkManager::Send(NetworkManager::PingServer, data_s, 0);
 		}
+		else if (state == Gameplay)
+		{
+			while (mtype != NetworkManager::None)
+			{
+				if (id == 0)
+				{
+					if (mtype == NetworkManager::OtherInputs)
+					{
+						unsigned int num = data_r[OtherInputs_PlayerNumber];
+						unsigned short f = 0;
+						for (unsigned int i = 0; i < Frame_size; i++)
+						{
+							f = f << 8;
+							f += (unsigned char)data_r[OtherInputs_Frame + i];
+						}
+						int difference = f - game->CurrentFrame;
+						if (num != playerNumber && difference >= 0 && difference < InputData_size)
+						{
+							for (unsigned int i = 0;
+									i < InputData_size - difference; i++)
+							{
+								Player::Direction input =
+									(Player::Direction)
+									data_r[OtherInputs_InputData + difference + i];
+								PlayerInputs[num][i] = input;
+							}
+							ReceivedFrames[num] = f;
+						}
+					}
+				}
+				NetworkManager::Receive(mtype, data_r, id);
+			}
 
-		// ping server
-		std::vector<char> d(0);
-		NetworkManager::Send(NetworkManager::PingServer, d, 0);
-	}
-	else if (state == Gameplay)
-	{
-		game->Players[0].NextDir = InputHandler::LastInput;
-		game->update();
+			if ((game->CurrentFrame - sync->CurrentFrame + 1) * 2 < InputData_size)
+			{
+				game->Players[playerNumber].NextDir = InputHandler::LastInput;
+				PlayerInputs[playerNumber].erase(PlayerInputs[playerNumber].begin());
+				PlayerInputs[playerNumber].push_back(InputHandler::LastInput);
+				game->update();
+			}
 
-		// TODO Receive inputs
-		// TODO Apply inputs to saved state
-		// TODO Save updated state
-		// TODO Reapply own inputs
+			unsigned short all_received = *std::min_element(
+					std::begin(ReceivedFrames), std::end(ReceivedFrames));
+			while (sync->CurrentFrame < all_received)
+			{
+				for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
+				{
+					sync->Players[i].NextDir = PlayerInputs[i][
+						InputData_size - 1
+							+ sync->CurrentFrame - game->CurrentFrame];
+				}
+				sync->update();
+			}
 
-		std::vector<char> d(1);
-		d.push_back((char)InputHandler::LastInput);
-		NetworkManager::Send(NetworkManager::OwnInputs, d, 0);
-	}
-	else if (state == Exiting)
-	{
-		// Don't do anything
+			int currentFrame = game->CurrentFrame;
+			*game = *sync;
+			while (game->CurrentFrame < currentFrame)
+			{
+				game->Players[playerNumber].NextDir = PlayerInputs[playerNumber][
+					InputData_size - 1 + game->CurrentFrame - currentFrame];
+				game->update();
+			}
+
+			std::vector<char> data_s(OwnInputs_size, 0);
+			int f = game->CurrentFrame;
+			ReceivedFrames[playerNumber] = f;
+			for (int i = OwnInputs_Frame + Frame_size - 1;
+					i >= OwnInputs_Frame; i--)
+			{
+				data_s[i] = (char)(f & 0xFF);
+				f = f >> 8;
+			}
+			for (unsigned int i = 0; i < InputData_size; i++)
+			{
+				data_s[OwnInputs_InputData + i] = PlayerInputs[playerNumber][i];
+			}
+			NetworkManager::Send(NetworkManager::OwnInputs, data_s, 0);
+		}
 	}
 }
 
@@ -442,12 +548,14 @@ static void render(const MainState &state)
 	}
 	else if (state == Gameplay)
 	{
-		Renderer::DrawSprite(
-				sprite,
-				game->Players[0].XPos, game->Players[0].YPos,
-				game->Players[0].CurrentDir * -90.f,
-				0, frame++);
-		Renderer::DrawText(text, 10, 2);
+		for (unsigned int i = 0; i < game->Players.size(); i++)
+		{
+			Renderer::DrawSprite(
+					sprite,
+					game->Players[i].XPos, game->Players[i].YPos,
+					game->Players[i].CurrentDir * -90.f,
+					0, frame++);
+		}
 	}
 	else if (state == Exiting)
 	{
@@ -482,8 +590,9 @@ static void change(MainState &state, MainState nextState)
 	}
 	else if (nextState == Gameplay)
 	{
-		std::vector<Player> p(1, Player(Player::Pacman));
+		std::vector<Player> p(ReceivedFrames.size(), Player(Player::Pacman));
 		game = new Game(f, p);
+		sync = new Game(f, p);
 		// TODO: delete game;
 	}
 	else if (nextState == Exiting)
