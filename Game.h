@@ -1,6 +1,8 @@
 //! \file
 //! Game class declaration
 
+#pragma once
+
 #include <vector>
 #include "Player.h"
 #include "Field.h"
