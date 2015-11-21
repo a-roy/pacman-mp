@@ -21,6 +21,7 @@ void Game::update()
 			move(&p, p.CurrentDir);
 		}
 	}
+	CurrentFrame++;
 }
 
 bool Game::move(Player *p, Player::Direction d)
