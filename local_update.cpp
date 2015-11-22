@@ -3,6 +3,7 @@
 #include "InputHandler.h"
 #include "NetworkManager.h"
 #include "MenuItem.h"
+#include <algorithm>
 #include <iomanip>
 #include <sstream>
 #include <vector>
