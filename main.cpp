@@ -243,8 +243,7 @@ static void render(const MainState &state)
 			game->Players[i]->Draw();
 		}
 	}
-	else if (state == Exiting)
-	{ }
+	else if (state == Exiting) { }
 	Renderer::Display();
 }
 
@@ -259,12 +258,9 @@ static void change(MainState &state, MainState nextState)
 	{
 		Data::HostData.PlayerCount = 0;
 	}
-	else if (nextState == Join)
-	{ }
-	else if (nextState == ClientWaiting)
-	{ }
-	else if (nextState == ClientConnected)
-	{ }
+	else if (nextState == Join) { }
+	else if (nextState == ClientWaiting) { }
+	else if (nextState == ClientConnected) { }
 	else if (nextState == Gameplay)
 	{
 		Field f;
@@ -284,18 +280,29 @@ static void change(MainState &state, MainState nextState)
 		}
 
 		unsigned int count = Data::GameplayData.PlayerCount;
-		Data::GameplayData.PlayerNumber = Data::ClientConnectedData.PlayerNumber;
+		Data::GameplayData.PlayerNumber =
+			Data::ClientConnectedData.PlayerNumber;
 		Data::GameplayData.PlayerInputs =
 			std::vector<std::vector<Player::Direction> >(
 				count,
 				std::vector<Player::Direction>(
 					InputData_size, Player::Right));
 		Data::GameplayData.ReceivedFrames = std::vector<unsigned short>(count);
-		std::vector<Player *> p(count, new Pacman());
+		std::vector<Player *> p;
+		for (unsigned int i = 0; i < count; i++)
+		{
+			if (Data::GameplayData.Characters[i] == Pacman_c)
+			{
+				p.push_back(new Pacman());
+			}
+			else if (Data::GameplayData.Characters[i] == Ghost_c)
+			{
+				p.push_back(new Ghost());
+			}
+		}
 		Data::GameplayData.Local = new Game(f, p);
 		Data::GameplayData.Synced = new Game(f, p);
 		// TODO: delete these
 	}
-	else if (nextState == Exiting)
-	{ }
+	else if (nextState == Exiting) { }
 }
