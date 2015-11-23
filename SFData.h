@@ -23,8 +23,6 @@ class SFData
 		static std::vector<sf::Sprite> Sprites;
 		//! SFML Font database, where keys are file paths
 		static std::map<std::string, sf::Font> Fonts;
-		//! SFML Text database
-		static std::vector<sf::Text> Texts;
 		//! SFML IP database
 		static std::vector<sf::IpAddress> Addresses;
 
