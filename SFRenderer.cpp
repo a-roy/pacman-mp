@@ -27,19 +27,6 @@ int Renderer::CreateSprite(std::string texpath)
 	return index;
 }
 
-int Renderer::CreateText(std::string fontpath, std::string string, int size)
-{
-	sf::Text text;
-	text.setFont(SFData::GetFont(fontpath));
-	text.setString(string);
-	text.setCharacterSize(size);
-	text.setColor(sf::Color::White);
-
-	int index = SFData::Texts.size();
-	SFData::Texts.push_back(text);
-	return index;
-}
-
 void Renderer::Clear()
 {
 	SFData::Window->clear();
@@ -61,11 +48,51 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta, int anim, 
 	SFData::Window->draw(sprite);
 }
 
-void Renderer::DrawText(int t, int x, int y)
+void Renderer::DrawText(std::string fontpath, std::string text, int x, int y)
 {
-	sf::Text &text = SFData::Texts[t];
-	text.setPosition(x * Scale, y * Scale);
-	SFData::Window->draw(text);
+	const sf::Font &font = SFData::GetFont(fontpath);
+	const sf::Texture &texture = font.getTexture(24);
+	float xi = (float)x;
+	std::wstring wtext;
+	wtext.assign(text.begin(), text.end());
+	for (unsigned int i = 0, size = wtext.size(); i < size; i++)
+	{
+		const sf::Glyph &glyph = font.getGlyph(wtext[i], 24, false);
+		sf::Vertex vertices[] =
+		{
+			sf::Vertex(
+					sf::Vector2f(
+						xi + glyph.bounds.left,
+						y + glyph.bounds.top),
+					sf::Vector2f(
+						glyph.textureRect.left,
+						glyph.textureRect.top)),
+			sf::Vertex(
+					sf::Vector2f(
+						xi + glyph.bounds.left + glyph.bounds.width,
+						y + glyph.bounds.top),
+					sf::Vector2f(
+							glyph.textureRect.left + glyph.textureRect.width,
+							glyph.textureRect.top)),
+			sf::Vertex(
+					sf::Vector2f(
+						xi + glyph.bounds.left,
+						y + glyph.bounds.top + glyph.bounds.height),
+					sf::Vector2f(
+							glyph.textureRect.left,
+							glyph.textureRect.top + glyph.textureRect.height)),
+			sf::Vertex(
+					sf::Vector2f(
+						xi + glyph.bounds.left + glyph.bounds.width,
+						y + glyph.bounds.top + glyph.bounds.height),
+					sf::Vector2f(
+							glyph.textureRect.left + glyph.textureRect.width,
+							glyph.textureRect.top + glyph.textureRect.height)),
+		};
+		SFData::Window->draw(
+				vertices, 4, sf::TrianglesStrip, sf::RenderStates(&texture));
+		xi += glyph.advance;
+	}
 }
 
 void Renderer::Deinit()

@@ -27,15 +27,6 @@ class Renderer
 		//! \returns       The index of the sprite in the database (e.g.
 		//! SFData::Sprites)
 		static int CreateSprite(std::string texpath);
-		//! Create a line of text
-		//!
-		//! \param fontpath The path to the corresponding font file
-		//! \param string   The string of text to display
-		//! \param size     The font size in pixels
-		//! \returns        The index of the font in the database (e.g.
-		//! SFData::Fonts)
-		static int CreateText(
-				std::string fontpath, std::string string, int size);
 		//! Draw a sprite to the window
 		//!
 		//! \param s     The sprite to draw
@@ -49,10 +40,11 @@ class Renderer
 				int anim, int frame);
 		//! Draw a line of text to the window
 		//!
-		//! \param t The database index of the text to display
+		//! \param fontpath The path to the corresponding font file
+		//! \param text     The string of text to display
 		//! \param x The X-coordinate at which to draw the text
 		//! \param y The Y-coordinate at which to draw the text
-		static void DrawText(int t, int x, int y);
+		static void DrawText(std::string fontpath, std::string text, int x, int y);
 		//! Deinitialize the graphics window
 		static void Deinit();
 };

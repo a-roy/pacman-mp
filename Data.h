@@ -49,7 +49,6 @@ class Data
 		};
 
 		static std::string Font;
-		static std::map<std::string, int> TextMap;
 		static int ClientsText;
 		static MainMenuData_t MainMenuData;
 		static HostData_t HostData;

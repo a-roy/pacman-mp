@@ -26,26 +26,6 @@ int main()
 
 	Data::Font = "../prstartk.ttf";
 
-	Data::TextMap["."] = Renderer::CreateText(Data::Font, ".", 24);
-	Data::TextMap[":"] = Renderer::CreateText(Data::Font, ":", 24);
-	Data::TextMap["0"] = Renderer::CreateText(Data::Font, "0", 24);
-	Data::TextMap["1"] = Renderer::CreateText(Data::Font, "1", 24);
-	Data::TextMap["2"] = Renderer::CreateText(Data::Font, "2", 24);
-	Data::TextMap["3"] = Renderer::CreateText(Data::Font, "3", 24);
-	Data::TextMap["4"] = Renderer::CreateText(Data::Font, "4", 24);
-	Data::TextMap["5"] = Renderer::CreateText(Data::Font, "5", 24);
-	Data::TextMap["6"] = Renderer::CreateText(Data::Font, "6", 24);
-	Data::TextMap["7"] = Renderer::CreateText(Data::Font, "7", 24);
-	Data::TextMap["8"] = Renderer::CreateText(Data::Font, "8", 24);
-	Data::TextMap["9"] = Renderer::CreateText(Data::Font, "9", 24);
-	Data::TextMap["^"] = Renderer::CreateText(Data::Font, "^", 24);
-
-	Data::TextMap[">"] = Renderer::CreateText(Data::Font, ">", 24);
-	for (unsigned int i = 0; i < Data::MainMenuData.Menu_EN.size(); i++)
-	{
-		std::string string = Data::MainMenuData.Menu_EN[i];
-		Data::TextMap[string] = Renderer::CreateText(Data::Font, string, 24);
-	}
 	MenuItem item1, item2, item3;
 	item1.Text = 0;
 	item1.Function = Host;
@@ -64,9 +44,6 @@ int main()
 		Renderer::CreateSprite("../pacman.png");
 	Data::GameplayData.GhostSprite.Index =
 		Renderer::CreateSprite("../pacman.png");
-
-	Data::ClientsText =
-		Renderer::CreateText(Data::Font, "Clients connected:", 24);
 
 	Data::JoinData.IP[0] = 127;
 	Data::JoinData.IP[1] = 0;
@@ -155,7 +132,6 @@ static void update(MainState &state)
 static void render(const MainState &state)
 {
 	Renderer::Clear();
-	std::map<std::string, int> &TextMap = Data::TextMap;
 
 	if (state == MainMenu)
 	{
@@ -165,11 +141,10 @@ static void render(const MainState &state)
 
 		for (unsigned int i = 0; i < menu.size(); i++)
 		{
-			Renderer::DrawText(
-					TextMap[Menu_EN[menu[i].Text]], 10, 10 + 12 * i);
+			Renderer::DrawText(Data::Font, Menu_EN[menu[i].Text], 60, 100 + 40 * i);
 			if (i == index)
 			{
-				Renderer::DrawText(TextMap[">"], 2, 10 + 12 * i);
+				Renderer::DrawText(Data::Font, ">", 20, 100 + 40 * i);
 			}
 		}
 	}
@@ -183,21 +158,12 @@ static void render(const MainState &state)
 		std::ostringstream ss;
 		ss << address << ":" << port;
 		std::string str = ss.str();
-		for (unsigned int i = 0; i < str.size(); i++)
-		{
-			std::string s({ str[i] });
-			Renderer::DrawText(TextMap[s], 10 + 8 * i, 15);
-		}
+		Renderer::DrawText(Data::Font, str, 60, 100);
 
-		Renderer::DrawText(clients_text, 14, 25);
 		ss.str("");
-		ss << lobby_count;
+		ss << "Clients connected: " << lobby_count;
 		str = ss.str();
-		for (unsigned int i = 0; i < str.size(); i++)
-		{
-			std::string s({ str[i] });
-			Renderer::DrawText(TextMap[s], 140 + 8 * i, 25);
-		}
+		Renderer::DrawText(Data::Font, str, 60, 140);
 	}
 	else if (state == Join)
 	{
@@ -213,17 +179,13 @@ static void render(const MainState &state)
 			<< std::setw(3) << (unsigned short)ip[3] << ":"
 			<< std::setw(5) << port;
 		std::string disp = ss.str();
-		for (unsigned int i = 0; i < disp.size(); i++)
-		{
-			std::string s({ disp[i] });
-			Renderer::DrawText(TextMap[s], 10 + 8 * i, 15);
-		}
+		Renderer::DrawText(Data::Font, disp, 60, 100);
 		int iPos = index;
 		if (index > 2) iPos++;
 		if (index > 5) iPos++;
 		if (index > 8) iPos++;
 		if (index > 11) iPos++;
-		Renderer::DrawText(TextMap["^"], 10 + 8 * iPos, 25);
+		Renderer::DrawText(Data::Font, "^", 60 + 24 * iPos, 136);
 	}
 	else if (state == ClientWaiting)
 	{
