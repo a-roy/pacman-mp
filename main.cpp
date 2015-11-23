@@ -7,113 +7,109 @@
 #include <sstream>
 #include <iomanip>
 #include "MainState.h"
-#include "Game.h"
 #include "Renderer.h"
 #include "InputHandler.h"
 #include "NetworkManager.h"
-#include "Sprite.h"
-#include "Animation.h"
-#include "MenuItem.h"
+#include "Data.h"
+#include "local_update.h"
+#include "process_packets.h"
 
 static void update(MainState &state);
 static void render(const MainState &state);
 static void change(MainState &state, MainState nextState);
-static void addrIncrement(unsigned int digit, int amount);
-
-Menu menu;
-unsigned int index = 0;
-Game* game;
-Game* sync;
-Field f;
-std::map<std::string, int> TextMap;
-std::vector<std::string> Menu_EN;
-unsigned char ip[4];
-unsigned short port;
-Sprite sprite;
-unsigned int frame;
-unsigned int lobby_count = 0;
-unsigned int playerNumber;
-std::vector<std::vector<Player::Direction> > PlayerInputs;
-std::vector<unsigned short> ReceivedFrames;
-
-int text;
-int clients_text;
 
 int main()
 {
-	Menu_EN.push_back("Host game");
-	Menu_EN.push_back("Join game");
-	Menu_EN.push_back("Quit");
+	Data::MainMenuData.Menu_EN.push_back("Host game");
+	Data::MainMenuData.Menu_EN.push_back("Join game");
+	Data::MainMenuData.Menu_EN.push_back("Quit");
 
-	std::string font = "../prstartk.ttf";
+	Data::Font = "../prstartk.ttf";
 
-	TextMap["."] = Renderer::CreateText(font, ".", 24);
-	TextMap[":"] = Renderer::CreateText(font, ":", 24);
-	TextMap["0"] = Renderer::CreateText(font, "0", 24);
-	TextMap["1"] = Renderer::CreateText(font, "1", 24);
-	TextMap["2"] = Renderer::CreateText(font, "2", 24);
-	TextMap["3"] = Renderer::CreateText(font, "3", 24);
-	TextMap["4"] = Renderer::CreateText(font, "4", 24);
-	TextMap["5"] = Renderer::CreateText(font, "5", 24);
-	TextMap["6"] = Renderer::CreateText(font, "6", 24);
-	TextMap["7"] = Renderer::CreateText(font, "7", 24);
-	TextMap["8"] = Renderer::CreateText(font, "8", 24);
-	TextMap["9"] = Renderer::CreateText(font, "9", 24);
-	TextMap["^"] = Renderer::CreateText(font, "^", 24);
+	Data::TextMap["."] = Renderer::CreateText(Data::Font, ".", 24);
+	Data::TextMap[":"] = Renderer::CreateText(Data::Font, ":", 24);
+	Data::TextMap["0"] = Renderer::CreateText(Data::Font, "0", 24);
+	Data::TextMap["1"] = Renderer::CreateText(Data::Font, "1", 24);
+	Data::TextMap["2"] = Renderer::CreateText(Data::Font, "2", 24);
+	Data::TextMap["3"] = Renderer::CreateText(Data::Font, "3", 24);
+	Data::TextMap["4"] = Renderer::CreateText(Data::Font, "4", 24);
+	Data::TextMap["5"] = Renderer::CreateText(Data::Font, "5", 24);
+	Data::TextMap["6"] = Renderer::CreateText(Data::Font, "6", 24);
+	Data::TextMap["7"] = Renderer::CreateText(Data::Font, "7", 24);
+	Data::TextMap["8"] = Renderer::CreateText(Data::Font, "8", 24);
+	Data::TextMap["9"] = Renderer::CreateText(Data::Font, "9", 24);
+	Data::TextMap["^"] = Renderer::CreateText(Data::Font, "^", 24);
 
-	TextMap[">"] = Renderer::CreateText(font, ">", 24);
-	for (unsigned int i = 0; i < Menu_EN.size(); i++)
+	Data::TextMap[">"] = Renderer::CreateText(Data::Font, ">", 24);
+	for (unsigned int i = 0; i < Data::MainMenuData.Menu_EN.size(); i++)
 	{
-		std::string string = Menu_EN[i];
-		TextMap[string] = Renderer::CreateText(font, string, 24);
+		std::string string = Data::MainMenuData.Menu_EN[i];
+		Data::TextMap[string] = Renderer::CreateText(Data::Font, string, 24);
 	}
 	MenuItem item1, item2, item3;
 	item1.Text = 0;
 	item1.Function = Host;
-	menu.push_back(item1);
+	Data::MainMenuData.MenuItems.push_back(item1);
 	item2.Text = 1;
 	item2.Function = Join;
-	menu.push_back(item2);
+	Data::MainMenuData.MenuItems.push_back(item2);
 	item3.Text = 2;
 	item3.Function = Exiting;
-	menu.push_back(item3);
+	Data::MainMenuData.MenuItems.push_back(item3);
 
-	Renderer::Scale = 8.0f;
+	Renderer::Scale = 4.0f;
 	Renderer::CreateWindow(1280, 720, "My window");
 
-	sprite.Index = Renderer::CreateSprite("../pacman.png");
+	Data::GameplayData.PacmanSprite.Index =
+		Renderer::CreateSprite("../pacman.png");
+	Data::GameplayData.GhostSprite.Index =
+		Renderer::CreateSprite("../pacman.png");
 
-	clients_text = Renderer::CreateText(font, "Clients connected:", 24);
-	text = Renderer::CreateText(font, "TESTING", 24);
+	Data::ClientsText =
+		Renderer::CreateText(Data::Font, "Clients connected:", 24);
 
-	ip[0] = 127;
-	ip[1] = 0;
-	ip[2] = 0;
-	ip[3] = 1;
-	port = 0;
+	Data::JoinData.IP[0] = 127;
+	Data::JoinData.IP[1] = 0;
+	Data::JoinData.IP[2] = 0;
+	Data::JoinData.IP[3] = 1;
+	Data::JoinData.Port = 0;
 
 	Animation pac_move(4);
-	pac_move.AddFrame(34, 170, 32, 32);
-	pac_move.AddFrame(1, 170, 32, 32);
-	pac_move.AddFrame(34, 170, 32, 32);
-	pac_move.AddFrame(67, 170, 32, 32);
-	sprite.Animations.push_back(pac_move);
-	frame = 0;
+	//pac_move.AddFrame(34, 170, 32, 32);
+	//pac_move.AddFrame(1, 170, 32, 32);
+	//pac_move.AddFrame(34, 170, 32, 32);
+	//pac_move.AddFrame(67, 170, 32, 32);
+	pac_move.AddFrame(18, 1, 16, 16);
+	pac_move.AddFrame(35, 1, 16, 16);
+	pac_move.AddFrame(18, 1, 16, 16);
+	pac_move.AddFrame(1, 1, 16, 16);
+	Data::GameplayData.PacmanSprite.Animations.push_back(pac_move);
+	Data::GameplayData.AnimFrame = 0;
 
-	for (int i = 0; i < FIELD_WIDTH; i++)
-	{
-		for (int j = 0; j < FIELD_HEIGHT; j++)
-		{
-			if (i == 0 || i == FIELD_WIDTH - 1 || j == 0 || j == FIELD_HEIGHT - 1)
-			{
-				f.Tiles[i][j] = Field::Wall;
-			}
-			else
-			{
-				f.Tiles[i][j] = Field::Empty;
-			}
-		}
-	}
+	//Animation gho_move(4);
+	//gho_move.AddFrame(196, 105, 32, 32);
+	//gho_move.AddFrame(196, 105, 32, 32);
+	//gho_move.AddFrame(229, 105, 32, 32);
+	//gho_move.AddFrame(229, 105, 32, 32);
+	Animation gho_hori(4);
+	gho_hori.AddFrame(1, 18, 16, 16);
+	gho_hori.AddFrame(1, 18, 16, 16);
+	gho_hori.AddFrame(18, 18, 16, 16);
+	gho_hori.AddFrame(18, 18, 16, 16);
+	Data::GameplayData.GhostSprite.Animations.push_back(gho_hori);
+	Animation gho_up(4);
+	gho_up.AddFrame(35, 18, 16, 16);
+	gho_up.AddFrame(35, 18, 16, 16);
+	gho_up.AddFrame(52, 18, 16, 16);
+	gho_up.AddFrame(52, 18, 16, 16);
+	Data::GameplayData.GhostSprite.Animations.push_back(gho_up);
+	Animation gho_down(4);
+	gho_down.AddFrame(69, 18, 16, 16);
+	gho_down.AddFrame(69, 18, 16, 16);
+	gho_down.AddFrame(86, 18, 16, 16);
+	gho_down.AddFrame(86, 18, 16, 16);
+	Data::GameplayData.GhostSprite.Animations.push_back(gho_down);
+	//Data::GameplayData.GhostSprite.Animations.push_back(gho_move);
 
 	MainState state = MainMenu;
 
@@ -141,360 +137,47 @@ int main()
 
 static void update(MainState &state)
 {
-	NetworkManager::LagIncrement();
-
-	if (state == MainMenu)
+	MainState s = process_data(state);
+	if (s != state)
 	{
-		if (InputHandler::InputTime == 0)
-		{
-			if (InputHandler::LastInput == Player::Up)
-			{
-				if (index > 0)
-				{
-					index--;
-				}
-			}
-			else if (InputHandler::LastInput == Player::Down)
-			{
-				if (index < menu.size() - 1)
-				{
-					index++;
-				}
-			}
-			else if (InputHandler::LastInput == Player::Right)
-			{
-				MainState newState = menu[index].Function;
-				change(state, newState);
-			}
-		}
+		change(state, s);
+		return;
 	}
-	else if (state == Join)
+
+	s = local_update(state);
+	if (s != state)
 	{
-		if (InputHandler::InputTime == 0)
-		{
-			if (InputHandler::LastInput == Player::Left)
-			{
-				if (index > 0)
-				{
-					index--;
-				}
-				else
-				{
-					change(state, MainMenu);
-					return;
-				}
-			}
-			else if (InputHandler::LastInput == Player::Right)
-			{
-				if (index < 16)
-				{
-					index++;
-				}
-				else
-				{
-					std::ostringstream ss;
-					ss << (unsigned short)ip[0] << "."
-						<< (unsigned short)ip[1] << "."
-						<< (unsigned short)ip[2] << "."
-						<< (unsigned short)ip[3];
-					NetworkManager::ResetConnections();
-					NetworkManager::GetConnection(ss.str(), port);
-					change(state, ClientWaiting);
-					return;
-				}
-			}
-			else if (InputHandler::LastInput == Player::Up)
-			{
-				addrIncrement(index, 1);
-			}
-			else if (InputHandler::LastInput == Player::Down)
-			{
-				addrIncrement(index, -1);
-			}
-		}
-	}
-	else if (state == Exiting)
-	{
-	}
-	else
-	{
-		NetworkManager::MessageType mtype;
-		std::vector<char> data_r;
-		unsigned int id;
-		NetworkManager::Receive(mtype, data_r, id);
-		if (state == Host)
-		{
-			unsigned int renumber = lobby_count;
-			while (mtype != NetworkManager::None)
-			{
-				if (id < lobby_count)
-				{
-					NetworkManager::CurrentConnections[id].Lag = 0;
-				}
-				if (mtype == NetworkManager::RequestServer)
-				{
-					// check if client is already in lobby
-					if (id == lobby_count)
-					{
-						lobby_count++;
-					}
-					NetworkManager::CurrentConnections.resize(lobby_count);
-					std::vector<char> data_s(ConfirmClient_size, 0);
-					data_s[ConfirmClient_PlayerNumber] = id;
-					NetworkManager::Send(NetworkManager::ConfirmClient, data_s, id);
-				}
-				else if (mtype == NetworkManager::PingServer)
-				{
-					// No action needed
-				}
-				else if (mtype == NetworkManager::DisconnectServer)
-				{
-					NetworkManager::CurrentConnections.erase(
-							NetworkManager::CurrentConnections.begin() + id);
-					lobby_count--;
-					if (id < renumber)
-					{
-						renumber = id;
-					}
-				}
-				else if (mtype == NetworkManager::OwnInputs)
-				{
-					std::vector<char> data_s(OtherInputs_size, 0);
-					data_s[OtherInputs_PlayerNumber] = id;
-					for (unsigned int i = 0; i < Frame_size; i++)
-					{
-						data_s[OtherInputs_Frame + i] = data_r[OwnInputs_Frame + i];
-					}
-					for (unsigned int i = 0; i < InputData_size; i++)
-					{
-						data_s[OtherInputs_InputData + i] =
-							data_r[OwnInputs_InputData + i];
-					}
-					NetworkManager::Broadcast(NetworkManager::OtherInputs, data_s);
-				}
-				if (id >= lobby_count)
-				{
-					NetworkManager::CurrentConnections.resize(lobby_count);
-				}
-				NetworkManager::Receive(mtype, data_r, id);
-			}
-
-			for (unsigned int i = 0; i < lobby_count; i++)
-			{
-				if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
-				{
-					NetworkManager::CurrentConnections.erase(
-							NetworkManager::CurrentConnections.begin() + i);
-					lobby_count--;
-					if (i < renumber)
-					{
-						renumber = i;
-					}
-					i--;
-				}
-			}
-
-			for (unsigned int i = renumber; i < lobby_count; i++)
-			{
-				std::vector<char> data_s(ConfirmClient_size, 0);
-				data_s[ConfirmClient_PlayerNumber] = i;
-				NetworkManager::Send(NetworkManager::ConfirmClient, data_s, i);
-			}
-
-			if (InputHandler::InputTime == 0)
-			{
-				if (InputHandler::LastInput == Player::Right)
-				{
-					std::vector<char> data_s(StartGame_size, 0);
-					data_s[StartGame_PlayerCount] = (char)lobby_count;
-					NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
-				}
-				else if (InputHandler::LastInput == Player::Left)
-				{
-					change(state, MainMenu);
-					return;
-				}
-			}
-			else
-			{
-				std::vector<char> data_s(PingClient_size, 0);
-				NetworkManager::Broadcast(NetworkManager::PingClient, data_s);
-			}
-		}
-		else if (state == ClientWaiting)
-		{
-			while (mtype != NetworkManager::None)
-			{
-				if (id == 0)
-				{
-					if (mtype == NetworkManager::ConfirmClient)
-					{
-						// TODO: display confirmation
-						playerNumber = data_r[0];
-						change(state, ClientConnected);
-						return;
-					}
-				}
-				NetworkManager::Receive(mtype, data_r, id);
-			}
-
-			if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
-			{
-				change(state, Join);
-				return;
-			}
-			else
-			{
-				std::vector<char> data_s(RequestServer_size, 0);
-				NetworkManager::Send(NetworkManager::RequestServer, data_s, 0);
-			}
-		}
-		else if (state == ClientConnected)
-		{
-			while (mtype != NetworkManager::None)
-			{
-				if (id == 0)
-				{
-					NetworkManager::CurrentConnections[0].Lag = 0;
-					if (mtype == NetworkManager::PingClient)
-					{
-						// No action needed
-					}
-					else if (mtype == NetworkManager::ConfirmClient)
-					{
-						playerNumber = data_r[0];
-						change(state, ClientConnected);
-					}
-					else if (mtype == NetworkManager::DisconnectClient)
-					{
-						change(state, Join);
-						return;
-					}
-					else if (mtype == NetworkManager::StartGame)
-					{
-						unsigned char count = data_r[0];
-						PlayerInputs = std::vector<std::vector<Player::Direction> >(
-								count,
-								std::vector<Player::Direction>(
-									InputData_size, Player::Right));
-						ReceivedFrames = std::vector<unsigned short>(count, 0);
-						change(state, Gameplay);
-						return;
-					}
-				}
-				NetworkManager::Receive(mtype, data_r, id);
-			}
-
-			if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
-			{
-				change(state, Join);
-				return;
-			}
-
-			// ping server
-			std::vector<char> data_s(PingServer_size, 0);
-			NetworkManager::Send(NetworkManager::PingServer, data_s, 0);
-		}
-		else if (state == Gameplay)
-		{
-			while (mtype != NetworkManager::None)
-			{
-				if (id == 0)
-				{
-					if (mtype == NetworkManager::OtherInputs)
-					{
-						unsigned int num = data_r[OtherInputs_PlayerNumber];
-						unsigned short f = 0;
-						for (unsigned int i = 0; i < Frame_size; i++)
-						{
-							f = f << 8;
-							f += (unsigned char)data_r[OtherInputs_Frame + i];
-						}
-						int difference = f - game->CurrentFrame;
-						if (num != playerNumber && difference >= 0 && difference < InputData_size)
-						{
-							for (unsigned int i = 0;
-									i < InputData_size - difference; i++)
-							{
-								Player::Direction input =
-									(Player::Direction)
-									data_r[OtherInputs_InputData + difference + i];
-								PlayerInputs[num][i] = input;
-							}
-							ReceivedFrames[num] = f;
-						}
-					}
-				}
-				NetworkManager::Receive(mtype, data_r, id);
-			}
-
-			if ((game->CurrentFrame - sync->CurrentFrame + 1) * 2 < InputData_size)
-			{
-				game->Players[playerNumber].NextDir = InputHandler::LastInput;
-				PlayerInputs[playerNumber].erase(PlayerInputs[playerNumber].begin());
-				PlayerInputs[playerNumber].push_back(InputHandler::LastInput);
-				game->update();
-			}
-
-			unsigned short all_received = *std::min_element(
-					std::begin(ReceivedFrames), std::end(ReceivedFrames));
-			while (sync->CurrentFrame < all_received)
-			{
-				for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
-				{
-					sync->Players[i].NextDir = PlayerInputs[i][
-						InputData_size - 1
-							+ sync->CurrentFrame - game->CurrentFrame];
-				}
-				sync->update();
-			}
-
-			int currentFrame = game->CurrentFrame;
-			*game = *sync;
-			while (game->CurrentFrame < currentFrame)
-			{
-				game->Players[playerNumber].NextDir = PlayerInputs[playerNumber][
-					InputData_size - 1 + game->CurrentFrame - currentFrame];
-				game->update();
-			}
-
-			std::vector<char> data_s(OwnInputs_size, 0);
-			int f = game->CurrentFrame;
-			ReceivedFrames[playerNumber] = f;
-			for (int i = OwnInputs_Frame + Frame_size - 1;
-					i >= OwnInputs_Frame; i--)
-			{
-				data_s[i] = (char)(f & 0xFF);
-				f = f >> 8;
-			}
-			for (unsigned int i = 0; i < InputData_size; i++)
-			{
-				data_s[OwnInputs_InputData + i] = PlayerInputs[playerNumber][i];
-			}
-			NetworkManager::Send(NetworkManager::OwnInputs, data_s, 0);
-		}
+		change(state, s);
+		return;
 	}
 }
 
 static void render(const MainState &state)
 {
 	Renderer::Clear();
+	std::map<std::string, int> &TextMap = Data::TextMap;
 
 	if (state == MainMenu)
 	{
+		std::vector<std::string> &Menu_EN = Data::MainMenuData.Menu_EN;
+		Menu &menu = Data::MainMenuData.MenuItems;
+		unsigned int index = Data::MainMenuData.Index;
+
 		for (unsigned int i = 0; i < menu.size(); i++)
 		{
 			Renderer::DrawText(
-					TextMap[Menu_EN[menu[i].Text]], 6, 10 + 6 * i);
+					TextMap[Menu_EN[menu[i].Text]], 10, 10 + 12 * i);
 			if (i == index)
 			{
-				Renderer::DrawText(
-						TextMap[">"], 2, 10 + 6 * i);
+				Renderer::DrawText(TextMap[">"], 2, 10 + 12 * i);
 			}
 		}
 	}
 	else if (state == Host)
 	{
+		int lobby_count = Data::HostData.PlayerCount;
+		int clients_text = Data::ClientsText;
+
 		std::string address = NetworkManager::GetAddress();
 		unsigned short port = NetworkManager::GetPort();
 		std::ostringstream ss;
@@ -503,21 +186,25 @@ static void render(const MainState &state)
 		for (unsigned int i = 0; i < str.size(); i++)
 		{
 			std::string s({ str[i] });
-			Renderer::DrawText(TextMap[s], 10 + 4 * i, 15);
+			Renderer::DrawText(TextMap[s], 10 + 8 * i, 15);
 		}
 
-		Renderer::DrawText(clients_text, 14, 20);
+		Renderer::DrawText(clients_text, 14, 25);
 		ss.str("");
 		ss << lobby_count;
 		str = ss.str();
 		for (unsigned int i = 0; i < str.size(); i++)
 		{
 			std::string s({ str[i] });
-			Renderer::DrawText(TextMap[s], 80 + 4 * i, 20);
+			Renderer::DrawText(TextMap[s], 140 + 8 * i, 25);
 		}
 	}
 	else if (state == Join)
 	{
+		unsigned char *ip = Data::JoinData.IP;
+		unsigned short &port = Data::JoinData.Port;
+		unsigned int index = Data::JoinData.Index;
+
 		std::ostringstream ss;
 		ss.fill('0');
 		ss << std::setw(3) << (unsigned short)ip[0] << "."
@@ -529,14 +216,14 @@ static void render(const MainState &state)
 		for (unsigned int i = 0; i < disp.size(); i++)
 		{
 			std::string s({ disp[i] });
-			Renderer::DrawText(TextMap[s], 10 + 4 * i, 15);
+			Renderer::DrawText(TextMap[s], 10 + 8 * i, 15);
 		}
 		int iPos = index;
 		if (index > 2) iPos++;
 		if (index > 5) iPos++;
 		if (index > 8) iPos++;
 		if (index > 11) iPos++;
-		Renderer::DrawText(TextMap["^"], 10 + 4 * iPos, 20);
+		Renderer::DrawText(TextMap["^"], 10 + 8 * iPos, 25);
 	}
 	else if (state == ClientWaiting)
 	{
@@ -548,19 +235,16 @@ static void render(const MainState &state)
 	}
 	else if (state == Gameplay)
 	{
+		Game *game = Data::GameplayData.Local;
+		unsigned int &frame = Data::GameplayData.AnimFrame;
+
 		for (unsigned int i = 0; i < game->Players.size(); i++)
 		{
-			Renderer::DrawSprite(
-					sprite,
-					game->Players[i].XPos, game->Players[i].YPos,
-					game->Players[i].CurrentDir * -90.f,
-					0, frame++);
+			game->Players[i]->Draw();
 		}
 	}
 	else if (state == Exiting)
-	{
-		// Don't do anything
-	}
+	{ }
 	Renderer::Display();
 }
 
@@ -569,70 +253,49 @@ static void change(MainState &state, MainState nextState)
 	state = nextState;
 	if (nextState == MainMenu)
 	{
-		index = 0;
 		NetworkManager::ResetConnections();
 	}
 	else if (nextState == Host)
 	{
-		lobby_count = 0;
+		Data::HostData.PlayerCount = 0;
 	}
 	else if (nextState == Join)
-	{
-		index = 0;
-	}
-	else if (state == ClientWaiting)
-	{
-		// TODO
-	}
-	else if (state == ClientConnected)
-	{
-		// TODO
-	}
+	{ }
+	else if (nextState == ClientWaiting)
+	{ }
+	else if (nextState == ClientConnected)
+	{ }
 	else if (nextState == Gameplay)
 	{
-		std::vector<Player> p(ReceivedFrames.size(), Player(Player::Pacman));
-		game = new Game(f, p);
-		sync = new Game(f, p);
-		// TODO: delete game;
+		Field f;
+		for (int i = 0; i < FIELD_WIDTH; i++)
+		{
+			for (int j = 0; j < FIELD_HEIGHT; j++)
+			{
+				if (i == 0 || i == FIELD_WIDTH - 1 || j == 0 || j == FIELD_HEIGHT - 1)
+				{
+					f.Tiles[i][j] = Field::Wall;
+				}
+				else
+				{
+					f.Tiles[i][j] = Field::Empty;
+				}
+			}
+		}
+
+		unsigned int count = Data::GameplayData.PlayerCount;
+		Data::GameplayData.PlayerNumber = Data::ClientConnectedData.PlayerNumber;
+		Data::GameplayData.PlayerInputs =
+			std::vector<std::vector<Player::Direction> >(
+				count,
+				std::vector<Player::Direction>(
+					InputData_size, Player::Right));
+		Data::GameplayData.ReceivedFrames = std::vector<unsigned short>(count);
+		std::vector<Player *> p(count, new Pacman());
+		Data::GameplayData.Local = new Game(f, p);
+		Data::GameplayData.Synced = new Game(f, p);
+		// TODO: delete these
 	}
 	else if (nextState == Exiting)
-	{
-		// Don't do anything
-	}
-}
-
-static void addrIncrement(unsigned int digit, int amount)
-{
-	int delta = amount;
-	if (digit < 12)
-	{
-		for (unsigned int i = digit % 3; i < 2; i++)
-		{
-			delta *= 10;
-		}
-		unsigned char &selected = ip[digit / 3];
-		if (selected + delta == (int)(unsigned char)(selected + delta))
-		{
-			selected += delta;
-		}
-		else
-		{
-			selected = (amount > 0) ? 255 : 0;
-		}
-	}
-	else
-	{
-		for (unsigned int i = digit - 12; i < 4; i++)
-		{
-			delta *= 10;
-		}
-		if (port + delta == (int)(unsigned short)(port + delta))
-		{
-			port += delta;
-		}
-		else
-		{
-			port = (amount > 0) ? 65535 : 0;
-		}
-	}
+	{ }
 }

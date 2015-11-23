@@ -3,28 +3,45 @@
 
 #pragma once
 
+#include "Animation.h"
+
 class Player
 {
-public:
-	//
-	enum Character
-	{
-		Pacman,
-		Ghost
-	};
-	enum Direction
-	{
-		Right,
-		Up,
-		Left,
-		Down
-	};
+	public:
+		enum Direction
+		{
+			Right,
+			Up,
+			Left,
+			Down
+		};
+	
+		int XPos;
+		int YPos;
+		Direction CurrentDir;
+		Direction NextDir;
+		int AnimFrame;
+		std::vector<Animation *> Animations;
 
-	Character Chara;
-	int XPos;
-	int YPos;
-	Direction CurrentDir;
-	Direction NextDir;
+		virtual void Draw() = 0;
+};
 
-	Player(Character c);
+class Pacman : public Player
+{
+	public:
+		Pacman();
+		void Draw();
+};
+
+class Ghost : public Player
+{
+	public:
+		Ghost();
+		void Draw();
+};
+
+enum Character
+{
+	Pacman_c,
+	Ghost_c
 };

@@ -1,6 +1,8 @@
 //! \file
 //! Field class declaration
 
+#pragma once
+
 #define FIELD_WIDTH  21
 #define FIELD_HEIGHT 21
 #define TILE_SIZE    6

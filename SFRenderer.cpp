@@ -20,7 +20,7 @@ int Renderer::CreateSprite(std::string texpath)
 	sf::Sprite sprite;
 	sprite.setTexture(SFData::GetTexture(texpath));
 	sprite.setScale(sf::Vector2f(-2.0f, 2.0f));
-	sprite.setOrigin(sf::Vector2f(16, 16));
+	sprite.setOrigin(sf::Vector2f(8, 8));
 
 	int index = SFData::Sprites.size();
 	SFData::Sprites.push_back(sprite);

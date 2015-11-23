@@ -1,24 +1,32 @@
 #include "Game.h"
 
-Game::Game(Field f, std::vector<Player> p)
+Game::Game(Field f, std::vector<Player *> p)
 {
 	GameField = f;
 	Players = p;
 	CurrentFrame = 0;
 }
 
+Game::~Game()
+{
+	for (unsigned int i = 0, size = Players.size(); i < size; i++)
+	{
+		delete Players[i];
+	}
+}
+
 void Game::update()
 {
 	for (int i = 0; i < Players.size(); i++)
 	{
-		Player &p = Players[i];
-		if (move(&p, p.NextDir))
+		Player *p = Players[i];
+		if (move(p, p->NextDir))
 		{
-			p.CurrentDir = p.NextDir;
+			p->CurrentDir = p->NextDir;
 		}
 		else
 		{
-			move(&p, p.CurrentDir);
+			move(p, p->CurrentDir);
 		}
 	}
 	CurrentFrame++;
