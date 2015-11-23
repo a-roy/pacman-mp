@@ -25,17 +25,14 @@ class Renderer
 		//!
 		//! \param texpath The path to the corresponding texture file
 		//! \returns       The index of the sprite in the database (e.g.
-		//! SFData::Sprites)
+		//!                SFData::Sprites)
 		static int CreateSprite(std::string texpath);
-		//! Create a line of text
+		//! Load a font
 		//!
 		//! \param fontpath The path to the corresponding font file
-		//! \param string   The string of text to display
-		//! \param size     The font size in pixels
 		//! \returns        The index of the font in the database (e.g.
-		//! SFData::Fonts)
-		static int CreateText(
-				std::string fontpath, std::string string, int size);
+		//!                 SFData::Fonts)
+		static int LoadFont(std::string fontpath);
 		//! Draw a sprite to the window
 		//!
 		//! \param s     The sprite to draw
@@ -49,10 +46,13 @@ class Renderer
 				int anim, int frame);
 		//! Draw a line of text to the window
 		//!
-		//! \param t The database index of the text to display
-		//! \param x The X-coordinate at which to draw the text
-		//! \param y The Y-coordinate at which to draw the text
-		static void DrawText(int t, int x, int y);
+		//! \param fontIndex The database index of a font
+		//! \param text      The string of text to display
+		//! \param charSize  The character size to use for drawing
+		//! \param x         The X-coordinate at which to draw the text
+		//! \param y         The Y-coordinate at which to draw the text
+		static void DrawText(int fontIndex, std::string text,
+				unsigned int charSize, int x, int y);
 		//! Deinitialize the graphics window
 		static void Deinit();
 };

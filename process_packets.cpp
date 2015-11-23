@@ -79,7 +79,7 @@ MainState process_host(NetworkManager::MessageType mtype,
 	}
 	else if (mtype == NetworkManager::OwnInputs)
 	{
-		std::vector<char> data_s(OtherInputs_size, 0);
+		std::vector<char> data_s(OtherInputs_size);
 		data_s[OtherInputs_PlayerNumber] = id;
 		for (unsigned int i = 0; i < Frame_size; i++)
 		{
@@ -108,7 +108,8 @@ MainState process_client_waiting(NetworkManager::MessageType mtype,
 		if (mtype == NetworkManager::ConfirmClient)
 		{
 			// TODO: display confirmation
-			Data::ClientConnectedData.PlayerNumber = data_r[ConfirmClient_PlayerNumber];
+			Data::ClientConnectedData.PlayerNumber =
+				data_r[ConfirmClient_PlayerNumber];
 			return ClientConnected;
 		}
 	}
@@ -138,6 +139,14 @@ MainState process_client_connected(NetworkManager::MessageType mtype,
 		else if (mtype == NetworkManager::StartGame)
 		{
 			unsigned char count = data_r[StartGame_PlayerCount];
+			unsigned char field = data_r[StartGame_Field];
+			Data::GameplayData.Characters =
+				std::vector<Character>(count);
+			for (unsigned int i = 0; i < count; i++)
+			{
+				Character c = (Character)data_r[StartGame_Character + i];
+				Data::GameplayData.Characters[i] = c;
+			}
 			Data::GameplayData.PlayerCount = count;
 			return Gameplay;
 		}

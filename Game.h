@@ -11,10 +11,11 @@ class Game
 {
 public:
 	Field GameField;
-	std::vector<Player> Players;
+	std::vector<Player *> Players;
 	int CurrentFrame;
 
-	Game(Field f, std::vector<Player> p);
+	Game(Field f, std::vector<Player *> p);
+	~Game();
 	void update();
 	bool move(Player *p, Player::Direction d);
 };

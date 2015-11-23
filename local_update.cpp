@@ -139,7 +139,7 @@ MainState local_host(MainState state)
 
 	for (unsigned int i = renumber; i < lobby_count; i++)
 	{
-		std::vector<char> data_s(ConfirmClient_size, 0);
+		std::vector<char> data_s(ConfirmClient_size);
 		data_s[ConfirmClient_PlayerNumber] = i;
 		NetworkManager::Send(NetworkManager::ConfirmClient, data_s, i);
 	}
@@ -148,8 +148,15 @@ MainState local_host(MainState state)
 	{
 		if (InputHandler::LastInput == Player::Right)
 		{
-			std::vector<char> data_s(StartGame_size, 0);
+			std::vector<char> data_s(StartGame_minsize + lobby_count);
 			data_s[StartGame_PlayerCount] = (char)lobby_count;
+			// TODO add field selection
+			data_s[StartGame_Field] = 0;
+			for (unsigned int i = 0; i < lobby_count; i++)
+			{
+				// TODO get character selections
+				data_s[StartGame_Character + i] = (i == 0) ? Pacman_c : Ghost_c;
+			}
 			NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
 		}
 		else if (InputHandler::LastInput == Player::Left)
@@ -159,7 +166,7 @@ MainState local_host(MainState state)
 	}
 	else
 	{
-		std::vector<char> data_s(PingClient_size, 0);
+		std::vector<char> data_s(PingClient_size);
 		NetworkManager::Broadcast(NetworkManager::PingClient, data_s);
 	}
 
@@ -174,7 +181,7 @@ MainState local_client_waiting(MainState state)
 	}
 	else
 	{
-		std::vector<char> data_s(RequestServer_size, 0);
+		std::vector<char> data_s(RequestServer_size);
 		NetworkManager::Send(NetworkManager::RequestServer, data_s, 0);
 	}
 
@@ -189,7 +196,7 @@ MainState local_client_connected(MainState state)
 	}
 
 	// ping server
-	std::vector<char> data_s(PingServer_size, 0);
+	std::vector<char> data_s(PingServer_size);
 	NetworkManager::Send(NetworkManager::PingServer, data_s, 0);
 
 	return state;
@@ -207,7 +214,7 @@ MainState local_gameplay(MainState state)
 
 	if ((game->CurrentFrame - sync->CurrentFrame + 1) * 2 < InputData_size)
 	{
-		game->Players[playerNumber].NextDir = InputHandler::LastInput;
+		game->Players[playerNumber]->NextDir = InputHandler::LastInput;
 		PlayerInputs[playerNumber].erase(PlayerInputs[playerNumber].begin());
 		PlayerInputs[playerNumber].push_back(InputHandler::LastInput);
 		game->update();
@@ -219,7 +226,7 @@ MainState local_gameplay(MainState state)
 	{
 		for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
 		{
-			sync->Players[i].NextDir = PlayerInputs[i][
+			sync->Players[i]->NextDir = PlayerInputs[i][
 				InputData_size - 1
 					+ sync->CurrentFrame - game->CurrentFrame];
 		}
@@ -230,12 +237,12 @@ MainState local_gameplay(MainState state)
 	*game = *sync;
 	while (game->CurrentFrame < currentFrame)
 	{
-		game->Players[playerNumber].NextDir = PlayerInputs[playerNumber][
+		game->Players[playerNumber]->NextDir = PlayerInputs[playerNumber][
 			InputData_size - 1 + game->CurrentFrame - currentFrame];
 		game->update();
 	}
 
-	std::vector<char> data_s(OwnInputs_size, 0);
+	std::vector<char> data_s(OwnInputs_size);
 	int f = game->CurrentFrame;
 	ReceivedFrames[playerNumber] = f;
 	for (int i = OwnInputs_Frame + Frame_size - 1;

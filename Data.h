@@ -38,16 +38,17 @@ class Data
 		{
 			Game *Local;
 			Game *Synced;
-			Sprite PacSprite;
+			Sprite PacmanSprite;
+			Sprite GhostSprite;
 			unsigned int AnimFrame;
 			unsigned int PlayerCount;
 			unsigned int PlayerNumber;
 			std::vector<std::vector<Player::Direction> > PlayerInputs;
 			std::vector<unsigned short> ReceivedFrames;
+			std::vector<Character> Characters;
 		};
 
-		static std::string Font;
-		static std::map<std::string, int> TextMap;
+		static int Font;
 		static int ClientsText;
 		static MainMenuData_t MainMenuData;
 		static HostData_t HostData;
