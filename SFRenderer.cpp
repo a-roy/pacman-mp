@@ -27,6 +27,15 @@ int Renderer::CreateSprite(std::string texpath)
 	return index;
 }
 
+int Renderer::LoadFont(std::string fontpath)
+{
+	sf::Font font;
+	font.loadFromFile(fontpath);
+	int index = SFData::Fonts.size();
+	SFData::Fonts.push_back(font);
+	return index;
+}
+
 void Renderer::Clear()
 {
 	SFData::Window->clear();
@@ -48,10 +57,10 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta, int anim, 
 	SFData::Window->draw(sprite);
 }
 
-void Renderer::DrawText(std::string fontpath, std::string text,
+void Renderer::DrawText(int fontIndex, std::string text,
 		unsigned int charSize, int x, int y)
 {
-	const sf::Font &font = SFData::GetFont(fontpath);
+	const sf::Font &font = SFData::Fonts[fontIndex];
 	const sf::Texture &texture = font.getTexture(charSize);
 	float xi = (float)x;
 	std::wstring wtext;

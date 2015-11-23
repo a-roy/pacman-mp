@@ -48,7 +48,7 @@ class Data
 			std::vector<Character> Characters;
 		};
 
-		static std::string Font;
+		static int Font;
 		static int ClientsText;
 		static MainMenuData_t MainMenuData;
 		static HostData_t HostData;

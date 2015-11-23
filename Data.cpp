@@ -1,6 +1,6 @@
 #include "Data.h"
 
-std::string Data::Font;
+int Data::Font;
 int Data::ClientsText;
 Data::MainMenuData_t Data::MainMenuData;
 Data::HostData_t Data::HostData;

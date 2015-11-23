@@ -24,7 +24,7 @@ int main()
 	Data::MainMenuData.Menu_EN.push_back("Join game");
 	Data::MainMenuData.Menu_EN.push_back("Quit");
 
-	Data::Font = "../prstartk.ttf";
+	Data::Font = Renderer::LoadFont("../prstartk.ttf");
 
 	MenuItem item1, item2, item3;
 	item1.Text = 0;
