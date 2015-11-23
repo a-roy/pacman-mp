@@ -207,7 +207,7 @@ MainState local_gameplay(MainState state)
 
 	if ((game->CurrentFrame - sync->CurrentFrame + 1) * 2 < InputData_size)
 	{
-		game->Players[playerNumber].NextDir = InputHandler::LastInput;
+		game->Players[playerNumber]->NextDir = InputHandler::LastInput;
 		PlayerInputs[playerNumber].erase(PlayerInputs[playerNumber].begin());
 		PlayerInputs[playerNumber].push_back(InputHandler::LastInput);
 		game->update();
@@ -219,7 +219,7 @@ MainState local_gameplay(MainState state)
 	{
 		for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
 		{
-			sync->Players[i].NextDir = PlayerInputs[i][
+			sync->Players[i]->NextDir = PlayerInputs[i][
 				InputData_size - 1
 					+ sync->CurrentFrame - game->CurrentFrame];
 		}
@@ -230,7 +230,7 @@ MainState local_gameplay(MainState state)
 	*game = *sync;
 	while (game->CurrentFrame < currentFrame)
 	{
-		game->Players[playerNumber].NextDir = PlayerInputs[playerNumber][
+		game->Players[playerNumber]->NextDir = PlayerInputs[playerNumber][
 			InputData_size - 1 + game->CurrentFrame - currentFrame];
 		game->update();
 	}

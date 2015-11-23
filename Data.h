@@ -38,7 +38,8 @@ class Data
 		{
 			Game *Local;
 			Game *Synced;
-			Sprite PacSprite;
+			Sprite PacmanSprite;
+			Sprite GhostSprite;
 			unsigned int AnimFrame;
 			unsigned int PlayerCount;
 			unsigned int PlayerNumber;

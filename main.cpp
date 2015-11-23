@@ -78,6 +78,31 @@ int main()
 	Data::GameplayData.PacSprite.Animations.push_back(pac_move);
 	Data::GameplayData.AnimFrame = 0;
 
+	//Animation gho_move(4);
+	//gho_move.AddFrame(196, 105, 32, 32);
+	//gho_move.AddFrame(196, 105, 32, 32);
+	//gho_move.AddFrame(229, 105, 32, 32);
+	//gho_move.AddFrame(229, 105, 32, 32);
+	Animation gho_hori(4);
+	gho_hori.AddFrame(1, 18, 16, 16);
+	gho_hori.AddFrame(1, 18, 16, 16);
+	gho_hori.AddFrame(18, 18, 16, 16);
+	gho_hori.AddFrame(18, 18, 16, 16);
+	Data::GameplayData.GhostSprite.Animations.push_back(gho_hori);
+	Animation gho_up(4);
+	gho_up.AddFrame(35, 18, 16, 16);
+	gho_up.AddFrame(35, 18, 16, 16);
+	gho_up.AddFrame(52, 18, 16, 16);
+	gho_up.AddFrame(52, 18, 16, 16);
+	Data::GameplayData.GhostSprite.Animations.push_back(gho_up);
+	Animation gho_down(4);
+	gho_down.AddFrame(69, 18, 16, 16);
+	gho_down.AddFrame(69, 18, 16, 16);
+	gho_down.AddFrame(86, 18, 16, 16);
+	gho_down.AddFrame(86, 18, 16, 16);
+	Data::GameplayData.GhostSprite.Animations.push_back(gho_down);
+	//Data::GameplayData.GhostSprite.Animations.push_back(gho_move);
+
 	MainState state = MainMenu;
 
 	NetworkManager::Init();
@@ -203,16 +228,11 @@ static void render(const MainState &state)
 	else if (state == Gameplay)
 	{
 		Game *game = Data::GameplayData.Local;
-		Sprite &sprite = Data::GameplayData.PacSprite;
 		unsigned int &frame = Data::GameplayData.AnimFrame;
 
 		for (unsigned int i = 0; i < game->Players.size(); i++)
 		{
-			Renderer::DrawSprite(
-					sprite,
-					game->Players[i].XPos, game->Players[i].YPos,
-					game->Players[i].CurrentDir * -90.f,
-					0, frame++);
+			game->Players[i]->Draw();
 		}
 	}
 	else if (state == Exiting)
@@ -263,7 +283,7 @@ static void change(MainState &state, MainState nextState)
 				std::vector<Player::Direction>(
 					InputData_size, Player::Right));
 		Data::GameplayData.ReceivedFrames = std::vector<unsigned short>(count);
-		std::vector<Player> p(count, Player(Player::Pacman));
+		std::vector<Player *> p(count, new Pacman());
 		Data::GameplayData.Local = new Game(f, p);
 		Data::GameplayData.Synced = new Game(f, p);
 		// TODO: delete these
