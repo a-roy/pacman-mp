@@ -1,10 +1,12 @@
 #include "SFData.h"
 
 sf::RenderWindow *SFData::Window;
+sf::UdpSocket SFData::Socket;
 std::map<std::string, sf::Texture> SFData::Textures;
 std::vector<sf::Sprite> SFData::Sprites;
 std::map<std::string, sf::Font> SFData::Fonts;
 std::vector<sf::Text> SFData::Texts;
+std::vector<sf::IpAddress> SFData::Addresses;
 
 const sf::Texture &SFData::GetTexture(std::string path)
 {
