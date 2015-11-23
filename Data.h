@@ -45,6 +45,7 @@ class Data
 			unsigned int PlayerNumber;
 			std::vector<std::vector<Player::Direction> > PlayerInputs;
 			std::vector<unsigned short> ReceivedFrames;
+			std::vector<Character> Characters;
 		};
 
 		static std::string Font;

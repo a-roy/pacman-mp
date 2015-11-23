@@ -14,8 +14,10 @@
 #define ConfirmClient_size 1
 #define ConfirmClient_PlayerNumber 0
 #define PingClient_size 0
-#define StartGame_size 1
+#define StartGame_minsize 2
 #define StartGame_PlayerCount 0
+#define StartGame_Field 1
+#define StartGame_Character 2
 #define OtherInputs_size 23
 #define OtherInputs_PlayerNumber 0
 #define OtherInputs_Frame 1
