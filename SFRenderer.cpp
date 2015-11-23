@@ -48,16 +48,17 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta, int anim, 
 	SFData::Window->draw(sprite);
 }
 
-void Renderer::DrawText(std::string fontpath, std::string text, int x, int y)
+void Renderer::DrawText(std::string fontpath, std::string text,
+		unsigned int charSize, int x, int y)
 {
 	const sf::Font &font = SFData::GetFont(fontpath);
-	const sf::Texture &texture = font.getTexture(24);
+	const sf::Texture &texture = font.getTexture(charSize);
 	float xi = (float)x;
 	std::wstring wtext;
 	wtext.assign(text.begin(), text.end());
 	for (unsigned int i = 0, size = wtext.size(); i < size; i++)
 	{
-		const sf::Glyph &glyph = font.getGlyph(wtext[i], 24, false);
+		const sf::Glyph &glyph = font.getGlyph(wtext[i], charSize, false);
 		sf::Vertex vertices[] =
 		{
 			sf::Vertex(

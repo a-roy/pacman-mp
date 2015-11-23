@@ -141,10 +141,11 @@ static void render(const MainState &state)
 
 		for (unsigned int i = 0; i < menu.size(); i++)
 		{
-			Renderer::DrawText(Data::Font, Menu_EN[menu[i].Text], 60, 100 + 40 * i);
+			Renderer::DrawText(
+					Data::Font, Menu_EN[menu[i].Text], 24, 60, 100 + 40 * i);
 			if (i == index)
 			{
-				Renderer::DrawText(Data::Font, ">", 20, 100 + 40 * i);
+				Renderer::DrawText(Data::Font, ">", 24, 20, 100 + 40 * i);
 			}
 		}
 	}
@@ -158,12 +159,12 @@ static void render(const MainState &state)
 		std::ostringstream ss;
 		ss << address << ":" << port;
 		std::string str = ss.str();
-		Renderer::DrawText(Data::Font, str, 60, 100);
+		Renderer::DrawText(Data::Font, str, 24, 60, 100);
 
 		ss.str("");
 		ss << "Clients connected: " << lobby_count;
 		str = ss.str();
-		Renderer::DrawText(Data::Font, str, 60, 140);
+		Renderer::DrawText(Data::Font, str, 24, 60, 140);
 	}
 	else if (state == Join)
 	{
@@ -179,13 +180,13 @@ static void render(const MainState &state)
 			<< std::setw(3) << (unsigned short)ip[3] << ":"
 			<< std::setw(5) << port;
 		std::string disp = ss.str();
-		Renderer::DrawText(Data::Font, disp, 60, 100);
+		Renderer::DrawText(Data::Font, disp, 24, 60, 100);
 		int iPos = index;
 		if (index > 2) iPos++;
 		if (index > 5) iPos++;
 		if (index > 8) iPos++;
 		if (index > 11) iPos++;
-		Renderer::DrawText(Data::Font, "^", 60 + 24 * iPos, 136);
+		Renderer::DrawText(Data::Font, "^", 24, 60 + 24 * iPos, 136);
 	}
 	else if (state == ClientWaiting)
 	{

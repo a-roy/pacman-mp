@@ -42,9 +42,11 @@ class Renderer
 		//!
 		//! \param fontpath The path to the corresponding font file
 		//! \param text     The string of text to display
-		//! \param x The X-coordinate at which to draw the text
-		//! \param y The Y-coordinate at which to draw the text
-		static void DrawText(std::string fontpath, std::string text, int x, int y);
+		//! \param charSize The character size to use for drawing
+		//! \param x        The X-coordinate at which to draw the text
+		//! \param y        The Y-coordinate at which to draw the text
+		static void DrawText(std::string fontpath, std::string text,
+				unsigned int charSize, int x, int y);
 		//! Deinitialize the graphics window
 		static void Deinit();
 };
