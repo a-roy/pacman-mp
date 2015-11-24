@@ -251,20 +251,22 @@ static void change(MainState &state, MainState nextState)
 				std::vector<Player::Direction>(
 					InputData_size, Player::Right));
 		Data::GameplayData.ReceivedFrames = std::vector<unsigned short>(count);
-		std::vector<Player *> p;
+		std::vector<Player *> pl, ps;
 		for (unsigned int i = 0; i < count; i++)
 		{
 			if (Data::GameplayData.Characters[i] == Pacman_c)
 			{
-				p.push_back(new Pacman());
+				pl.push_back(new Pacman());
+				ps.push_back(new Pacman());
 			}
 			else if (Data::GameplayData.Characters[i] == Ghost_c)
 			{
-				p.push_back(new Ghost());
+				pl.push_back(new Ghost());
+				ps.push_back(new Ghost());
 			}
 		}
-		Data::GameplayData.Local = new Game(f, p);
-		Data::GameplayData.Synced = new Game(f, p);
+		Data::GameplayData.Local = new Game(f, pl);
+		Data::GameplayData.Synced = new Game(f, ps);
 		// TODO: delete these
 	}
 	else if (nextState == Exiting) { }

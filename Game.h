@@ -15,7 +15,9 @@ public:
 	int CurrentFrame;
 
 	Game(Field f, std::vector<Player *> p);
+	Game(const Game &other);
 	~Game();
+	Game& operator=(const Game& rhs);
 	void update();
 	bool move(Player *p, Player::Direction d);
 };

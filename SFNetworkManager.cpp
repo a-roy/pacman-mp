@@ -80,6 +80,7 @@ bool NetworkManager::HasConnection(std::string address, unsigned short port)
 			return true;
 		}
 	}
+	return false;
 }
 
 unsigned int
