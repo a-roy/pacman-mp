@@ -166,6 +166,27 @@ static void render(const MainState &state)
 		ss << "Clients connected: " << lobby_count;
 		str = ss.str();
 		Renderer::DrawText(Data::Font, str, 24, 60, 140);
+
+		ss.str("");
+		ss << "Field " << 0;
+		str = ss.str();
+		Renderer::DrawText(Data::Font, str, 24, 60, 180);
+
+		for (int i = 0; i < lobby_count; i++)
+		{
+			ss.str("");
+			ss << NetworkManager::CurrentConnections[i].Address
+				<< ":"
+				<< NetworkManager::CurrentConnections[i].Port
+				<< " Ready";
+			str = ss.str();
+			Renderer::DrawText(Data::Font, str, 18, 60, 220 + 40 * i);
+		}
+
+		ss.str("");
+		ss << "Start Game >";
+		str = ss.str();
+		Renderer::DrawText(Data::Font, str, 24, 60, 420);
 	}
 	else if (state == Join)
 	{
