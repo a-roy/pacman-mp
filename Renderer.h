@@ -11,7 +11,8 @@ class Renderer
 {
 	public:
 		//! A scaling factor for all drawing coordinates
-		static float Scale;
+		static float TileScale;
+		static float SpriteScale;
 
 		//! Clear the screen
 		static void Clear();

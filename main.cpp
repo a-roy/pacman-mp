@@ -37,7 +37,8 @@ int main()
 	item3.Function = Exiting;
 	Data::MainMenuData.MenuItems.push_back(item3);
 
-	Renderer::Scale = 4.0f;
+	Renderer::TileScale = 4.0f;
+	Renderer::SpriteScale = 2.0f;
 	Renderer::CreateWindow(1280, 720, "My window");
 
 	Data::GameplayData.PacmanSprite.Index =
