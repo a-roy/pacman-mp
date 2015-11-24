@@ -11,7 +11,8 @@ class Renderer
 {
 	public:
 		//! A scaling factor for all drawing coordinates
-		static float Scale;
+		static float TileScale;
+		static float SpriteScale;
 
 		//! Clear the screen
 		static void Clear();
@@ -41,9 +42,8 @@ class Renderer
 		//! \param theta The rotation (in degrees) of the sprite
 		//! \param anim  The index of the sprite's current animation
 		//! \param frame The sprite's current frame of animation
-		static void DrawSprite(
-				const Sprite &s, int x, int y, float theta,
-				int anim, int frame);
+		static void DrawSprite(const Sprite &s, int x, int y, float theta,
+				bool flip, int anim, int frame);
 		//! Draw a line of text to the window
 		//!
 		//! \param fontIndex The database index of a font

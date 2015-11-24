@@ -37,8 +37,9 @@ int main()
 	item3.Function = Exiting;
 	Data::MainMenuData.MenuItems.push_back(item3);
 
-	Renderer::Scale = 4.0f;
-	Renderer::CreateWindow(1280, 720, "My window");
+	Renderer::TileScale = 6.0f;
+	Renderer::SpriteScale = 3.0f;
+	Renderer::CreateWindow(768, 768, "My window");
 
 	Data::GameplayData.PacmanSprite.Index =
 		Renderer::CreateSprite("../pacman.png");

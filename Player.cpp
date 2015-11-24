@@ -17,7 +17,7 @@ void Pacman::Draw()
 			Data::GameplayData.PacmanSprite,
 			XPos, YPos,
 			CurrentDir * -90.f,
-			0, AnimFrame);
+			true, 0, AnimFrame);
 }
 
 Ghost::Ghost()
@@ -31,9 +31,10 @@ Ghost::Ghost()
 void Ghost::Draw()
 {
 	int anim = 0;
-	if (CurrentDir == Right || CurrentDir == Left)
+	bool flip = false;
+	if (CurrentDir == Right)
 	{
-		anim = 0;
+		flip = true;
 	}
 	else if (CurrentDir == Up)
 	{
@@ -45,5 +46,5 @@ void Ghost::Draw()
 	}
 	Renderer::DrawSprite(
 			Data::GameplayData.GhostSprite,
-			XPos, YPos, 0.f, anim, AnimFrame);
+			XPos, YPos, 0.f, flip, anim, AnimFrame);
 }

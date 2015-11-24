@@ -2,7 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include "SFData.h"
 
-float Renderer::Scale;
+float Renderer::TileScale;
+float Renderer::SpriteScale;
 
 void Renderer::CreateWindow(int width, int height, std::string title)
 {
@@ -19,7 +20,7 @@ int Renderer::CreateSprite(std::string texpath)
 {
 	sf::Sprite sprite;
 	sprite.setTexture(SFData::GetTexture(texpath));
-	sprite.setScale(sf::Vector2f(-2.0f, 2.0f));
+	sprite.setScale(sf::Vector2f(SpriteScale, SpriteScale));
 	sprite.setOrigin(sf::Vector2f(8, 8));
 
 	int index = SFData::Sprites.size();
@@ -46,14 +47,16 @@ void Renderer::Display()
 	SFData::Window->display();
 }
 
-void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta, int anim, int frame)
+void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
+		bool flip, int anim, int frame)
 {
 	sf::Sprite &sprite = SFData::Sprites[s.Index];
 	int tx, ty, tw, th;
 	s.Animations[anim].GetRect(frame, tx, ty, tw, th);
 	sprite.setTextureRect(sf::IntRect(tx, ty, tw, th));
-	sprite.setPosition(x * Scale, y * Scale);
+	sprite.setPosition(x * TileScale, y * TileScale);
 	sprite.setRotation(theta);
+	sprite.setScale(flip ? -SpriteScale : SpriteScale, SpriteScale);
 	SFData::Window->draw(sprite);
 }
 
