@@ -255,10 +255,10 @@ MainState local_gameplay(MainState state)
 		data_s[i] = (char)(f & 0xFF);
 		f = f >> 8;
 	}
-	for (unsigned int i = 0; i < InputData_size; i++)
-	{
-		data_s[OwnInputs_InputData + i] = PlayerInputs[playerNumber][i];
-	}
+	std::copy(
+			PlayerInputs[playerNumber].begin(),
+			PlayerInputs[playerNumber].end(),
+			&data_s[OwnInputs_InputData]);
 	NetworkManager::Send(NetworkManager::OwnInputs, data_s, 0);
 
 	return state;
