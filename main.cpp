@@ -205,21 +205,21 @@ static void render(const MainState &state)
 		unsigned int index = Data::ClientConnectedData.Index;
 		if (c == Pacman_c)
 		{
-			Renderer::DrawText(Data::Font, "< Pac-Man >", 20, 60, 140);
+			Renderer::DrawText(Data::Font, "< Pac-Man >", 18, 60, 140);
 		}
 		else
 		{
-			Renderer::DrawText(Data::Font, "<  Ghost  >", 20, 60, 140);
+			Renderer::DrawText(Data::Font, "<  Ghost  >", 18, 60, 140);
 		}
 		if (ready)
 		{
-			Renderer::DrawText(Data::Font, "< Ready!", 20, 60, 180);
+			Renderer::DrawText(Data::Font, "< Ready!", 18, 60, 180);
 		}
 		else
 		{
-			Renderer::DrawText(Data::Font, "  Ready? >", 20, 60, 180);
+			Renderer::DrawText(Data::Font, "  Ready? >", 18, 60, 180);
 		}
-		Renderer::DrawText(Data::Font, ">", 20, 20, 140 + 40 * index);
+		Renderer::DrawText(Data::Font, ">", 18, 20, 140 + 40 * index);
 	}
 	else if (state == Gameplay)
 	{
