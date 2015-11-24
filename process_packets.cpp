@@ -76,7 +76,12 @@ MainState process_host(NetworkManager::MessageType mtype,
 		NetworkManager::CurrentConnections.erase(
 				NetworkManager::CurrentConnections.begin() + id);
 		lobby_count--;
-		// TODO renumber clients
+		for (unsigned int i = id; i < lobby_count; i++)
+		{
+			std::vector<char> data_s(ConfirmClient_size);
+			data_s[ConfirmClient_PlayerNumber] = id;
+			NetworkManager::Send(NetworkManager::ConfirmClient, data_s, id);
+		}
 	}
 	else if (mtype == NetworkManager::OwnInputs)
 	{
