@@ -274,7 +274,7 @@ void addrIncrement(unsigned int digit, int amount)
 			delta *= 10;
 		}
 		unsigned char &selected = Data::JoinData.IP[digit / 3];
-		if (selected + delta == (int)(unsigned char)(selected + delta))
+		if (selected + delta == (selected + delta + 255) % 255)
 		{
 			selected += delta;
 		}
@@ -290,7 +290,7 @@ void addrIncrement(unsigned int digit, int amount)
 			delta *= 10;
 		}
 		unsigned short &port = Data::JoinData.Port;
-		if (port + delta == (int)(unsigned short)(port + delta))
+		if (port + delta == (port + delta + 65535) % 65535)
 		{
 			port += delta;
 		}
