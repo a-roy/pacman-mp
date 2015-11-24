@@ -79,6 +79,10 @@ MainState process_host(NetworkManager::MessageType mtype,
 			static_cast<Character>(data_r[PlayerReady_Character]);
 		Data::HostData.PlayersReady[id] = true;
 	}
+	else if (mtype == NetworkManager::PlayerNotReady)
+	{
+		Data::HostData.PlayersReady[id] = false;
+	}
 	else if (mtype == NetworkManager::DisconnectServer)
 	{
 		NetworkManager::CurrentConnections.erase(
