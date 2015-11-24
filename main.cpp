@@ -178,7 +178,7 @@ static void render(const MainState &state)
 			ss << NetworkManager::CurrentConnections[i].Address
 				<< ":"
 				<< NetworkManager::CurrentConnections[i].Port
-				<< " Ready";
+				<< (Data::HostData.PlayersReady[i] ? " Ready" : " Not ready");
 			str = ss.str();
 			Renderer::DrawText(Data::Font, str, 18, 60, 220 + 40 * i);
 		}

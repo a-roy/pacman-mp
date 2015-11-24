@@ -148,14 +148,26 @@ MainState local_host(MainState state)
 	{
 		if (InputHandler::LastInput == Player::Right)
 		{
-			std::vector<char> data_s(StartGame_minsize + lobby_count);
-			data_s[StartGame_PlayerCount] = (char)lobby_count;
-			// TODO add field selection
-			data_s[StartGame_Field] = 0;
-			std::copy(Data::HostData.Characters.begin(),
-					Data::HostData.Characters.end(),
-					&data_s[StartGame_Character]);
-			NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
+			bool ready = true;
+			for (unsigned int i = 0; i < lobby_count; i++)
+			{
+				if (!Data::HostData.PlayersReady[i])
+				{
+					ready = false;
+					break;
+				}
+			}
+			if (ready)
+			{
+				std::vector<char> data_s(StartGame_minsize + lobby_count);
+				data_s[StartGame_PlayerCount] = (char)lobby_count;
+				// TODO add field selection
+				data_s[StartGame_Field] = 0;
+				std::copy(Data::HostData.Characters.begin(),
+						Data::HostData.Characters.end(),
+						&data_s[StartGame_Character]);
+				NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
+			}
 		}
 		else if (InputHandler::LastInput == Player::Left)
 		{
@@ -229,6 +241,8 @@ MainState local_client_connected(MainState state)
 			else if (InputHandler::LastInput == Player::Left)
 			{
 				ready = false;
+				std::vector<char> data_s(PlayerNotReady_size);
+				NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
 			}
 		}
 	}

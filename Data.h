@@ -21,6 +21,7 @@ class Data
 		{
 			unsigned int PlayerCount;
 			std::vector<Character> Characters;
+			std::vector<bool> PlayersReady;
 		};
 
 		struct JoinData_t

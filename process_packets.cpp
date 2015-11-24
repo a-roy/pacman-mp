@@ -64,6 +64,7 @@ MainState process_host(NetworkManager::MessageType mtype,
 		}
 		NetworkManager::CurrentConnections.resize(lobby_count);
 		Data::HostData.Characters.resize(lobby_count);
+		Data::HostData.PlayersReady.resize(lobby_count);
 		std::vector<char> data_s(ConfirmClient_size);
 		data_s[ConfirmClient_PlayerNumber] = id;
 		NetworkManager::Send(NetworkManager::ConfirmClient, data_s, id);
@@ -76,6 +77,7 @@ MainState process_host(NetworkManager::MessageType mtype,
 	{
 		Data::HostData.Characters[id] =
 			static_cast<Character>(data_r[PlayerReady_Character]);
+		Data::HostData.PlayersReady[id] = true;
 	}
 	else if (mtype == NetworkManager::DisconnectServer)
 	{
@@ -83,6 +85,8 @@ MainState process_host(NetworkManager::MessageType mtype,
 				NetworkManager::CurrentConnections.begin() + id);
 		Data::HostData.Characters.erase(
 				Data::HostData.Characters.begin() + id);
+		Data::HostData.PlayersReady.erase(
+				Data::HostData.PlayersReady.begin() + id);
 		lobby_count--;
 		for (unsigned int i = id; i < lobby_count; i++)
 		{
@@ -109,6 +113,7 @@ MainState process_host(NetworkManager::MessageType mtype,
 	{
 		NetworkManager::CurrentConnections.resize(lobby_count);
 		Data::HostData.Characters.resize(lobby_count);
+		Data::HostData.PlayersReady.resize(lobby_count);
 	}
 
 	return Host;
