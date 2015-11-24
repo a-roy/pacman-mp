@@ -200,6 +200,26 @@ static void render(const MainState &state)
 		ss << Data::ClientConnectedData.PlayerNumber + 1;
 		std::string str = ss.str();
 		Renderer::DrawText(Data::Font, str, 24, 60, 100);
+		Character c = Data::ClientConnectedData.SelectedCharacter;
+		bool ready = Data::ClientConnectedData.Ready;
+		unsigned int index = Data::ClientConnectedData.Index;
+		if (c == Pacman_c)
+		{
+			Renderer::DrawText(Data::Font, "< Pac-Man >", 20, 60, 140);
+		}
+		else
+		{
+			Renderer::DrawText(Data::Font, "<  Ghost  >", 20, 60, 140);
+		}
+		if (ready)
+		{
+			Renderer::DrawText(Data::Font, "< Ready!", 20, 60, 180);
+		}
+		else
+		{
+			Renderer::DrawText(Data::Font, "  Ready? >", 20, 60, 180);
+		}
+		Renderer::DrawText(Data::Font, ">", 20, 20, 140 + 40 * index);
 	}
 	else if (state == Gameplay)
 	{

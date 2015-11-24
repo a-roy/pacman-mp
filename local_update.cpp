@@ -152,11 +152,9 @@ MainState local_host(MainState state)
 			data_s[StartGame_PlayerCount] = (char)lobby_count;
 			// TODO add field selection
 			data_s[StartGame_Field] = 0;
-			for (unsigned int i = 0; i < lobby_count; i++)
-			{
-				// TODO get character selections
-				data_s[StartGame_Character + i] = (i == 0) ? Pacman_c : Ghost_c;
-			}
+			std::copy(Data::HostData.Characters.begin(),
+					Data::HostData.Characters.end(),
+					&data_s[StartGame_Character]);
 			NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
 		}
 		else if (InputHandler::LastInput == Player::Left)
@@ -190,6 +188,51 @@ MainState local_client_waiting(MainState state)
 
 MainState local_client_connected(MainState state)
 {
+	unsigned int &index = Data::ClientConnectedData.Index;
+	Character &c = Data::ClientConnectedData.SelectedCharacter;
+	if (InputHandler::InputTime == 0)
+	{
+		if (index == 0)
+		{
+			if (InputHandler::LastInput == Player::Down)
+			{
+				index = 1;
+			}
+			else if (InputHandler::LastInput == Player::Left
+					|| InputHandler::LastInput == Player::Right)
+			{
+				if (c == Pacman_c)
+				{
+					c = Ghost_c;
+				}
+				else
+				{
+					c = Pacman_c;
+				}
+			}
+		}
+		else
+		{
+			bool &ready = Data::ClientConnectedData.Ready;
+			if (InputHandler::LastInput == Player::Up)
+			{
+				ready = false;
+				index = 0;
+			}
+			else if (InputHandler::LastInput == Player::Right)
+			{
+				ready = true;
+				std::vector<char> data_s(PlayerReady_size);
+				data_s[PlayerReady_Character] = c;
+				NetworkManager::Send(NetworkManager::PlayerReady, data_s, 0);
+			}
+			else if (InputHandler::LastInput == Player::Left)
+			{
+				ready = false;
+			}
+		}
+	}
+
 	if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
 	{
 		return Join;
