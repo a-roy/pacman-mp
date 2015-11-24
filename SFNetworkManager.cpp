@@ -26,10 +26,7 @@ void NetworkManager::Receive(MessageType &mtype, std::vector<char> &data,
 		{
 			mtype = (MessageType)d[1];
 			data = std::vector<char>(received - 2);
-			for (std::size_t i = 2; i < received; i++)
-			{
-				data[i - 2] = d[i];
-			}
+			std::copy(d + 2, d + received, data.begin());
 		}
 		else
 		{
@@ -54,10 +51,7 @@ void NetworkManager::Send(MessageType mtype, const std::vector<char> &data,
 	// TODO: insert correct header
 	d[0] = 0x00;
 	d[1] = mtype;
-	for (std::size_t i = 2; i < size; i++)
-	{
-		d[i] = data[i - 2];
-	}
+	std::copy(data.begin(), data.end(), d + 2);
 	SFData::Socket.send(d, size, address, port);
 	free(d);
 }
