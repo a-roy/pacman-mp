@@ -1,6 +1,7 @@
 #include "process_packets.h"
 #include "Data.h"
 #include "NetworkManager.h"
+#include <algorithm>
 
 MainState process_data(MainState state)
 {
@@ -62,6 +63,8 @@ MainState process_host(NetworkManager::MessageType mtype,
 			lobby_count++;
 		}
 		NetworkManager::CurrentConnections.resize(lobby_count);
+		Data::HostData.Characters.resize(lobby_count);
+		Data::HostData.PlayersReady.resize(lobby_count);
 		std::vector<char> data_s(ConfirmClient_size);
 		data_s[ConfirmClient_PlayerNumber] = id;
 		NetworkManager::Send(NetworkManager::ConfirmClient, data_s, id);
@@ -70,31 +73,47 @@ MainState process_host(NetworkManager::MessageType mtype,
 	{
 		// No action needed
 	}
+	else if (mtype == NetworkManager::PlayerReady)
+	{
+		Data::HostData.Characters[id] =
+			static_cast<Character>(data_r[PlayerReady_Character]);
+		Data::HostData.PlayersReady[id] = true;
+	}
 	else if (mtype == NetworkManager::DisconnectServer)
 	{
 		NetworkManager::CurrentConnections.erase(
 				NetworkManager::CurrentConnections.begin() + id);
+		Data::HostData.Characters.erase(
+				Data::HostData.Characters.begin() + id);
+		Data::HostData.PlayersReady.erase(
+				Data::HostData.PlayersReady.begin() + id);
 		lobby_count--;
-		// TODO renumber clients
+		for (unsigned int i = id; i < lobby_count; i++)
+		{
+			std::vector<char> data_s(ConfirmClient_size);
+			data_s[ConfirmClient_PlayerNumber] = id;
+			NetworkManager::Send(NetworkManager::ConfirmClient, data_s, id);
+		}
 	}
 	else if (mtype == NetworkManager::OwnInputs)
 	{
 		std::vector<char> data_s(OtherInputs_size);
 		data_s[OtherInputs_PlayerNumber] = id;
-		for (unsigned int i = 0; i < Frame_size; i++)
-		{
-			data_s[OtherInputs_Frame + i] = data_r[OwnInputs_Frame + i];
-		}
-		for (unsigned int i = 0; i < InputData_size; i++)
-		{
-			data_s[OtherInputs_InputData + i] =
-				data_r[OwnInputs_InputData + i];
-		}
+		std::copy(
+				&data_r[OwnInputs_Frame],
+				&data_r[OwnInputs_Frame] + Frame_size,
+				&data_s[OtherInputs_Frame]);
+		std::copy(
+				&data_r[OwnInputs_InputData],
+				&data_r[OwnInputs_InputData] + InputData_size,
+				&data_s[OtherInputs_InputData]);
 		NetworkManager::Broadcast(NetworkManager::OtherInputs, data_s);
 	}
 	if (id >= lobby_count)
 	{
 		NetworkManager::CurrentConnections.resize(lobby_count);
+		Data::HostData.Characters.resize(lobby_count);
+		Data::HostData.PlayersReady.resize(lobby_count);
 	}
 
 	return Host;
@@ -107,7 +126,6 @@ MainState process_client_waiting(NetworkManager::MessageType mtype,
 	{
 		if (mtype == NetworkManager::ConfirmClient)
 		{
-			// TODO: display confirmation
 			Data::ClientConnectedData.PlayerNumber =
 				data_r[ConfirmClient_PlayerNumber];
 			return ClientConnected;
@@ -180,15 +198,14 @@ MainState process_gameplay(NetworkManager::MessageType mtype,
 			int difference = game->CurrentFrame - f;
 			if (num != playerNumber && f > ReceivedFrames[num])
 			{
-				for (unsigned int i = std::max(0, -difference),
-					end = std::min(InputData_size, InputData_size - difference);
-						i < end; i++)
-				{
-					Player::Direction input =
-						(Player::Direction)
-						data_r[OtherInputs_InputData + difference + i];
-					PlayerInputs[num][i] = input;
-				}
+				std::transform(
+						&data_r[OtherInputs_InputData]
+						+ std::max(0, -difference),
+						&data_r[OtherInputs_InputData]
+						+ InputData_size + std::min(0, -difference),
+						PlayerInputs[num].begin(),
+						[] (char c)
+						{ return static_cast<Player::Direction>(c); });
 				ReceivedFrames[num] = f;
 			}
 		}

@@ -8,6 +8,7 @@
 #include <vector>
 
 #define NetworkTimeout 120
+#define NetworkDelay 2
 
 #define InputData_size 20
 #define Frame_size 2
@@ -27,6 +28,9 @@
 #define DisconnectClient_size 0
 #define RequestServer_size 0
 #define PingServer_size 0
+#define PlayerReady_size 1
+#define PlayerReady_Character 0
+#define PlayerNotReady_size 0
 #define OwnInputs_size 22
 #define OwnInputs_Frame 0
 #define OwnInputs_InputData 2
@@ -57,6 +61,8 @@ class NetworkManager
 			DisconnectClient,
 			RequestServer,
 			PingServer,
+			PlayerReady,
+			PlayerNotReady,
 			OwnInputs,
 			EndedGame,
 			DisconnectServer

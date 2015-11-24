@@ -148,16 +148,26 @@ MainState local_host(MainState state)
 	{
 		if (InputHandler::LastInput == Player::Right)
 		{
-			std::vector<char> data_s(StartGame_minsize + lobby_count);
-			data_s[StartGame_PlayerCount] = (char)lobby_count;
-			// TODO add field selection
-			data_s[StartGame_Field] = 0;
+			bool ready = true;
 			for (unsigned int i = 0; i < lobby_count; i++)
 			{
-				// TODO get character selections
-				data_s[StartGame_Character + i] = (i == 0) ? Pacman_c : Ghost_c;
+				if (!Data::HostData.PlayersReady[i])
+				{
+					ready = false;
+					break;
+				}
 			}
-			NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
+			if (ready)
+			{
+				std::vector<char> data_s(StartGame_minsize + lobby_count);
+				data_s[StartGame_PlayerCount] = (char)lobby_count;
+				// TODO add field selection
+				data_s[StartGame_Field] = 0;
+				std::copy(Data::HostData.Characters.begin(),
+						Data::HostData.Characters.end(),
+						&data_s[StartGame_Character]);
+				NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
+			}
 		}
 		else if (InputHandler::LastInput == Player::Left)
 		{
@@ -190,6 +200,53 @@ MainState local_client_waiting(MainState state)
 
 MainState local_client_connected(MainState state)
 {
+	unsigned int &index = Data::ClientConnectedData.Index;
+	Character &c = Data::ClientConnectedData.SelectedCharacter;
+	if (InputHandler::InputTime == 0)
+	{
+		if (index == 0)
+		{
+			if (InputHandler::LastInput == Player::Down)
+			{
+				index = 1;
+			}
+			else if (InputHandler::LastInput == Player::Left
+					|| InputHandler::LastInput == Player::Right)
+			{
+				if (c == Pacman_c)
+				{
+					c = Ghost_c;
+				}
+				else
+				{
+					c = Pacman_c;
+				}
+			}
+		}
+		else
+		{
+			bool &ready = Data::ClientConnectedData.Ready;
+			if (InputHandler::LastInput == Player::Up)
+			{
+				ready = false;
+				index = 0;
+			}
+			else if (InputHandler::LastInput == Player::Right)
+			{
+				ready = true;
+				std::vector<char> data_s(PlayerReady_size);
+				data_s[PlayerReady_Character] = c;
+				NetworkManager::Send(NetworkManager::PlayerReady, data_s, 0);
+			}
+			else if (InputHandler::LastInput == Player::Left)
+			{
+				ready = false;
+				std::vector<char> data_s(PlayerNotReady_size);
+				NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
+			}
+		}
+	}
+
 	if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
 	{
 		return Join;
@@ -212,11 +269,14 @@ MainState local_gameplay(MainState state)
 		= Data::GameplayData.ReceivedFrames;
 	unsigned int playerNumber = Data::GameplayData.PlayerNumber;
 
+	// Instead of changing our frame number, we use the delay to read inputs
+	// from previous frames
 	if ((game->CurrentFrame - sync->CurrentFrame + 1) * 2 < InputData_size)
 	{
-		game->Players[playerNumber]->NextDir = InputHandler::LastInput;
 		PlayerInputs[playerNumber].erase(PlayerInputs[playerNumber].begin());
 		PlayerInputs[playerNumber].push_back(InputHandler::LastInput);
+		game->Players[playerNumber]->NextDir =
+			PlayerInputs[playerNumber][InputData_size - 1 - NetworkDelay];
 		game->update();
 	}
 
@@ -227,7 +287,7 @@ MainState local_gameplay(MainState state)
 		for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
 		{
 			sync->Players[i]->NextDir = PlayerInputs[i][
-				InputData_size - 1
+				InputData_size - 1 - NetworkDelay
 					+ sync->CurrentFrame - game->CurrentFrame];
 		}
 		sync->update();
@@ -238,12 +298,13 @@ MainState local_gameplay(MainState state)
 	while (game->CurrentFrame < currentFrame)
 	{
 		game->Players[playerNumber]->NextDir = PlayerInputs[playerNumber][
-			InputData_size - 1 + game->CurrentFrame - currentFrame];
+			InputData_size - 1 - NetworkDelay
+				+ game->CurrentFrame - currentFrame];
 		game->update();
 	}
 
 	std::vector<char> data_s(OwnInputs_size);
-	int f = game->CurrentFrame;
+	int f = currentFrame;
 	ReceivedFrames[playerNumber] = f;
 	for (int i = OwnInputs_Frame + Frame_size - 1;
 			i >= OwnInputs_Frame; i--)
@@ -251,10 +312,10 @@ MainState local_gameplay(MainState state)
 		data_s[i] = (char)(f & 0xFF);
 		f = f >> 8;
 	}
-	for (unsigned int i = 0; i < InputData_size; i++)
-	{
-		data_s[OwnInputs_InputData + i] = PlayerInputs[playerNumber][i];
-	}
+	std::copy(
+			PlayerInputs[playerNumber].begin(),
+			PlayerInputs[playerNumber].end(),
+			&data_s[OwnInputs_InputData]);
 	NetworkManager::Send(NetworkManager::OwnInputs, data_s, 0);
 
 	return state;
@@ -270,7 +331,7 @@ void addrIncrement(unsigned int digit, int amount)
 			delta *= 10;
 		}
 		unsigned char &selected = Data::JoinData.IP[digit / 3];
-		if (selected + delta == (int)(unsigned char)(selected + delta))
+		if (selected + delta == (selected + delta + 255) % 255)
 		{
 			selected += delta;
 		}
@@ -286,7 +347,7 @@ void addrIncrement(unsigned int digit, int amount)
 			delta *= 10;
 		}
 		unsigned short &port = Data::JoinData.Port;
-		if (port + delta == (int)(unsigned short)(port + delta))
+		if (port + delta == (port + delta + 65535) % 65535)
 		{
 			port += delta;
 		}

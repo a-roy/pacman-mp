@@ -20,6 +20,8 @@ class Data
 		struct HostData_t
 		{
 			unsigned int PlayerCount;
+			std::vector<Character> Characters;
+			std::vector<bool> PlayersReady;
 		};
 
 		struct JoinData_t
@@ -32,6 +34,9 @@ class Data
 		struct ClientConnectedData_t
 		{
 			unsigned int PlayerNumber;
+			unsigned int Index;
+			Character SelectedCharacter;
+			bool Ready;
 		};
 
 		struct GameplayData_t

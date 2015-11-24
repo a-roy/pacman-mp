@@ -37,8 +37,9 @@ int main()
 	item3.Function = Exiting;
 	Data::MainMenuData.MenuItems.push_back(item3);
 
-	Renderer::Scale = 4.0f;
-	Renderer::CreateWindow(1280, 720, "My window");
+	Renderer::TileScale = 6.0f;
+	Renderer::SpriteScale = 3.0f;
+	Renderer::CreateWindow(768, 768, "My window");
 
 	Data::GameplayData.PacmanSprite.Index =
 		Renderer::CreateSprite("../pacman.png");
@@ -165,6 +166,27 @@ static void render(const MainState &state)
 		ss << "Clients connected: " << lobby_count;
 		str = ss.str();
 		Renderer::DrawText(Data::Font, str, 24, 60, 140);
+
+		ss.str("");
+		ss << "Field " << 0;
+		str = ss.str();
+		Renderer::DrawText(Data::Font, str, 24, 60, 180);
+
+		for (int i = 0; i < lobby_count; i++)
+		{
+			ss.str("");
+			ss << NetworkManager::CurrentConnections[i].Address
+				<< ":"
+				<< NetworkManager::CurrentConnections[i].Port
+				<< (Data::HostData.PlayersReady[i] ? " Ready" : " Not ready");
+			str = ss.str();
+			Renderer::DrawText(Data::Font, str, 18, 60, 220 + 40 * i);
+		}
+
+		ss.str("");
+		ss << "Start Game >";
+		str = ss.str();
+		Renderer::DrawText(Data::Font, str, 24, 60, 420);
 	}
 	else if (state == Join)
 	{
@@ -190,11 +212,35 @@ static void render(const MainState &state)
 	}
 	else if (state == ClientWaiting)
 	{
-		// TODO
+		Renderer::DrawText(Data::Font, "Connecting...", 24, 60, 100);
 	}
 	else if (state == ClientConnected)
 	{
-		// TODO
+		std::ostringstream ss;
+		ss << "You are Player ";
+		ss << Data::ClientConnectedData.PlayerNumber + 1;
+		std::string str = ss.str();
+		Renderer::DrawText(Data::Font, str, 24, 60, 100);
+		Character c = Data::ClientConnectedData.SelectedCharacter;
+		bool ready = Data::ClientConnectedData.Ready;
+		unsigned int index = Data::ClientConnectedData.Index;
+		if (c == Pacman_c)
+		{
+			Renderer::DrawText(Data::Font, "< Pac-Man >", 18, 60, 140);
+		}
+		else
+		{
+			Renderer::DrawText(Data::Font, "<  Ghost  >", 18, 60, 140);
+		}
+		if (ready)
+		{
+			Renderer::DrawText(Data::Font, "< Ready!", 18, 60, 180);
+		}
+		else
+		{
+			Renderer::DrawText(Data::Font, "  Ready? >", 18, 60, 180);
+		}
+		Renderer::DrawText(Data::Font, ">", 18, 20, 140 + 40 * index);
 	}
 	else if (state == Gameplay)
 	{
@@ -251,20 +297,22 @@ static void change(MainState &state, MainState nextState)
 				std::vector<Player::Direction>(
 					InputData_size, Player::Right));
 		Data::GameplayData.ReceivedFrames = std::vector<unsigned short>(count);
-		std::vector<Player *> p;
+		std::vector<Player *> pl, ps;
 		for (unsigned int i = 0; i < count; i++)
 		{
 			if (Data::GameplayData.Characters[i] == Pacman_c)
 			{
-				p.push_back(new Pacman());
+				pl.push_back(new Pacman());
+				ps.push_back(new Pacman());
 			}
 			else if (Data::GameplayData.Characters[i] == Ghost_c)
 			{
-				p.push_back(new Ghost());
+				pl.push_back(new Ghost());
+				ps.push_back(new Ghost());
 			}
 		}
-		Data::GameplayData.Local = new Game(f, p);
-		Data::GameplayData.Synced = new Game(f, p);
+		Data::GameplayData.Local = new Game(f, pl);
+		Data::GameplayData.Synced = new Game(f, ps);
 		// TODO: delete these
 	}
 	else if (nextState == Exiting) { }
