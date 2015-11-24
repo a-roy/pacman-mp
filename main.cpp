@@ -191,11 +191,15 @@ static void render(const MainState &state)
 	}
 	else if (state == ClientWaiting)
 	{
-		// TODO
+		Renderer::DrawText(Data::Font, "Connecting...", 24, 60, 100);
 	}
 	else if (state == ClientConnected)
 	{
-		// TODO
+		std::ostringstream ss;
+		ss << "You are Player ";
+		ss << Data::ClientConnectedData.PlayerNumber + 1;
+		std::string str = ss.str();
+		Renderer::DrawText(Data::Font, str, 24, 60, 100);
 	}
 	else if (state == Gameplay)
 	{

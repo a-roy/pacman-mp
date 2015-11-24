@@ -107,7 +107,6 @@ MainState process_client_waiting(NetworkManager::MessageType mtype,
 	{
 		if (mtype == NetworkManager::ConfirmClient)
 		{
-			// TODO: display confirmation
 			Data::ClientConnectedData.PlayerNumber =
 				data_r[ConfirmClient_PlayerNumber];
 			return ClientConnected;
