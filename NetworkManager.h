@@ -8,6 +8,7 @@
 #include <vector>
 
 #define NetworkTimeout 120
+#define NetworkDelay 2
 
 #define InputData_size 20
 #define Frame_size 2
