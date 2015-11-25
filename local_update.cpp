@@ -304,7 +304,7 @@ MainState local_gameplay(MainState state)
 	}
 
 	std::vector<char> data_s(OwnInputs_size);
-	int f = currentFrame;
+	int f = currentFrame + NetworkDelay;
 	ReceivedFrames[playerNumber] = f;
 	for (int i = OwnInputs_Frame + Frame_size - 1;
 			i >= OwnInputs_Frame; i--)
