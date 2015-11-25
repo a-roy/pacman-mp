@@ -271,7 +271,8 @@ MainState local_gameplay(MainState state)
 
 	// Instead of changing our frame number, we use the delay to read inputs
 	// from previous frames
-	if ((game->CurrentFrame - sync->CurrentFrame + 1) * 2 < InputData_size)
+	if ((game->CurrentFrame - sync->CurrentFrame + 1 + NetworkDelay) * 2
+			< InputData_size)
 	{
 		PlayerInputs[playerNumber].erase(PlayerInputs[playerNumber].begin());
 		PlayerInputs[playerNumber].push_back(InputHandler::LastInput);

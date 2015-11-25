@@ -2,6 +2,7 @@
 #include "Data.h"
 #include "NetworkManager.h"
 #include <algorithm>
+#include <exception>
 
 MainState process_data(MainState state)
 {
@@ -199,19 +200,30 @@ MainState process_gameplay(NetworkManager::MessageType mtype,
 				f += (unsigned char)data_r[OtherInputs_Frame + i];
 			}
 			// TODO Do something smart if we receive something from the future
-			int difference = game->CurrentFrame - f;
+			int difference = game->CurrentFrame + NetworkDelay - f;
 			if (num != playerNumber && f > ReceivedFrames[num])
 			{
 				std::transform(
 						&data_r[OtherInputs_InputData]
-						+ std::max(0, -difference),
+						+ std::max(0, difference),
 						&data_r[OtherInputs_InputData]
-						+ InputData_size + std::min(0, -difference),
+						+ InputData_size + std::min(0, difference),
 						PlayerInputs[num].begin(),
 						[] (char c)
 						{ return static_cast<Player::Direction>(c); });
+				//std::fill(&data_r[OtherInputs_InputData] + InputData_size - difference);
 				ReceivedFrames[num] = f;
 			}
+			//else if (difference >= 0)
+			//{
+			//	for (unsigned int i = difference; i < InputData_size; i++)
+			//	{
+			//		if (PlayerInputs[num][i - difference] != data_r[OtherInputs_InputData + i])
+			//		{
+			//			throw std::exception();
+			//		}
+			//	}
+			//}
 		}
 	}
 
