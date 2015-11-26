@@ -74,43 +74,46 @@ void Renderer::DrawText(int fontIndex, std::string text,
 	for (unsigned int i = 0; i < len; i++)
 	{
 		const sf::Glyph &glyph = font.getGlyph(wtext[i], charSize, false);
-		sf::Vertex topleft = sf::Vertex(
+		if (glyph.bounds.width > 0.f)
+		{
+			sf::Vertex topleft = sf::Vertex(
 				sf::Vector2f(xi + glyph.bounds.left,
 					y + glyph.bounds.top),
 				sf::Vector2f(glyph.textureRect.left,
 					glyph.textureRect.top));
-		vertices[j++] = topleft;
-		vertices[j++] = topleft;
-		sf::Vertex botleft = sf::Vertex(
+			vertices[j++] = topleft;
+			vertices[j++] = topleft;
+			sf::Vertex botleft = sf::Vertex(
 				sf::Vector2f(
 					xi + glyph.bounds.left,
 					y + glyph.bounds.top + glyph.bounds.height),
 				sf::Vector2f(
 					glyph.textureRect.left,
 					glyph.textureRect.top + glyph.textureRect.height));
-		vertices[j++] = botleft;
-		sf::Vertex topright = sf::Vertex(
+			vertices[j++] = botleft;
+			sf::Vertex topright = sf::Vertex(
 				sf::Vector2f(
 					xi + glyph.bounds.left + glyph.bounds.width,
 					y + glyph.bounds.top),
 				sf::Vector2f(
 					glyph.textureRect.left + glyph.textureRect.width,
 					glyph.textureRect.top));
-		vertices[j++] = topright;
-		sf::Vertex botright = sf::Vertex(
+			vertices[j++] = topright;
+			sf::Vertex botright = sf::Vertex(
 				sf::Vector2f(
 					xi + glyph.bounds.left + glyph.bounds.width,
 					y + glyph.bounds.top + glyph.bounds.height),
 				sf::Vector2f(
 					glyph.textureRect.left + glyph.textureRect.width,
 					glyph.textureRect.top + glyph.textureRect.height));
-		vertices[j++] = botright;
-		vertices[j++] = botright;
+			vertices[j++] = botright;
+			vertices[j++] = botright;
+		}
 		xi += glyph.advance;
 	}
 	SFData::Window->draw(
 			vertices + 1,
-			j - 1,
+			j - 2,
 			sf::TrianglesStrip,
 			sf::RenderStates(&texture));
 	free(vertices);
