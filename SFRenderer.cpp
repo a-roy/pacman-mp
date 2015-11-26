@@ -70,19 +70,17 @@ void Renderer::DrawText(int fontIndex, std::string text,
 	wtext.assign(text.begin(), text.end());
 	std::size_t len = wtext.size();
 	sf::Vertex *vertices = (sf::Vertex *)malloc(len * 6 * sizeof(sf::Vertex));
+	unsigned int j = 0;
 	for (unsigned int i = 0; i < len; i++)
 	{
 		const sf::Glyph &glyph = font.getGlyph(wtext[i], charSize, false);
 		sf::Vertex topleft = sf::Vertex(
-				sf::Vector2f(xi + glyph.bounds.left, y + glyph.bounds.top),
-				sf::Vector2f(glyph.textureRect.left, glyph.textureRect.top));
-		sf::Vertex topright = sf::Vertex(
-				sf::Vector2f(
-					xi + glyph.bounds.left + glyph.bounds.width,
+				sf::Vector2f(xi + glyph.bounds.left,
 					y + glyph.bounds.top),
-				sf::Vector2f(
-					glyph.textureRect.left + glyph.textureRect.width,
+				sf::Vector2f(glyph.textureRect.left,
 					glyph.textureRect.top));
+		vertices[j++] = topleft;
+		vertices[j++] = topleft;
 		sf::Vertex botleft = sf::Vertex(
 				sf::Vector2f(
 					xi + glyph.bounds.left,
@@ -90,6 +88,15 @@ void Renderer::DrawText(int fontIndex, std::string text,
 				sf::Vector2f(
 					glyph.textureRect.left,
 					glyph.textureRect.top + glyph.textureRect.height));
+		vertices[j++] = botleft;
+		sf::Vertex topright = sf::Vertex(
+				sf::Vector2f(
+					xi + glyph.bounds.left + glyph.bounds.width,
+					y + glyph.bounds.top),
+				sf::Vector2f(
+					glyph.textureRect.left + glyph.textureRect.width,
+					glyph.textureRect.top));
+		vertices[j++] = topright;
 		sf::Vertex botright = sf::Vertex(
 				sf::Vector2f(
 					xi + glyph.bounds.left + glyph.bounds.width,
@@ -97,19 +104,13 @@ void Renderer::DrawText(int fontIndex, std::string text,
 				sf::Vector2f(
 					glyph.textureRect.left + glyph.textureRect.width,
 					glyph.textureRect.top + glyph.textureRect.height));
-		vertices[0 + 6 * i] = topleft;
-		vertices[1 + 6 * i] = topleft;
-		vertices[2 + 6 * i] = botleft;
-		vertices[3 + 6 * i] = topright;
-		vertices[4 + 6 * i] = botright;
-		vertices[5 + 6 * i] = botright;
-		SFData::Window->draw(
-				vertices, 4, sf::TrianglesStrip, sf::RenderStates(&texture));
+		vertices[j++] = botright;
+		vertices[j++] = botright;
 		xi += glyph.advance;
 	}
 	SFData::Window->draw(
 			vertices + 1,
-			len * 6 - 2,
+			j - 1,
 			sf::TrianglesStrip,
 			sf::RenderStates(&texture));
 	free(vertices);
