@@ -10,7 +10,7 @@
 #define NetworkTimeout 120
 #define NetworkDelay 2
 
-#define InputData_size 20
+#define InputData_size 10
 #define Frame_size 2
 #define ConfirmClient_size 1
 #define ConfirmClient_PlayerNumber 0
@@ -19,10 +19,10 @@
 #define StartGame_PlayerCount 0
 #define StartGame_Field 1
 #define StartGame_Character 2
-#define OtherInputs_size 23
+#define OtherInputs_size (InputData_size + Frame_size + 1)
 #define OtherInputs_PlayerNumber 0
 #define OtherInputs_Frame 1
-#define OtherInputs_InputData 3
+#define OtherInputs_InputData (Frame_size + 1)
 #define BlockFrame_size 0
 #define EndGame_size 0
 #define DisconnectClient_size 0
@@ -31,9 +31,9 @@
 #define PlayerReady_size 1
 #define PlayerReady_Character 0
 #define PlayerNotReady_size 0
-#define OwnInputs_size 22
+#define OwnInputs_size (InputData_size + Frame_size)
 #define OwnInputs_Frame 0
-#define OwnInputs_InputData 2
+#define OwnInputs_InputData (Frame_size)
 #define EndedGame_size 0
 #define DisconnectServer_size 0
 
