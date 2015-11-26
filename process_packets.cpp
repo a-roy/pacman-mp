@@ -223,17 +223,14 @@ MainState process_gameplay(NetworkManager::MessageType mtype,
 				}
 				else
 				{
-					std::copy(
-						&PlayerInputs[num][InputData_size + difference],
-						&PlayerInputs[num][0] + InputData_size,
-						&PlayerInputs[num][0]);
 					std::transform(
 						&data_r[OtherInputs_InputData],
-						&data_r[OtherInputs_InputData] + InputData_size + difference,
+						&data_r[OtherInputs_InputData]
+						+ InputData_size + difference,
 						&PlayerInputs[num][0] - difference,
 						[](char c)
 						{ return static_cast<Player::Direction>(c); });
-					ReceivedFrames[num] = f;
+					ReceivedFrames[num] = game->CurrentFrame + NetworkDelay;
 				}
 			}
 		}

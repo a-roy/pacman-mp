@@ -276,21 +276,27 @@ MainState local_gameplay(MainState state)
 	{
 		PlayerInputs[playerNumber].erase(PlayerInputs[playerNumber].begin());
 		PlayerInputs[playerNumber].push_back(InputHandler::LastInput);
-		game->Players[playerNumber]->NextDir =
-			PlayerInputs[playerNumber][InputData_size - 1 - NetworkDelay];
+		for (unsigned int i = 0; i < PlayerInputs.size(); i++)
+		{
+			game->Players[i]->NextDir =
+				PlayerInputs[i][InputData_size - 1 - NetworkDelay];
+		}
 		game->update();
 	}
 
+	unsigned int currentFrame = game->CurrentFrame;
+	int f = currentFrame + NetworkDelay - 1;
+	ReceivedFrames[playerNumber] = f;
+
 	unsigned short all_received = *std::min_element(
 			std::begin(ReceivedFrames), std::end(ReceivedFrames));
-	unsigned int currentFrame = game->CurrentFrame;
 	while (sync->CurrentFrame < all_received
 			&& sync->CurrentFrame < currentFrame)
 	{
 		for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
 		{
 			sync->Players[i]->NextDir = PlayerInputs[i][
-				InputData_size - 1 - NetworkDelay
+				InputData_size - NetworkDelay
 					+ sync->CurrentFrame - game->CurrentFrame];
 		}
 		sync->update();
@@ -300,14 +306,12 @@ MainState local_gameplay(MainState state)
 	while (game->CurrentFrame < currentFrame)
 	{
 		game->Players[playerNumber]->NextDir = PlayerInputs[playerNumber][
-			InputData_size - 1 - NetworkDelay
+			InputData_size - NetworkDelay
 				+ game->CurrentFrame - currentFrame];
 		game->update();
 	}
 
 	std::vector<char> data_s(OwnInputs_size);
-	int f = currentFrame + NetworkDelay;
-	ReceivedFrames[playerNumber] = f;
 	for (int i = OwnInputs_Frame + Frame_size - 1;
 			i >= OwnInputs_Frame; i--)
 	{
