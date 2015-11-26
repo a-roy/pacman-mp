@@ -2,7 +2,6 @@
 #include "Data.h"
 #include "NetworkManager.h"
 #include <algorithm>
-#include <exception>
 
 MainState process_data(MainState state)
 {
@@ -203,27 +202,40 @@ MainState process_gameplay(NetworkManager::MessageType mtype,
 			int difference = game->CurrentFrame + NetworkDelay - f;
 			if (num != playerNumber && f > ReceivedFrames[num])
 			{
-				std::transform(
-						&data_r[OtherInputs_InputData]
-						+ std::max(0, difference),
-						&data_r[OtherInputs_InputData]
-						+ InputData_size + std::min(0, difference),
-						PlayerInputs[num].begin(),
-						[] (char c)
+				if (difference >= 0)
+				{
+					std::transform(
+							&data_r[OtherInputs_InputData] + difference,
+							&data_r[OtherInputs_InputData] + InputData_size,
+							&PlayerInputs[num][0],
+							[](char c)
+							{ return static_cast<Player::Direction>(c); });
+					Player::Direction d =
+						static_cast<Player::Direction>(
+						data_r[OtherInputs_InputData + InputData_size - 1]);
+					if (difference > 0)
+					{
+						std::fill(
+								&PlayerInputs[num][InputData_size - difference],
+								&PlayerInputs[num][0] + InputData_size, d);
+					}
+					ReceivedFrames[num] = f;
+				}
+				else
+				{
+					std::copy(
+						&PlayerInputs[num][InputData_size + difference],
+						&PlayerInputs[num][0] + InputData_size,
+						&PlayerInputs[num][0]);
+					std::transform(
+						&data_r[OtherInputs_InputData],
+						&data_r[OtherInputs_InputData] + InputData_size + difference,
+						&PlayerInputs[num][0] - difference,
+						[](char c)
 						{ return static_cast<Player::Direction>(c); });
-				//std::fill(&data_r[OtherInputs_InputData] + InputData_size - difference);
-				ReceivedFrames[num] = f;
+					ReceivedFrames[num] = f;
+				}
 			}
-			//else if (difference >= 0)
-			//{
-			//	for (unsigned int i = difference; i < InputData_size; i++)
-			//	{
-			//		if (PlayerInputs[num][i - difference] != data_r[OtherInputs_InputData + i])
-			//		{
-			//			throw std::exception();
-			//		}
-			//	}
-			//}
 		}
 	}
 

@@ -283,7 +283,9 @@ MainState local_gameplay(MainState state)
 
 	unsigned short all_received = *std::min_element(
 			std::begin(ReceivedFrames), std::end(ReceivedFrames));
-	while (sync->CurrentFrame < all_received)
+	unsigned int currentFrame = game->CurrentFrame;
+	while (sync->CurrentFrame < all_received
+			&& sync->CurrentFrame < currentFrame)
 	{
 		for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
 		{
@@ -294,7 +296,6 @@ MainState local_gameplay(MainState state)
 		sync->update();
 	}
 
-	int currentFrame = game->CurrentFrame;
 	*game = *sync;
 	while (game->CurrentFrame < currentFrame)
 	{

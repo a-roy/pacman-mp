@@ -12,7 +12,7 @@ class Game
 public:
 	Field GameField;
 	std::vector<Player *> Players;
-	int CurrentFrame;
+	unsigned int CurrentFrame;
 
 	Game(Field f, std::vector<Player *> p);
 	Game(const Game &other);
