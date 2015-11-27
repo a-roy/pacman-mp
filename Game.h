@@ -19,5 +19,4 @@ public:
 	~Game();
 	Game& operator=(const Game& rhs);
 	void update();
-	bool move(Player *p, Player::Direction d);
 };
