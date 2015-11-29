@@ -4,8 +4,8 @@
 #pragma once
 
 #define FIELD_WIDTH  28
-#define FIELD_HEIGHT 28
-#define TILE_SIZE    6
+#define FIELD_HEIGHT 31
+#define TILE_SIZE    5
 #define WALL_CHAR    '#'
 #define EMPTY_CHAR   ' '
 #define PELLET_CHAR  '.'
@@ -29,4 +29,5 @@ class Field
 
 		Field() { }
 		Field(std::string file);
+		TileType InterpolateAtPos(int x, int y) const;
 };
