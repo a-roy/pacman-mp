@@ -36,15 +36,17 @@ bool Player::Move(Field *f, Player::Direction d)
 			dy = 1;
 			break;
 	}
-	//int xnew, ynew;
-	//xnew = ((XPos + dx) + (FIELD_WIDTH * TILE_SIZE)) % (FIELD_WIDTH * TILE_SIZE);
-	//ynew = ((YPos + dy) + (FIELD_HEIGHT * TILE_SIZE)) % (FIELD_HEIGHT * TILE_SIZE);
-	Field::TileType new_tile = f->InterpolateAtPos(XPos + dx, YPos + dy);
+	int xnew, ynew;
+	xnew = ((XPos + dx) + (FIELD_WIDTH * TILE_SIZE))
+		% (FIELD_WIDTH * TILE_SIZE);
+	ynew = ((YPos + dy) + (FIELD_HEIGHT * TILE_SIZE))
+		% (FIELD_HEIGHT * TILE_SIZE);
+	Field::TileType new_tile = f->InterpolateAtPos(xnew, ynew);
 
 	if (new_tile & Field::Empty)
 	{
-		XPos += dx;
-		YPos += dy;
+		XPos = xnew;
+		YPos = ynew;
 		return true;
 		CurrentDir = NextDir;
 	}
