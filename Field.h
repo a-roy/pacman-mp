@@ -10,6 +10,8 @@
 #define EMPTY_CHAR   ' '
 #define PELLET_CHAR  '.'
 #define POWER_CHAR   'o'
+#define GBOX_CHAR    '='
+#define GDOOR_CHAR   '%'
 
 #include <array>
 #include <string>
@@ -20,6 +22,8 @@ class Field
 		enum TileType
 		{
 			Wall = 0x00,
+			GhostBox = 0x00,
+			GhostDoor = 0x00,
 			Empty = 0x01,
 			Pellet = 0x03,
 			PowerPellet = 0x05

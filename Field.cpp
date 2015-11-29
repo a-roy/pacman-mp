@@ -29,6 +29,14 @@ Field::Field(std::string file)
 				{
 					Tiles[j][i] = PowerPellet;
 				}
+				else if (line[j] == GBOX_CHAR)
+				{
+					Tiles[j][i] = GhostBox;
+				}
+				else if (line[j] == GDOOR_CHAR)
+				{
+					Tiles[j][i] = GhostDoor;
+				}
 			}
 		}
 		fs.close();
