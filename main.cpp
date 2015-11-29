@@ -279,21 +279,7 @@ static void change(MainState &state, MainState nextState)
 	else if (nextState == ClientConnected) { }
 	else if (nextState == Gameplay)
 	{
-		Field f;
-		for (int i = 0; i < FIELD_WIDTH; i++)
-		{
-			for (int j = 0; j < FIELD_HEIGHT; j++)
-			{
-				if (i == 0 || i == FIELD_WIDTH - 1 || j == 0 || j == FIELD_HEIGHT - 1)
-				{
-					f.Tiles[i][j] = Field::Wall;
-				}
-				else
-				{
-					f.Tiles[i][j] = Field::Empty;
-				}
-			}
-		}
+		Field f("../stage1.txt");
 
 		unsigned int count = Data::GameplayData.PlayerCount;
 		Data::GameplayData.PlayerNumber =
