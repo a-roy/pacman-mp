@@ -29,4 +29,5 @@ class Field
 
 		Field() { }
 		Field(std::string file);
+		TileType InterpolateAtPos(int x, int y) const;
 };

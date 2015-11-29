@@ -36,14 +36,15 @@ bool Player::Move(Field *f, Player::Direction d)
 			dy = 1;
 			break;
 	}
-	int xnew, ynew;
-	xnew = ((XPos + dx) + (FIELD_WIDTH * TILE_SIZE)) % (FIELD_WIDTH * TILE_SIZE);
-	ynew = ((YPos + dy) + (FIELD_HEIGHT * TILE_SIZE)) % (FIELD_HEIGHT * TILE_SIZE);
+	//int xnew, ynew;
+	//xnew = ((XPos + dx) + (FIELD_WIDTH * TILE_SIZE)) % (FIELD_WIDTH * TILE_SIZE);
+	//ynew = ((YPos + dy) + (FIELD_HEIGHT * TILE_SIZE)) % (FIELD_HEIGHT * TILE_SIZE);
+	Field::TileType new_tile = f->InterpolateAtPos(XPos + dx, YPos + dy);
 
-	if (f->Tiles[xnew / TILE_SIZE][ynew / TILE_SIZE] & Field::Empty)
+	if (new_tile & Field::Empty)
 	{
-		XPos = xnew;
-		YPos = ynew;
+		XPos += dx;
+		YPos += dy;
 		return true;
 		CurrentDir = NextDir;
 	}
@@ -55,8 +56,8 @@ bool Player::Move(Field *f, Player::Direction d)
 
 Pacman::Pacman()
 {
-	XPos = 10 * TILE_SIZE;
-	YPos = 12 * TILE_SIZE;
+	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 17 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	CurrentDir = Right;
 	NextDir = Right;
 }
