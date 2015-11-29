@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-Field(std::string file)
+Field::Field(std::string file)
 {
 	std::ifstream fs;
 	fs.open(file);
