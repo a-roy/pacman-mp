@@ -14,7 +14,7 @@ void Player::Move(Field *f)
 	}
 }
 
-bool Player::Move(Field *f, Player::Direction d)
+bool Player::Move(Field *f, Direction d)
 {
 	int dx, dy;
 	switch (d)

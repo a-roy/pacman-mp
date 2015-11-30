@@ -285,10 +285,10 @@ static void change(MainState &state, MainState nextState)
 		Data::GameplayData.PlayerNumber =
 			Data::ClientConnectedData.PlayerNumber;
 		Data::GameplayData.PlayerInputs =
-			std::vector<std::vector<Player::Direction> >(
+			std::vector<std::vector<Direction> >(
 				count,
-				std::vector<Player::Direction>(
-					InputData_size, Player::Right));
+				std::vector<Direction>(
+					InputData_size, Right));
 		Data::GameplayData.ReceivedFrames = std::vector<unsigned short>(count);
 		std::vector<Player *> pl, ps;
 		for (unsigned int i = 0; i < count; i++)
