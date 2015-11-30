@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 #include "SFData.h"
 
 float Renderer::TileScale;
@@ -30,8 +31,39 @@ int Renderer::CreateSprite(std::string texpath)
 
 void Renderer::LoadField(Field *field)
 {
+	for (std::size_t i = 0; i < FIELD_WIDTH; i++)
+	{
+		for (std::size_t j = 0; j < FIELD_HEIGHT; j++)
+		{
+			int tx, ty, tw, th;
+			float theta;
+			bool flip;
+			GetTile(field, i, j, tx, ty, tw, th, theta, flip);
+		}
+	}
 	// TODO draw the field to SFData::FieldTexture
 	// TODO update SFData::FieldShader
+}
+
+void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
+		int &tx, int &ty, float &theta, bool &flip)
+{
+	if (field->Tiles[x][y] == Field::Wall)
+	{
+		tx = 19;
+		ty = 120;
+		theta = 0.f;
+		flip = false;
+	}
+	// 2 edges, 2 walls -> type 0
+	// 1 edge, 3 walls -> type 1 (orientation depends on diagonal)
+	// 1 edge, 2 opposite walls -> type 2
+	// 1 edge, 2 adjacent walls -> type 3
+	// 1 edge, 1 wall -> type 2
+	// no edge, 2 adjacent walls -> type 3
+	// no edge, 2-3 opposite walls -> type 2
+	// no edge, 4 walls -> type 3 (orientation depends on diagonal)
+	// anything else -> undefined
 }
 
 int Renderer::LoadFont(std::string fontpath)
@@ -68,12 +100,31 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 
 static void DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 {
-	sf::Vertex vertices[4];
-	// TODO initialize vertices
-	// TODO set `eaten` uniform
+	sf::Vector2f screenSize(SFData::Window->getSize());
+	sf::Vector2f fieldSize(FIELD_WIDTH, FIELD_HEIGHT);
+	sf::Vector2f offset((screenSize - fieldSize) / 2.f);
+	sf::Vertex vertices[] =
+	{
+		sf::Vertex(
+				offset,
+				sf::Vector2f(0.f, 0.f)),
+		sf::Vertex(
+				sf::Vector2f(offset.x, offset.y + fieldSize.y),
+				sf::Vector2f(0.f, fieldSize.y)),
+		sf::Vertex(
+				sf::Vector2f(offset.x + fieldSize.x, offset.y),
+				sf::Vector2f(fieldSize.x, 0.f)),
+		sf::Vertex(
+				offset + fieldSize,
+				fieldSize)
+	};
+	GLuint program = SFData::FieldShader.getNativeHandle();
+	GLint location = glGetUniformLocation(program, "eaten");
+	sf::Shader::bind(&SFData::FieldShader);
+	glUniform1uiv(location, FIELD_HEIGHT, &eaten[0]);
 	sf::RenderStates renderStates(&SFData::FieldShader);
 	SFData::Window->draw(vertices, 4, sf::TrianglesStrip, renderStates);
-	// TODO draw the saved texture to the screen using our shader
+	sf::Shader::bind(NULL);
 }
 
 void Renderer::DrawText(int fontIndex, std::string text,
