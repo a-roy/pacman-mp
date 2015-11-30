@@ -42,9 +42,9 @@ int main()
 	Renderer::CreateWindow(768, 768, "My window");
 
 	Data::GameplayData.PacmanSprite.Index =
-		Renderer::CreateSprite("../pacman.png");
+		Renderer::CreateSprite("../spritesheet.png");
 	Data::GameplayData.GhostSprite.Index =
-		Renderer::CreateSprite("../pacman.png");
+		Renderer::CreateSprite("../spritesheet.png");
 
 	Data::JoinData.IP[0] = 127;
 	Data::JoinData.IP[1] = 0;
