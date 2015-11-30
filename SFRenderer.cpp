@@ -28,6 +28,12 @@ int Renderer::CreateSprite(std::string texpath)
 	return index;
 }
 
+void Renderer::LoadField(Field *field)
+{
+	// TODO draw the field to SFData::FieldTexture
+	// TODO update SFData::FieldShader
+}
+
 int Renderer::LoadFont(std::string fontpath)
 {
 	sf::Font font;
@@ -58,6 +64,16 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	sprite.setRotation(theta);
 	sprite.setScale(flip ? -SpriteScale : SpriteScale, SpriteScale);
 	SFData::Window->draw(sprite);
+}
+
+static void DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
+{
+	sf::Vertex vertices[4];
+	// TODO initialize vertices
+	// TODO set `eaten` uniform
+	sf::RenderStates renderStates(&SFData::FieldShader);
+	SFData::Window->draw(vertices, 4, sf::TrianglesStrip, renderStates);
+	// TODO draw the saved texture to the screen using our shader
 }
 
 void Renderer::DrawText(int fontIndex, std::string text,
