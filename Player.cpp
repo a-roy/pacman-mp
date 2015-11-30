@@ -75,8 +75,8 @@ void Pacman::Draw()
 
 Ghost::Ghost()
 {
-	XPos = 10 * TILE_SIZE;
-	YPos = 10 * TILE_SIZE;
+	XPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 17 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	CurrentDir = Right;
 	NextDir = Right;
 }
