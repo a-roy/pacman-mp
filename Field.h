@@ -13,6 +13,7 @@
 #define GBOX_CHAR    '='
 #define GDOOR_CHAR   '%'
 
+#include <cstdint>
 #include <array>
 #include <string>
 
@@ -34,4 +35,7 @@ class Field
 		Field() { }
 		Field(std::string file);
 		TileType InterpolateAtPos(int x, int y) const;
+		void NeighborhoodWalls(
+				std::size_t x, std::size_t y,
+				uint8_t &neighborhood, uint8_t &outercardinal) const;
 };
