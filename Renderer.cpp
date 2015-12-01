@@ -12,7 +12,7 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 
 	for (int i = 0; i < 4; i++)
 	{
-		if ((neighborhood & 0xD5) == 0x41
+		if (((neighborhood & 0xD5) == 0x41)
 				&& ((outercardinal & 0x06) == 0x00))
 		{
 			index = 1;
@@ -30,7 +30,7 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 		else if (neighborhood == 0x5C)
 		{
 			index = 2;
-			rotation = (4 - i) % 4;
+			rotation = i;
 			flip = true;
 			return;
 		}
@@ -41,7 +41,7 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 			flip = false;
 			if ((outercardinal & 0x08) == 0x00)
 			{
-				rotation = (i + 2) % 4;
+				rotation = (2 + i) % 4;
 			}
 			return;
 		}
@@ -52,7 +52,8 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 			flip = false;
 			return;
 		}
-		else if ((neighborhood & 0x55) == 0x14)
+		else if (((neighborhood & 0x55) == 0x14)
+				&& ((outercardinal & 0x09) == 0x09))
 		{
 			index = 5;
 			rotation = i;

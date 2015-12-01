@@ -85,19 +85,19 @@ void Renderer::LoadField(Field *field, std::string texpath)
 			// Decide how to align the texture coordinates to the position
 			// coordinates based on the flip and rotation parameters
 			int step = flip ? -1 : 1;
-			int start = flip ? 4 - rotation : 3 + rotation;
+			int start = flip ? (7 - rotation) : (4 + rotation);
 			vertices[6 * (i * FIELD_HEIGHT + j)] =
-				sf::Vertex(positions[0], texcoords[(start + step) % 4]);
+				sf::Vertex(positions[0], texcoords[start % 4]);
 			vertices[6 * (i * FIELD_HEIGHT + j) + 1] =
-				sf::Vertex(positions[1], texcoords[(start + step + 1) % 4]);
+				sf::Vertex(positions[1], texcoords[(start + step) % 4]);
 			vertices[6 * (i * FIELD_HEIGHT + j) + 2] =
-				sf::Vertex(positions[2], texcoords[(start + step + 2) % 4]);
+				sf::Vertex(positions[2], texcoords[(start + step * 2) % 4]);
 			vertices[6 * (i * FIELD_HEIGHT + j) + 3] =
-				sf::Vertex(positions[0], texcoords[(start + step) % 4]);
+				sf::Vertex(positions[0], texcoords[start % 4]);
 			vertices[6 * (i * FIELD_HEIGHT + j) + 4] =
-				sf::Vertex(positions[2], texcoords[(start + step + 2) % 4]);
+				sf::Vertex(positions[2], texcoords[(start + step * 2) % 4]);
 			vertices[6 * (i * FIELD_HEIGHT + j) + 5] =
-				sf::Vertex(positions[3], texcoords[(start + step + 3) % 4]);
+				sf::Vertex(positions[3], texcoords[(start + step * 3) % 4]);
 		}
 	}
 	const sf::Texture &texture = SFData::GetTexture(texpath);
