@@ -43,7 +43,7 @@ void Renderer::LoadField(Field *field, std::string texpath)
 			bool flip;
 			if (field->Tiles[i][j] == Field::Wall)
 			{
-				GetTile(field, i, j, tile, rotation, flip);
+				GetWallTile(field, i, j, tile, rotation, flip);
 			}
 			else if (field->Tiles[i][j] == Field::Pellet)
 			{

@@ -21,6 +21,10 @@ Field::Field(std::string file)
 				{
 					Tiles[j][i] = Empty;
 				}
+				else if (line[j] == EDGE_CHAR)
+				{
+					Tiles[j][i] = Edge;
+				}
 				else if (line[j] == PELLET_CHAR)
 				{
 					Tiles[j][i] = Pellet;
@@ -32,6 +36,10 @@ Field::Field(std::string file)
 				else if (line[j] == GBOX_CHAR)
 				{
 					Tiles[j][i] = GhostBox;
+				}
+				else if (line[j] == GZONE_CHAR)
+				{
+					Tiles[j][i] = GhostZone;
 				}
 				else if (line[j] == GDOOR_CHAR)
 				{
@@ -72,10 +80,10 @@ Field::TileType Field::InterpolateAtPos(int x, int y) const
 
 void Field::NeighborhoodWalls(
 		std::size_t x, std::size_t y,
-		uint8_t &neighborhood, uint8_t &outercardinal) const
+		uint8_t &neighborhood, uint8_t &edges) const
 {
 	neighborhood = 0x00;
-	outercardinal = 0x00;
+	edges = 0x00;
 	if (x < FIELD_WIDTH - 1 && y < FIELD_HEIGHT - 1
 			&& Tiles[x + 1][y + 1] == Wall)
 	{
@@ -87,11 +95,11 @@ void Field::NeighborhoodWalls(
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y < FIELD_HEIGHT - 2 && Tiles[x][y + 2] != Empty)
+	if (y == FIELD_HEIGHT - 1 || Tiles[x][y + 1] == Edge)
 	{
-		outercardinal += 1;
+		edges += 1;
 	}
-	outercardinal <<= 1;
+	edges <<= 1;
 	if (x > 0 && y < FIELD_HEIGHT - 1
 			&& Tiles[x - 1][y + 1] == Wall)
 	{
@@ -103,11 +111,11 @@ void Field::NeighborhoodWalls(
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (x > 1 && Tiles[x - 2][y] != Empty)
+	if (x == 0 || Tiles[x - 1][y] == Edge)
 	{
-		outercardinal += 1;
+		edges += 1;
 	}
-	outercardinal <<= 1;
+	edges <<= 1;
 	if (x > 0 && y > 0 && Tiles[x - 1][y - 1] == Wall)
 	{
 		neighborhood += 1;
@@ -118,11 +126,11 @@ void Field::NeighborhoodWalls(
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y > 1 && Tiles[x][y - 2] != Empty)
+	if (y == 0 || Tiles[x][y - 1] == Edge)
 	{
-		outercardinal += 1;
+		edges += 1;
 	}
-	outercardinal <<= 1;
+	edges <<= 1;
 	if (x < FIELD_WIDTH - 1 && y > 0
 			&& Tiles[x + 1][y - 1] == Wall)
 	{
@@ -133,8 +141,8 @@ void Field::NeighborhoodWalls(
 	{
 		neighborhood += 1;
 	}
-	if (x < FIELD_WIDTH - 2 && Tiles[x + 2][y] != Empty)
+	if (x == FIELD_WIDTH - 1 || Tiles[x + 1][y] == Edge)
 	{
-		outercardinal += 1;
+		edges += 1;
 	}
 }
