@@ -66,7 +66,7 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	SFData::Window->draw(sprite);
 }
 
-static void DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
+void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 {
 	sf::Vertex vertices[4];
 	// TODO initialize vertices
