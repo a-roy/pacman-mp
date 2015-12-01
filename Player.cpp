@@ -14,7 +14,7 @@ void Player::Move(Field *f)
 	}
 }
 
-bool Player::Move(Field *f, Player::Direction d)
+bool Player::Move(Field *f, Direction d)
 {
 	int dx, dy;
 	switch (d)
@@ -36,15 +36,17 @@ bool Player::Move(Field *f, Player::Direction d)
 			dy = 1;
 			break;
 	}
-	//int xnew, ynew;
-	//xnew = ((XPos + dx) + (FIELD_WIDTH * TILE_SIZE)) % (FIELD_WIDTH * TILE_SIZE);
-	//ynew = ((YPos + dy) + (FIELD_HEIGHT * TILE_SIZE)) % (FIELD_HEIGHT * TILE_SIZE);
-	Field::TileType new_tile = f->InterpolateAtPos(XPos + dx, YPos + dy);
+	int xnew, ynew;
+	xnew = ((XPos + dx) + (FIELD_WIDTH * TILE_SIZE))
+		% (FIELD_WIDTH * TILE_SIZE);
+	ynew = ((YPos + dy) + (FIELD_HEIGHT * TILE_SIZE))
+		% (FIELD_HEIGHT * TILE_SIZE);
+	Field::TileType new_tile = f->InterpolateAtPos(xnew, ynew);
 
 	if (new_tile & Field::Empty)
 	{
-		XPos += dx;
-		YPos += dy;
+		XPos = xnew;
+		YPos = ynew;
 		return true;
 		CurrentDir = NextDir;
 	}
@@ -66,15 +68,15 @@ void Pacman::Draw()
 {
 	Renderer::DrawSprite(
 			Data::GameplayData.PacmanSprite,
-			XPos, YPos,
+			XPos + 16, YPos,
 			CurrentDir * -90.f,
 			true, 0, AnimFrame);
 }
 
 Ghost::Ghost()
 {
-	XPos = 10 * TILE_SIZE;
-	YPos = 10 * TILE_SIZE;
+	XPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 17 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	CurrentDir = Right;
 	NextDir = Right;
 }
@@ -112,5 +114,5 @@ void Ghost::Draw()
 	}
 	Renderer::DrawSprite(
 			Data::GameplayData.GhostSprite,
-			XPos, YPos, 0.f, flip, anim, AnimFrame);
+			XPos + 16, YPos, 0.f, flip, anim, AnimFrame);
 }

@@ -182,7 +182,7 @@ MainState process_gameplay(NetworkManager::MessageType mtype,
 {
 	Game *game = Data::GameplayData.Local;
 	unsigned int playerNumber = Data::GameplayData.PlayerNumber;
-	std::vector<std::vector<Player::Direction> > &PlayerInputs =
+	std::vector<std::vector<Direction> > &PlayerInputs =
 		Data::GameplayData.PlayerInputs;
 	std::vector<unsigned short> &ReceivedFrames =
 		Data::GameplayData.ReceivedFrames;
@@ -209,9 +209,9 @@ MainState process_gameplay(NetworkManager::MessageType mtype,
 							&data_r[OtherInputs_InputData] + InputData_size,
 							&PlayerInputs[num][0],
 							[](char c)
-							{ return static_cast<Player::Direction>(c); });
-					Player::Direction d =
-						static_cast<Player::Direction>(
+							{ return static_cast<Direction>(c); });
+					Direction d =
+						static_cast<Direction>(
 						data_r[OtherInputs_InputData + InputData_size - 1]);
 					if (difference > 0)
 					{
@@ -229,7 +229,7 @@ MainState process_gameplay(NetworkManager::MessageType mtype,
 						+ InputData_size + difference,
 						&PlayerInputs[num][0] - difference,
 						[](char c)
-						{ return static_cast<Player::Direction>(c); });
+						{ return static_cast<Direction>(c); });
 					ReceivedFrames[num] = game->CurrentFrame + NetworkDelay;
 				}
 			}

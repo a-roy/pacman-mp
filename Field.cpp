@@ -29,6 +29,14 @@ Field::Field(std::string file)
 				{
 					Tiles[j][i] = PowerPellet;
 				}
+				else if (line[j] == GBOX_CHAR)
+				{
+					Tiles[j][i] = GhostBox;
+				}
+				else if (line[j] == GDOOR_CHAR)
+				{
+					Tiles[j][i] = GhostDoor;
+				}
 			}
 		}
 		fs.close();
@@ -37,15 +45,19 @@ Field::Field(std::string file)
 
 Field::TileType Field::InterpolateAtPos(int x, int y) const
 {
+	// Looks confusing, but all it's doing is checking a half-tile neighborhood
+	// of the given position and doing a bitwise AND (so walls have priority
+	// over open space).
 	int w = FIELD_WIDTH * TILE_SIZE;
 	int h = FIELD_HEIGHT * TILE_SIZE;
-	int del = (TILE_SIZE - 1) / 2;
+	int d_sm = (TILE_SIZE - 1) / 2;
+	int d_lg = TILE_SIZE / 2;
 	std::size_t x_c = (x + w) % w;
-	std::size_t x_r = (x_c + del) % w;
-	std::size_t x_l = (x_c - del + w) % w;
+	std::size_t x_r = (x_c + d_lg) % w;
+	std::size_t x_l = (x_c - d_sm + w) % w;
 	std::size_t y_c = (y + h) % h;
-	std::size_t y_d = (y_c + del) % h;
-	std::size_t y_u = (y_c - del + h) % h;
+	std::size_t y_d = (y_c + d_lg) % h;
+	std::size_t y_u = (y_c - d_sm + h) % h;
 	TileType t5 = Tiles[x_c / TILE_SIZE][y_c / TILE_SIZE];
 	TileType t6 = Tiles[x_r / TILE_SIZE][y_c / TILE_SIZE];
 	TileType t9 = Tiles[x_r / TILE_SIZE][y_u / TILE_SIZE];
@@ -56,4 +68,73 @@ Field::TileType Field::InterpolateAtPos(int x, int y) const
 	TileType t2 = Tiles[x_c / TILE_SIZE][y_d / TILE_SIZE];
 	TileType t3 = Tiles[x_r / TILE_SIZE][y_d / TILE_SIZE];
 	return (TileType)(t5 & t6 & t9 & t8 & t7 & t4 & t1 & t2 & t3);
+}
+
+void Field::NeighborhoodWalls(
+		std::size_t x, std::size_t y,
+		uint8_t &neighborhood, uint8_t &outercardinal) const
+{
+	neighborhood = 0x00;
+	outercardinal = 0x00;
+	if (x < FIELD_WIDTH - 1 && y < FIELD_HEIGHT - 1
+			&& Tiles[x + 1][y + 1] == Wall)
+	{
+		neighborhood += 1;
+	}
+	neighborhood <<= 1;
+	if (y < FIELD_HEIGHT - 1 && Tiles[x][y + 1] == Wall)
+	{
+		neighborhood += 1;
+	}
+	neighborhood <<= 1;
+	if (y < FIELD_HEIGHT - 2 && Tiles[x][y + 2] != Empty)
+	{
+		outercardinal += 1;
+	}
+	outercardinal <<= 1;
+	if (x > 0 && y < FIELD_HEIGHT - 1
+			&& Tiles[x - 1][y + 1] == Wall)
+	{
+		neighborhood += 1;
+	}
+	neighborhood <<= 1;
+	if (x > 0 && Tiles[x - 1][y] == Wall)
+	{
+		neighborhood += 1;
+	}
+	neighborhood <<= 1;
+	if (x > 1 && Tiles[x - 2][y] != Empty)
+	{
+		outercardinal += 1;
+	}
+	outercardinal <<= 1;
+	if (x > 0 && y > 0 && Tiles[x - 1][y - 1] == Wall)
+	{
+		neighborhood += 1;
+	}
+	neighborhood <<= 1;
+	if (y > 0 && Tiles[x][y - 1] == Wall)
+	{
+		neighborhood += 1;
+	}
+	neighborhood <<= 1;
+	if (y > 1 && Tiles[x][y - 2] != Empty)
+	{
+		outercardinal += 1;
+	}
+	outercardinal <<= 1;
+	if (x < FIELD_WIDTH - 1 && y > 0
+			&& Tiles[x + 1][y - 1] == Wall)
+	{
+		neighborhood += 1;
+	}
+	neighborhood <<= 1;
+	if (x < FIELD_WIDTH - 1 && Tiles[x + 1][y] == Wall)
+	{
+		neighborhood += 1;
+	}
+	if (x < FIELD_WIDTH - 2 && Tiles[x + 2][y] != Empty)
+	{
+		outercardinal += 1;
+	}
 }

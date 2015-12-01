@@ -3,20 +3,13 @@
 
 #pragma once
 
+#include "Direction.h"
 #include "Field.h"
 #include "Animation.h"
 
 class Player
 {
 	public:
-		enum Direction
-		{
-			Right,
-			Up,
-			Left,
-			Down
-		};
-	
 		int XPos;
 		int YPos;
 		Direction CurrentDir;
