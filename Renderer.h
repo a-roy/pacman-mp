@@ -32,7 +32,7 @@ class Renderer
 		static int CreateSprite(std::string texpath);
 		static void LoadField(Field *field);
 		static void GetTile(Field *field, std::size_t x, std::size_t y,
-				int &tx, int &ty, float &theta, bool &flip);
+				int &index, int &rotation, bool &flip);
 		//! Load a font
 		//!
 		//! \param fontpath The path to the corresponding font file

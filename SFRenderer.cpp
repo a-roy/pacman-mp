@@ -45,27 +45,6 @@ void Renderer::LoadField(Field *field)
 	// TODO update SFData::FieldShader
 }
 
-void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
-		int &tx, int &ty, float &theta, bool &flip)
-{
-	if (field->Tiles[x][y] == Field::Wall)
-	{
-		tx = 19;
-		ty = 120;
-		theta = 0.f;
-		flip = false;
-	}
-	// 2 edges, 2 walls -> type 0
-	// 1 edge, 3 walls -> type 1 (orientation depends on diagonal)
-	// 1 edge, 2 opposite walls -> type 2
-	// 1 edge, 2 adjacent walls -> type 3
-	// 1 edge, 1 wall -> type 2
-	// no edge, 2 adjacent walls -> type 3
-	// no edge, 2-3 opposite walls -> type 2
-	// no edge, 4 walls -> type 3 (orientation depends on diagonal)
-	// anything else -> undefined
-}
-
 int Renderer::LoadFont(std::string fontpath)
 {
 	sf::Font font;
@@ -98,7 +77,7 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	SFData::Window->draw(sprite);
 }
 
-static void DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
+void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 {
 	sf::Vector2f screenSize(SFData::Window->getSize());
 	sf::Vector2f fieldSize(FIELD_WIDTH, FIELD_HEIGHT);
