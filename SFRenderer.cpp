@@ -45,6 +45,16 @@ void Renderer::LoadField(Field *field, std::string texpath)
 			{
 				GetWallTile(field, i, j, tile, rotation, flip);
 			}
+			else if (field->Tiles[i][j] == Field::GhostBox)
+			{
+				GetBoxTile(field, i, j, tile, rotation, flip);
+			}
+			else if (field->Tiles[i][j] == Field::GhostDoor)
+			{
+				tile = 8;
+				rotation = 2;
+				flip = false;
+			}
 			else if (field->Tiles[i][j] == Field::Pellet)
 			{
 				tile = 9;

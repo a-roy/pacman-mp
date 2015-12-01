@@ -78,70 +78,70 @@ Field::TileType Field::InterpolateAtPos(int x, int y) const
 	return (TileType)(t5 & t6 & t9 & t8 & t7 & t4 & t1 & t2 & t3);
 }
 
-void Field::NeighborhoodWalls(
-		std::size_t x, std::size_t y,
+void Field::NeighborhoodInfo(
+		std::size_t x, std::size_t y, TileType wall, TileType edge,
 		uint8_t &neighborhood, uint8_t &edges) const
 {
 	neighborhood = 0x00;
 	edges = 0x00;
 	if (x < FIELD_WIDTH - 1 && y < FIELD_HEIGHT - 1
-			&& Tiles[x + 1][y + 1] == Wall)
+			&& Tiles[x + 1][y + 1] == wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y < FIELD_HEIGHT - 1 && Tiles[x][y + 1] == Wall)
+	if (y < FIELD_HEIGHT - 1 && Tiles[x][y + 1] == wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y == FIELD_HEIGHT - 1 || Tiles[x][y + 1] == Edge)
+	if (y == FIELD_HEIGHT - 1 || Tiles[x][y + 1] == edge)
 	{
 		edges += 1;
 	}
 	edges <<= 1;
 	if (x > 0 && y < FIELD_HEIGHT - 1
-			&& Tiles[x - 1][y + 1] == Wall)
+			&& Tiles[x - 1][y + 1] == wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (x > 0 && Tiles[x - 1][y] == Wall)
+	if (x > 0 && Tiles[x - 1][y] == wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (x == 0 || Tiles[x - 1][y] == Edge)
+	if (x == 0 || Tiles[x - 1][y] == edge)
 	{
 		edges += 1;
 	}
 	edges <<= 1;
-	if (x > 0 && y > 0 && Tiles[x - 1][y - 1] == Wall)
+	if (x > 0 && y > 0 && Tiles[x - 1][y - 1] == wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y > 0 && Tiles[x][y - 1] == Wall)
+	if (y > 0 && Tiles[x][y - 1] == wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y == 0 || Tiles[x][y - 1] == Edge)
+	if (y == 0 || Tiles[x][y - 1] == edge)
 	{
 		edges += 1;
 	}
 	edges <<= 1;
 	if (x < FIELD_WIDTH - 1 && y > 0
-			&& Tiles[x + 1][y - 1] == Wall)
+			&& Tiles[x + 1][y - 1] == wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (x < FIELD_WIDTH - 1 && Tiles[x + 1][y] == Wall)
+	if (x < FIELD_WIDTH - 1 && Tiles[x + 1][y] == wall)
 	{
 		neighborhood += 1;
 	}
-	if (x == FIELD_WIDTH - 1 || Tiles[x + 1][y] == Edge)
+	if (x == FIELD_WIDTH - 1 || Tiles[x + 1][y] == edge)
 	{
 		edges += 1;
 	}

@@ -33,6 +33,8 @@ class Renderer
 		static void LoadField(Field *field, std::string texpath);
 		static void GetWallTile(Field *field, std::size_t x, std::size_t y,
 				int &index, int &rotation, bool &flip);
+		static void GetBoxTile(Field *field, std::size_t x, std::size_t y,
+				int &index, int &rotation, bool &flip);
 		//! Load a font
 		//!
 		//! \param fontpath The path to the corresponding font file

@@ -43,7 +43,7 @@ class Field
 		Field() { }
 		Field(std::string file);
 		TileType InterpolateAtPos(int x, int y) const;
-		void NeighborhoodWalls(
-				std::size_t x, std::size_t y,
+		void NeighborhoodInfo(
+				std::size_t x, std::size_t y, TileType wall, TileType edge,
 				uint8_t &neighborhood, uint8_t &outercardinal) const;
 };
