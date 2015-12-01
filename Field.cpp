@@ -77,64 +77,64 @@ void Field::NeighborhoodWalls(
 	neighborhood = 0x00;
 	outercardinal = 0x00;
 	if (x < FIELD_WIDTH - 1 && y < FIELD_HEIGHT - 1
-			&& field->Tiles[x + 1][y + 1] == Field::Wall)
+			&& Tiles[x + 1][y + 1] == Wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y < FIELD_HEIGHT - 1 && field->Tiles[x][y + 1] == Field::Wall)
+	if (y < FIELD_HEIGHT - 1 && Tiles[x][y + 1] == Wall)
 	{
 		neighborhood += 1;
-		if (y < FIELD_HEIGHT - 2 && field->Tiles[x][y + 2] == Field::Wall)
-		{
-			outercardinal += 1;
-		}
 	}
 	neighborhood <<= 1;
+	if (y < FIELD_HEIGHT - 2 && Tiles[x][y + 2] != Empty)
+	{
+		outercardinal += 1;
+	}
 	outercardinal <<= 1;
 	if (x > 0 && y < FIELD_HEIGHT - 1
-			&& field->Tiles[x - 1][y + 1] == Field::Wall)
+			&& Tiles[x - 1][y + 1] == Wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (x > 0 && field->Tiles[x - 1][y] == Field::Wall)
+	if (x > 0 && Tiles[x - 1][y] == Wall)
 	{
 		neighborhood += 1;
-		if (x > 1 && field->Tiles[x - 2][y] == Field::Wall)
-		{
-			outercardinal += 1;
-		}
 	}
 	neighborhood <<= 1;
+	if (x > 1 && Tiles[x - 2][y] != Empty)
+	{
+		outercardinal += 1;
+	}
 	outercardinal <<= 1;
-	if (x > 0 && y > 0 && field->Tiles[x - 1][y - 1] == Field::Wall)
+	if (x > 0 && y > 0 && Tiles[x - 1][y - 1] == Wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (y > 0 && field->Tiles[x][y - 1] == Field::Wall)
+	if (y > 0 && Tiles[x][y - 1] == Wall)
 	{
 		neighborhood += 1;
-		if (y > 1 && field->Tiles[x][y - 2] == Field::Wall)
-		{
-			outercardinal += 1;
-		}
 	}
 	neighborhood <<= 1;
+	if (y > 1 && Tiles[x][y - 2] != Empty)
+	{
+		outercardinal += 1;
+	}
 	outercardinal <<= 1;
 	if (x < FIELD_WIDTH - 1 && y > 0
-			&& field->Tiles[x + 1][y - 1] == Field::Wall)
+			&& Tiles[x + 1][y - 1] == Wall)
 	{
 		neighborhood += 1;
 	}
 	neighborhood <<= 1;
-	if (x < FIELD_WIDTH - 1 && field->Tiles[x + 1][y] == Field::Wall)
+	if (x < FIELD_WIDTH - 1 && Tiles[x + 1][y] == Wall)
 	{
 		neighborhood += 1;
-		if (x < FIELD_WIDTH - 2 && field->Tiles[x + 2][y] == Field::Wall)
-		{
-			outercardinal += 1;
-		}
+	}
+	if (x < FIELD_WIDTH - 2 && Tiles[x + 2][y] != Empty)
+	{
+		outercardinal += 1;
 	}
 }

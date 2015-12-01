@@ -1,5 +1,8 @@
 #include "Renderer.h"
 
+float Renderer::TileScale;
+float Renderer::SpriteScale;
+
 void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 		int &index, int &rotation, bool &flip)
 {
@@ -9,24 +12,25 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 
 	for (int i = 0; i < 4; i++)
 	{
-		if ((neighborhood & 0xD5) == 0x41)
+		if ((neighborhood & 0xD5) == 0x41
+				&& ((outercardinal & 0x06) == 0x00))
 		{
 			index = 1;
 			rotation = i;
 			flip = false;
 			return;
 		}
-		else if ((neighborhood & 0xD7) == 0x47)
+		else if (neighborhood == 0x47)
 		{
 			index = 2;
 			rotation = i;
 			flip = false;
 			return;
 		}
-		else if ((neighborhood & 0xBE) == 0x3A)
+		else if (neighborhood == 0x5C)
 		{
 			index = 2;
-			rotation = i;
+			rotation = (4 - i) % 4;
 			flip = true;
 			return;
 		}
@@ -35,6 +39,10 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 			index = 3;
 			rotation = i;
 			flip = false;
+			if ((outercardinal & 0x08) == 0x00)
+			{
+				rotation = (i + 2) % 4;
+			}
 			return;
 		}
 		else if ((neighborhood & 0x5F) == 0x1F)
@@ -60,7 +68,7 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 		}
 
 		neighborhood = (neighborhood << 2) + (neighborhood >> 6);
-		outercardinal = ((outercardinal << 1) + (outercardinal >> 3)) & 0xEF;
+		outercardinal = ((outercardinal << 1) + (outercardinal >> 3)) & 0x0F;
 	}
 
 	index = 0;

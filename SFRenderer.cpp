@@ -1,15 +1,15 @@
 #include "Renderer.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
 #include "SFData.h"
-
-float Renderer::TileScale;
-float Renderer::SpriteScale;
 
 void Renderer::CreateWindow(int width, int height, std::string title)
 {
 	SFData::Window = new sf::RenderWindow(sf::VideoMode(width, height), title);
 	SFData::Window->setFramerateLimit(60);
+	SFData::FieldTexture = new sf::RenderTexture();
+	SFData::FieldTexture->create(
+			FIELD_WIDTH * 8 * SpriteScale, FIELD_HEIGHT * 8 * SpriteScale);
+	SFData::FieldShader.loadFromFile("../Field.vert", "../Field.frag");
 }
 
 bool Renderer::WindowOpen()
@@ -29,20 +29,84 @@ int Renderer::CreateSprite(std::string texpath)
 	return index;
 }
 
-void Renderer::LoadField(Field *field)
+void Renderer::LoadField(Field *field, std::string texpath)
 {
+	sf::Vertex vertices[6 * FIELD_WIDTH * FIELD_HEIGHT];
 	for (std::size_t i = 0; i < FIELD_WIDTH; i++)
 	{
 		for (std::size_t j = 0; j < FIELD_HEIGHT; j++)
 		{
-			int tx, ty, tw, th;
-			float theta;
+			int tile;
+			int rotation;
 			bool flip;
-			GetTile(field, i, j, tx, ty, tw, th, theta, flip);
+			if (field->Tiles[i][j] == Field::Wall)
+			{
+				GetTile(field, i, j, tile, rotation, flip);
+			}
+			else if (field->Tiles[i][j] == Field::Pellet)
+			{
+				tile = 9;
+				rotation = 0;
+				flip = false;
+			}
+			else if (field->Tiles[i][j] == Field::PowerPellet)
+			{
+				tile = 10;
+				rotation = 0;
+				flip = false;
+			}
+			else
+			{
+				tile = 0;
+				rotation = 0;
+				flip = false;
+			}
+			// This is just how they are laid out in the spritesheet
+			int x = 1 + 9 * tile;
+			int y = 120;
+			int w = 8;
+			int h = 8;
+			sf::Vector2f positions[4] =
+			{
+				sf::Vector2f(SpriteScale * w * i, SpriteScale * h * j),
+				sf::Vector2f(SpriteScale * w * i, SpriteScale * h * (j + 1)),
+				sf::Vector2f(SpriteScale * w * (i + 1), SpriteScale * h * (j + 1)),
+				sf::Vector2f(SpriteScale * w * (i + 1), SpriteScale * h * j),
+			};
+			sf::Vector2f texcoords[4] =
+			{
+				sf::Vector2f(x, y),
+				sf::Vector2f(x, y + h),
+				sf::Vector2f(x + w, y + h),
+				sf::Vector2f(x + w, y),
+			};
+			// Decide how to align the texture coordinates to the position
+			// coordinates based on the flip and rotation parameters
+			int step = flip ? -1 : 1;
+			int start = flip ? 4 - rotation : 3 + rotation;
+			vertices[6 * (i * FIELD_HEIGHT + j)] =
+				sf::Vertex(positions[0], texcoords[(start + step) % 4]);
+			vertices[6 * (i * FIELD_HEIGHT + j) + 1] =
+				sf::Vertex(positions[1], texcoords[(start + step + 1) % 4]);
+			vertices[6 * (i * FIELD_HEIGHT + j) + 2] =
+				sf::Vertex(positions[2], texcoords[(start + step + 2) % 4]);
+			vertices[6 * (i * FIELD_HEIGHT + j) + 3] =
+				sf::Vertex(positions[0], texcoords[(start + step) % 4]);
+			vertices[6 * (i * FIELD_HEIGHT + j) + 4] =
+				sf::Vertex(positions[2], texcoords[(start + step + 2) % 4]);
+			vertices[6 * (i * FIELD_HEIGHT + j) + 5] =
+				sf::Vertex(positions[3], texcoords[(start + step + 3) % 4]);
 		}
 	}
-	// TODO draw the field to SFData::FieldTexture
-	// TODO update SFData::FieldShader
+	const sf::Texture &texture = SFData::GetTexture(texpath);
+	SFData::FieldTexture->draw(
+			vertices,
+			6 * FIELD_WIDTH * FIELD_HEIGHT,
+			sf::Triangles,
+			sf::RenderStates(&texture));
+	SFData::FieldTexture->display();
+	SFData::FieldShader.setParameter(
+			"fieldTexture", SFData::FieldTexture->getTexture());
 }
 
 int Renderer::LoadFont(std::string fontpath)
@@ -80,7 +144,8 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 {
 	sf::Vector2f screenSize(SFData::Window->getSize());
-	sf::Vector2f fieldSize(FIELD_WIDTH, FIELD_HEIGHT);
+	sf::Vector2f fieldSize =
+		SpriteScale * 8 * sf::Vector2f(FIELD_WIDTH, FIELD_HEIGHT);
 	sf::Vector2f offset((screenSize - fieldSize) / 2.f);
 	sf::Vertex vertices[] =
 	{
@@ -97,13 +162,23 @@ void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 				offset + fieldSize,
 				fieldSize)
 	};
-	GLuint program = SFData::FieldShader.getNativeHandle();
-	GLint location = glGetUniformLocation(program, "eaten");
-	sf::Shader::bind(&SFData::FieldShader);
-	glUniform1uiv(location, FIELD_HEIGHT, &eaten[0]);
-	sf::RenderStates renderStates(&SFData::FieldShader);
+	sf::Image eaten_image;
+	eaten_image.create(FIELD_WIDTH, FIELD_HEIGHT);
+	for (std::size_t i = 0; i < FIELD_WIDTH; i++)
+	{
+		for (std::size_t j = 0; j < FIELD_HEIGHT; j++)
+		{
+			if (eaten[j] & (1U << i))
+			{
+				eaten_image.setPixel(i, j, sf::Color(1, 1, 1));
+			}
+		}
+	}
+	sf::Texture eaten_texture;
+	eaten_texture.loadFromImage(eaten_image);
+	SFData::FieldShader.setParameter("eatenTexture", eaten_texture);
+	sf::RenderStates renderStates(&SFData::FieldTexture->getTexture());
 	SFData::Window->draw(vertices, 4, sf::TrianglesStrip, renderStates);
-	sf::Shader::bind(NULL);
 }
 
 void Renderer::DrawText(int fontIndex, std::string text,
@@ -169,4 +244,5 @@ void Renderer::Deinit()
 {
 	SFData::Window->close();
 	delete SFData::Window;
+	delete SFData::FieldTexture;
 }

@@ -5,7 +5,7 @@
 
 #define FIELD_WIDTH  28
 #define FIELD_HEIGHT 31
-#define TILE_SIZE    5
+#define TILE_SIZE    8
 #define WALL_CHAR    '#'
 #define EMPTY_CHAR   ' '
 #define PELLET_CHAR  '.'

@@ -30,7 +30,7 @@ class Renderer
 		//! \returns       The index of the sprite in the database (e.g.
 		//!                SFData::Sprites)
 		static int CreateSprite(std::string texpath);
-		static void LoadField(Field *field);
+		static void LoadField(Field *field, std::string texpath);
 		static void GetTile(Field *field, std::size_t x, std::size_t y,
 				int &index, int &rotation, bool &flip);
 		//! Load a font
