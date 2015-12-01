@@ -119,6 +119,13 @@ void Renderer::LoadField(Field *field, std::string texpath)
 	SFData::FieldTexture->display();
 }
 
+void Renderer::GetFieldPos(int &x, int &y)
+{
+	sf::Vector2u size = SFData::Window->getSize();
+	x = (size.x - SpriteScale * 8 * FIELD_WIDTH) / 2;
+	y = (size.y - SpriteScale * 8 * FIELD_HEIGHT) / 2;
+}
+
 int Renderer::LoadFont(std::string fontpath)
 {
 	sf::Font font;
@@ -144,8 +151,10 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	sf::Sprite &sprite = SFData::Sprites[s.Index];
 	int tx, ty, tw, th;
 	s.Animations[anim].GetRect(frame, tx, ty, tw, th);
+	int fx, fy;
+	GetFieldPos(fx, fy);
 	sprite.setTextureRect(sf::IntRect(tx, ty, tw, th));
-	sprite.setPosition(x * TileScale, y * TileScale);
+	sprite.setPosition(x * TileScale + fx, y * TileScale + fy);
 	sprite.setRotation(theta);
 	sprite.setScale(flip ? -SpriteScale : SpriteScale, SpriteScale);
 	SFData::Window->draw(sprite);

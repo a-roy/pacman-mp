@@ -31,6 +31,7 @@ class Renderer
 		//!                SFData::Sprites)
 		static int CreateSprite(std::string texpath);
 		static void LoadField(Field *field, std::string texpath);
+		static void GetFieldPos(int &x, int &y);
 		static void GetWallTile(Field *field, std::size_t x, std::size_t y,
 				int &index, int &rotation, bool &flip);
 		static void GetBoxTile(Field *field, std::size_t x, std::size_t y,
