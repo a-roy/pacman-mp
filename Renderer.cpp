@@ -52,7 +52,7 @@ void Renderer::GetTile(Field *field, std::size_t x, std::size_t y,
 			flip = false;
 			return;
 		}
-		else if ((neighborhood & 0x5D) == 0x1C)
+		else if ((neighborhood & 0x55) == 0x14)
 		{
 			index = 5;
 			rotation = i;

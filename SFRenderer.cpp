@@ -8,8 +8,10 @@ void Renderer::CreateWindow(int width, int height, std::string title)
 	SFData::Window->setFramerateLimit(60);
 	SFData::FieldTexture = new sf::RenderTexture();
 	SFData::FieldTexture->create(
-			FIELD_WIDTH * 8 * SpriteScale, FIELD_HEIGHT * 8 * SpriteScale);
+			FIELD_WIDTH * 8, FIELD_HEIGHT * 8);
 	SFData::FieldShader.loadFromFile("../Field.vert", "../Field.frag");
+	SFData::FieldShader.setParameter(
+			"fieldTexture", SFData::FieldTexture->getTexture());
 }
 
 bool Renderer::WindowOpen()
@@ -68,10 +70,10 @@ void Renderer::LoadField(Field *field, std::string texpath)
 			int h = 8;
 			sf::Vector2f positions[4] =
 			{
-				sf::Vector2f(SpriteScale * w * i, SpriteScale * h * j),
-				sf::Vector2f(SpriteScale * w * i, SpriteScale * h * (j + 1)),
-				sf::Vector2f(SpriteScale * w * (i + 1), SpriteScale * h * (j + 1)),
-				sf::Vector2f(SpriteScale * w * (i + 1), SpriteScale * h * j),
+				sf::Vector2f(w * i, h * j),
+				sf::Vector2f(w * i, h * (j + 1)),
+				sf::Vector2f(w * (i + 1), h * (j + 1)),
+				sf::Vector2f(w * (i + 1), h * j),
 			};
 			sf::Vector2f texcoords[4] =
 			{
@@ -105,8 +107,6 @@ void Renderer::LoadField(Field *field, std::string texpath)
 			sf::Triangles,
 			sf::RenderStates(&texture));
 	SFData::FieldTexture->display();
-	SFData::FieldShader.setParameter(
-			"fieldTexture", SFData::FieldTexture->getTexture());
 }
 
 int Renderer::LoadFont(std::string fontpath)
@@ -145,22 +145,26 @@ void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 {
 	sf::Vector2f screenSize(SFData::Window->getSize());
 	sf::Vector2f fieldSize =
-		SpriteScale * 8 * sf::Vector2f(FIELD_WIDTH, FIELD_HEIGHT);
-	sf::Vector2f offset((screenSize - fieldSize) / 2.f);
+		8.f * sf::Vector2f(FIELD_WIDTH, FIELD_HEIGHT);
+	sf::Vector2f scaledSize = SpriteScale * fieldSize;
+	sf::Vector2f offset = (screenSize - scaledSize) / 2.f;
 	sf::Vertex vertices[] =
 	{
 		sf::Vertex(
 				offset,
+				sf::Vector2f(0.f, 1.f)),
+		sf::Vertex(
+				sf::Vector2f(offset.x, offset.y + scaledSize.y),
+				//sf::Vector2f(0.f, fieldSize.y)),
 				sf::Vector2f(0.f, 0.f)),
 		sf::Vertex(
-				sf::Vector2f(offset.x, offset.y + fieldSize.y),
-				sf::Vector2f(0.f, fieldSize.y)),
+				sf::Vector2f(offset.x + scaledSize.x, offset.y),
+				//sf::Vector2f(fieldSize.x, 0.f)),
+				sf::Vector2f(1.f, 1.f)),
 		sf::Vertex(
-				sf::Vector2f(offset.x + fieldSize.x, offset.y),
-				sf::Vector2f(fieldSize.x, 0.f)),
-		sf::Vertex(
-				offset + fieldSize,
-				fieldSize)
+				offset + scaledSize,
+				//fieldSize)
+				sf::Vector2f(1.f, 0.f))
 	};
 	sf::Image eaten_image;
 	eaten_image.create(FIELD_WIDTH, FIELD_HEIGHT);
@@ -177,7 +181,7 @@ void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 	sf::Texture eaten_texture;
 	eaten_texture.loadFromImage(eaten_image);
 	SFData::FieldShader.setParameter("eatenTexture", eaten_texture);
-	sf::RenderStates renderStates(&SFData::FieldTexture->getTexture());
+	sf::RenderStates renderStates(&SFData::FieldShader);
 	SFData::Window->draw(vertices, 4, sf::TrianglesStrip, renderStates);
 }
 
