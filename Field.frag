@@ -7,7 +7,7 @@ uniform sampler2D eatenTexture;
 
 void main()
 {
-	vec2 tile = vec2(floor(gl_TexCoord[0].st / TILE_PIXELS));
-	float visibility = 1.0 - texture2D(eatenTexture, tile).r;
-	gl_FragColor = texture2D(fieldTexture, gl_TexCoord[0].st);
+	float visibility = 1.0 - texture2D(eatenTexture, gl_TexCoord[0].st).r;
+	vec4 color = texture2D(fieldTexture, gl_TexCoord[0].st);
+	gl_FragColor = vec4(color.rgb, visibility);
 }

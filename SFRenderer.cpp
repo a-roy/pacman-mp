@@ -12,6 +12,9 @@ void Renderer::CreateWindow(int width, int height, std::string title)
 	SFData::FieldShader.loadFromFile("../Field.vert", "../Field.frag");
 	SFData::FieldShader.setParameter(
 			"fieldTexture", SFData::FieldTexture->getTexture());
+	SFData::PelletTexture.create(FIELD_WIDTH, FIELD_HEIGHT);
+	SFData::FieldShader.setParameter(
+			"eatenTexture", SFData::PelletTexture);
 }
 
 bool Renderer::WindowOpen()
@@ -185,21 +188,20 @@ void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
 				//fieldSize)
 				sf::Vector2f(1.f, 0.f))
 	};
-	sf::Image eaten_image;
-	eaten_image.create(FIELD_WIDTH, FIELD_HEIGHT);
+	sf::Image pellet_mask;
+	pellet_mask.create(FIELD_WIDTH, FIELD_HEIGHT);
 	for (std::size_t i = 0; i < FIELD_WIDTH; i++)
 	{
 		for (std::size_t j = 0; j < FIELD_HEIGHT; j++)
 		{
 			if (eaten[j] & (1U << i))
 			{
-				eaten_image.setPixel(i, j, sf::Color(1, 1, 1));
+				pellet_mask.setPixel(i, j, sf::Color(255, 255, 255));
 			}
 		}
 	}
-	sf::Texture eaten_texture;
-	eaten_texture.loadFromImage(eaten_image);
-	SFData::FieldShader.setParameter("eatenTexture", eaten_texture);
+	pellet_mask.flipVertically();
+	SFData::PelletTexture.update(pellet_mask);
 	sf::RenderStates renderStates(&SFData::FieldShader);
 	SFData::Window->draw(vertices, 4, sf::TrianglesStrip, renderStates);
 }

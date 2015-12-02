@@ -249,6 +249,17 @@ static void render(const MainState &state)
 
 		std::array<uint32_t, FIELD_HEIGHT> eaten;
 		eaten.fill(0x00);
+		for (unsigned int i = 0; i < FIELD_WIDTH; i++)
+		{
+			for (unsigned int j = 0; j < FIELD_HEIGHT; j++)
+			{
+				if ((game->GameField.Tiles[i][j] & Field::Pellet)
+						== Field::Pellet)
+				{
+					eaten[j] = eaten[j] | (1U << i);
+				}
+			}
+		}
 		Renderer::DrawField(eaten);
 		for (unsigned int i = 0; i < game->Players.size(); i++)
 		{
