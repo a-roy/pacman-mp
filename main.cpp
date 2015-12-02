@@ -254,13 +254,6 @@ static void render(const MainState &state)
 		{
 			game->Players[i]->Draw();
 		}
-		//std::ostringstream ss;
-		//ss << "Local: " << game->CurrentFrame;
-		//Renderer::DrawText(Data::Font, ss.str(), 18, 20, 20);
-		//ss.str("");
-		//Game *sync = Data::GameplayData.Synced;
-		//ss << "Synced: " << sync->CurrentFrame;
-		//Renderer::DrawText(Data::Font, ss.str(), 18, 20, 60);
 	}
 	else if (state == Exiting) { }
 	Renderer::Display();
