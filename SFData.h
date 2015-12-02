@@ -20,6 +20,8 @@ class SFData
 		//!
 		static sf::Shader FieldShader;
 		//!
+		static sf::Texture PelletTexture;
+		//!
 		static sf::UdpSocket Socket;
 		//! SFML Texture database, where keys are file paths
 		static std::map<std::string, sf::Texture> Textures;

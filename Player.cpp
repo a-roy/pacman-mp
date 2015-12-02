@@ -68,7 +68,7 @@ void Pacman::Draw()
 {
 	Renderer::DrawSprite(
 			Data::GameplayData.PacmanSprite,
-			XPos + 16, YPos,
+			XPos, YPos,
 			CurrentDir * -90.f,
 			true, 0, AnimFrame);
 }
@@ -114,5 +114,5 @@ void Ghost::Draw()
 	}
 	Renderer::DrawSprite(
 			Data::GameplayData.GhostSprite,
-			XPos + 16, YPos, 0.f, flip, anim, AnimFrame);
+			XPos, YPos, 0.f, flip, anim, AnimFrame);
 }
