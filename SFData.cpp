@@ -14,8 +14,11 @@ const sf::Texture &SFData::GetTexture(std::string path)
 	std::map<std::string, sf::Texture>::iterator i = Textures.find(path);
 	if (i == Textures.end())
 	{
+		sf::Image image;
+		image.loadFromFile(path);
+		image.createMaskFromColor(sf::Color(0, 0, 0));
 		sf::Texture texture;
-		texture.loadFromFile(path);
+		texture.loadFromImage(image);
 		Textures[path] = texture;
 		return Textures[path];
 	}
