@@ -45,21 +45,21 @@ MainState local_main_menu(MainState state)
 
 	if (InputHandler::InputTime == 0)
 	{
-		if (InputHandler::LastInput == Player::Up)
+		if (InputHandler::LastInput == Up)
 		{
 			if (index > 0)
 			{
 				index--;
 			}
 		}
-		else if (InputHandler::LastInput == Player::Down)
+		else if (InputHandler::LastInput == Down)
 		{
 			if (index < menu.size() - 1)
 			{
 				index++;
 			}
 		}
-		else if (InputHandler::LastInput == Player::Right)
+		else if (InputHandler::LastInput == Right)
 		{
 			return menu[index].Function;
 		}
@@ -74,7 +74,7 @@ MainState local_join(MainState state)
 
 	if (InputHandler::InputTime == 0)
 	{
-		if (InputHandler::LastInput == Player::Left)
+		if (InputHandler::LastInput == Left)
 		{
 			if (index > 0)
 			{
@@ -85,7 +85,7 @@ MainState local_join(MainState state)
 				return MainMenu;
 			}
 		}
-		else if (InputHandler::LastInput == Player::Right)
+		else if (InputHandler::LastInput == Right)
 		{
 			if (index < 16)
 			{
@@ -104,11 +104,11 @@ MainState local_join(MainState state)
 				return ClientWaiting;
 			}
 		}
-		else if (InputHandler::LastInput == Player::Up)
+		else if (InputHandler::LastInput == Up)
 		{
 			addrIncrement(index, 1);
 		}
-		else if (InputHandler::LastInput == Player::Down)
+		else if (InputHandler::LastInput == Down)
 		{
 			addrIncrement(index, -1);
 		}
@@ -146,7 +146,7 @@ MainState local_host(MainState state)
 
 	if (InputHandler::InputTime == 0)
 	{
-		if (InputHandler::LastInput == Player::Right)
+		if (InputHandler::LastInput == Right)
 		{
 			bool ready = true;
 			for (unsigned int i = 0; i < lobby_count; i++)
@@ -169,7 +169,7 @@ MainState local_host(MainState state)
 				NetworkManager::Broadcast(NetworkManager::StartGame, data_s);
 			}
 		}
-		else if (InputHandler::LastInput == Player::Left)
+		else if (InputHandler::LastInput == Left)
 		{
 			return MainMenu;
 		}
@@ -206,12 +206,12 @@ MainState local_client_connected(MainState state)
 	{
 		if (index == 0)
 		{
-			if (InputHandler::LastInput == Player::Down)
+			if (InputHandler::LastInput == Down)
 			{
 				index = 1;
 			}
-			else if (InputHandler::LastInput == Player::Left
-					|| InputHandler::LastInput == Player::Right)
+			else if (InputHandler::LastInput == Left
+					|| InputHandler::LastInput == Right)
 			{
 				if (c == Pacman_c)
 				{
@@ -226,19 +226,19 @@ MainState local_client_connected(MainState state)
 		else
 		{
 			bool &ready = Data::ClientConnectedData.Ready;
-			if (InputHandler::LastInput == Player::Up)
+			if (InputHandler::LastInput == Up)
 			{
 				ready = false;
 				index = 0;
 			}
-			else if (InputHandler::LastInput == Player::Right)
+			else if (InputHandler::LastInput == Right)
 			{
 				ready = true;
 				std::vector<char> data_s(PlayerReady_size);
 				data_s[PlayerReady_Character] = c;
 				NetworkManager::Send(NetworkManager::PlayerReady, data_s, 0);
 			}
-			else if (InputHandler::LastInput == Player::Left)
+			else if (InputHandler::LastInput == Left)
 			{
 				ready = false;
 				std::vector<char> data_s(PlayerNotReady_size);
@@ -263,7 +263,7 @@ MainState local_gameplay(MainState state)
 {
 	Game *game = Data::GameplayData.Local;
 	Game *sync = Data::GameplayData.Synced;
-	std::vector<std::vector<Player::Direction> > &PlayerInputs
+	std::vector<std::vector<Direction> > &PlayerInputs
 		= Data::GameplayData.PlayerInputs;
 	std::vector<unsigned short> &ReceivedFrames
 		= Data::GameplayData.ReceivedFrames;

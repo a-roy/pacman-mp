@@ -3,8 +3,10 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include "Sprite.h"
+#include "Field.h"
 
 //! Handles graphics rendering
 class Renderer
@@ -28,6 +30,12 @@ class Renderer
 		//! \returns       The index of the sprite in the database (e.g.
 		//!                SFData::Sprites)
 		static int CreateSprite(std::string texpath);
+		static void LoadField(Field *field, std::string texpath);
+		static void GetFieldPos(int &x, int &y);
+		static void GetWallTile(Field *field, std::size_t x, std::size_t y,
+				int &index, int &rotation, bool &flip);
+		static void GetBoxTile(Field *field, std::size_t x, std::size_t y,
+				int &index, int &rotation, bool &flip);
 		//! Load a font
 		//!
 		//! \param fontpath The path to the corresponding font file
@@ -44,6 +52,7 @@ class Renderer
 		//! \param frame The sprite's current frame of animation
 		static void DrawSprite(const Sprite &s, int x, int y, float theta,
 				bool flip, int anim, int frame);
+		static void DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten);
 		//! Draw a line of text to the window
 		//!
 		//! \param fontIndex The database index of a font

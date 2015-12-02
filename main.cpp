@@ -37,14 +37,14 @@ int main()
 	item3.Function = Exiting;
 	Data::MainMenuData.MenuItems.push_back(item3);
 
-	Renderer::TileScale = 6.0f;
+	Renderer::TileScale = 3.0f;
 	Renderer::SpriteScale = 3.0f;
 	Renderer::CreateWindow(768, 768, "My window");
 
 	Data::GameplayData.PacmanSprite.Index =
-		Renderer::CreateSprite("../pacman.png");
+		Renderer::CreateSprite("../spritesheet.png");
 	Data::GameplayData.GhostSprite.Index =
-		Renderer::CreateSprite("../pacman.png");
+		Renderer::CreateSprite("../spritesheet.png");
 
 	Data::JoinData.IP[0] = 127;
 	Data::JoinData.IP[1] = 0;
@@ -247,17 +247,13 @@ static void render(const MainState &state)
 		Game *game = Data::GameplayData.Local;
 		unsigned int &frame = Data::GameplayData.AnimFrame;
 
+		std::array<uint32_t, FIELD_HEIGHT> eaten;
+		eaten.fill(0x00);
+		Renderer::DrawField(eaten);
 		for (unsigned int i = 0; i < game->Players.size(); i++)
 		{
 			game->Players[i]->Draw();
 		}
-		std::ostringstream ss;
-		ss << "Local: " << game->CurrentFrame;
-		Renderer::DrawText(Data::Font, ss.str(), 18, 20, 20);
-		ss.str("");
-		Game *sync = Data::GameplayData.Synced;
-		ss << "Synced: " << sync->CurrentFrame;
-		Renderer::DrawText(Data::Font, ss.str(), 18, 20, 60);
 	}
 	else if (state == Exiting) { }
 	Renderer::Display();
@@ -279,30 +275,17 @@ static void change(MainState &state, MainState nextState)
 	else if (nextState == ClientConnected) { }
 	else if (nextState == Gameplay)
 	{
-		Field f;
-		for (int i = 0; i < FIELD_WIDTH; i++)
-		{
-			for (int j = 0; j < FIELD_HEIGHT; j++)
-			{
-				if (i == 0 || i == FIELD_WIDTH - 1 || j == 0 || j == FIELD_HEIGHT - 1)
-				{
-					f.Tiles[i][j] = Field::Wall;
-				}
-				else
-				{
-					f.Tiles[i][j] = Field::Empty;
-				}
-			}
-		}
+		Field f("../stage1.txt");
+		Renderer::LoadField(&f, "../spritesheet.png");
 
 		unsigned int count = Data::GameplayData.PlayerCount;
 		Data::GameplayData.PlayerNumber =
 			Data::ClientConnectedData.PlayerNumber;
 		Data::GameplayData.PlayerInputs =
-			std::vector<std::vector<Player::Direction> >(
+			std::vector<std::vector<Direction> >(
 				count,
-				std::vector<Player::Direction>(
-					InputData_size, Player::Right));
+				std::vector<Direction>(
+					InputData_size, Right));
 		Data::GameplayData.ReceivedFrames = std::vector<unsigned short>(count);
 		std::vector<Player *> pl, ps;
 		for (unsigned int i = 0; i < count; i++)

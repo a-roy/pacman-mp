@@ -48,7 +48,7 @@ class Data
 			unsigned int AnimFrame;
 			unsigned int PlayerCount;
 			unsigned int PlayerNumber;
-			std::vector<std::vector<Player::Direction> > PlayerInputs;
+			std::vector<std::vector<Direction> > PlayerInputs;
 			std::vector<unsigned short> ReceivedFrames;
 			std::vector<Character> Characters;
 		};
