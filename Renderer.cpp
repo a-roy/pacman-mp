@@ -28,7 +28,7 @@ void Renderer::GetWallTile(Field *field, std::size_t x, std::size_t y,
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (((neighborhood & (NB_R|NB_U|NB_UL)) == (NB_R|NB_D))
+		if (((neighborhood & (NB_R|NB_U|NB_L|NB_D|NB_DR)) == (NB_R|NB_D))
 				&& ((edges & (ED_U|ED_L)) == (ED_U|ED_L)))
 		{
 			index = 1;
