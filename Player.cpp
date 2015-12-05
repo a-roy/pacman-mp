@@ -2,7 +2,7 @@
 #include "Renderer.h"
 #include "Data.h"
 
-void Player::Move(Field *f)
+void Player::Move(const Field *f, PelletStatus &p)
 {
 	if (Move(f, NextDir))
 	{
@@ -14,7 +14,7 @@ void Player::Move(Field *f)
 	}
 }
 
-bool Player::Move(Field *f, Direction d)
+bool Player::Move(const Field *f, Direction d)
 {
 	int dx, dy;
 	switch (d)
@@ -64,6 +64,16 @@ Pacman::Pacman()
 	NextDir = Right;
 }
 
+void Pacman::Move(const Field *f, PelletStatus &p)
+{
+	Player::Move(f, p);
+	Field::TileType tile = f->Tiles[XPos / TILE_SIZE][YPos / TILE_SIZE];
+	if (tile & Field::Pellet)
+	{
+		p[YPos / TILE_SIZE] |= (1U << (XPos / TILE_SIZE));
+	}
+}
+
 void Pacman::Draw()
 {
 	Renderer::DrawSprite(
@@ -81,7 +91,7 @@ Ghost::Ghost()
 	NextDir = Right;
 }
 
-bool Ghost::Move(Field *f, Direction d)
+bool Ghost::Move(const Field *f, Direction d)
 {
 	if ((CurrentDir == Right && d == Left)
 			|| (CurrentDir == Up && d == Down)

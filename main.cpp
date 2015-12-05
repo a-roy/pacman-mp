@@ -245,22 +245,8 @@ static void render(const MainState &state)
 	else if (state == Gameplay)
 	{
 		Game *game = Data::GameplayData.Local;
-		unsigned int &frame = Data::GameplayData.AnimFrame;
 
-		std::array<uint32_t, FIELD_HEIGHT> eaten;
-		eaten.fill(0x00);
-		for (unsigned int i = 0; i < FIELD_WIDTH; i++)
-		{
-			for (unsigned int j = 0; j < FIELD_HEIGHT; j++)
-			{
-				if ((game->GameField.Tiles[i][j] & Field::Pellet)
-						== Field::Pellet)
-				{
-					eaten[j] = eaten[j] | (1U << i);
-				}
-			}
-		}
-		Renderer::DrawField(eaten);
+		Renderer::DrawField(game->Pellets);
 		for (unsigned int i = 0; i < game->Players.size(); i++)
 		{
 			game->Players[i]->Draw();

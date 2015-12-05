@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <array>
+#include <cstdint>
 #include <vector>
 #include "Player.h"
 #include "Field.h"
@@ -11,6 +13,7 @@ class Game
 {
 public:
 	Field GameField;
+	PelletStatus Pellets;
 	std::vector<Player *> Players;
 	unsigned int CurrentFrame;
 

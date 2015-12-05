@@ -163,7 +163,7 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	SFData::Window->draw(sprite);
 }
 
-void Renderer::DrawField(std::array<uint32_t, FIELD_HEIGHT> eaten)
+void Renderer::DrawField(const PelletStatus &eaten)
 {
 	sf::Vector2f screenSize(SFData::Window->getSize());
 	sf::Vector2f fieldSize =
