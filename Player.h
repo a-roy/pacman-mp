@@ -7,6 +7,7 @@
 #include <vector>
 #include "Direction.h"
 #include "Field.h"
+#include "Sprite.h"
 #include "Animation.h"
 
 class Player
@@ -28,6 +29,8 @@ class Player
 class Pacman : public Player
 {
 	public:
+		static Sprite PacmanSprite;
+
 		Pacman();
 		void Move(const Field *f, PelletStatus &p);
 		void Draw();
@@ -37,6 +40,8 @@ class Pacman : public Player
 class Ghost : public Player
 {
 	public:
+		static Sprite GhostSprite;
+
 		Ghost();
 		bool Move(const Field *f, Direction d);
 		void Draw();

@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "Renderer.h"
-#include "Data.h"
 
 void Player::Move(const Field *f, PelletStatus &p)
 {
@@ -56,6 +55,8 @@ bool Player::Move(const Field *f, Direction d)
 	}
 }
 
+Sprite Pacman::PacmanSprite;
+
 Pacman::Pacman()
 {
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
@@ -77,11 +78,13 @@ void Pacman::Move(const Field *f, PelletStatus &p)
 void Pacman::Draw()
 {
 	Renderer::DrawSprite(
-			Data::GameplayData.PacmanSprite,
+			PacmanSprite,
 			XPos, YPos,
 			CurrentDir * -90.f,
 			true, 0, AnimFrame);
 }
+
+Sprite Ghost::GhostSprite;
 
 Ghost::Ghost()
 {
@@ -123,6 +126,6 @@ void Ghost::Draw()
 		anim = 2;
 	}
 	Renderer::DrawSprite(
-			Data::GameplayData.GhostSprite,
+			GhostSprite,
 			XPos, YPos, 0.f, flip, anim, AnimFrame);
 }

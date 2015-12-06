@@ -14,7 +14,7 @@ Game::Game(const Game &other)
 	Pellets = other.Pellets;
 	CurrentFrame = other.CurrentFrame;
 	Players = std::vector<Player *>();
-	for (unsigned int i = 0, size = Players.size(); i < size; i++)
+	for (unsigned int i = 0, size = other.Players.size(); i < size; i++)
 	{
 		Players.push_back(other.Players[i]->Clone());
 	}
