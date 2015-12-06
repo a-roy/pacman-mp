@@ -19,6 +19,8 @@
 #include <array>
 #include <string>
 
+typedef std::array<uint32_t, FIELD_HEIGHT> PelletStatus;
+
 class Field
 {
 	public:
