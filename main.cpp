@@ -152,12 +152,7 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		ClientConnectedState *client =
 			(ClientConnectedState *)states[ClientConnected];
 		GameplayState *gameplay = (GameplayState *)states[Gameplay];
-		//Field f("../stage1.txt");
-		//std::vector<Player *> p(1, new Pacman());
-		//gameplay->Local = new Game(f, p);
 		gameplay->Local = client->StartingGame;
-		//std::vector<Player *> q(1, new Pacman());
-		//gameplay->Synced = new Game(f, q);
 		gameplay->Synced = new Game(*gameplay->Local);
 		gameplay->PlayerNumber = client->PlayerNumber;
 		unsigned int count = gameplay->Local->Players.size();
