@@ -157,7 +157,7 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		gameplay->PlayerNumber = client->PlayerNumber;
 		unsigned int count = gameplay->Local->Players.size();
 		gameplay->PlayerInputs = std::vector<std::vector<Direction> >(
-				count, std::vector<Direction>(InputData_size, Right));
+				count, std::vector<Direction>(InputData_size, Left));
 		gameplay->ReceivedFrames = std::vector<unsigned short>(count);
 	}
 

@@ -60,9 +60,9 @@ Sprite Pacman::PacmanSprite;
 Pacman::Pacman()
 {
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	YPos = 17 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	CurrentDir = Right;
-	NextDir = Right;
+	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	CurrentDir = Left;
+	NextDir = Left;
 }
 
 void Pacman::Move(const Field *f, PelletStatus &p)
@@ -88,10 +88,10 @@ Sprite Ghost::GhostSprite;
 
 Ghost::Ghost()
 {
-	XPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	YPos = 17 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	CurrentDir = Right;
-	NextDir = Right;
+	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	CurrentDir = Left;
+	NextDir = Left;
 }
 
 bool Ghost::Move(const Field *f, Direction d)
