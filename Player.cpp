@@ -69,7 +69,7 @@ void Pacman::Move(const Field *f, PelletStatus &p)
 {
 	Player::Move(f, p);
 	Field::TileType tile = f->Tiles[XPos / TILE_SIZE][YPos / TILE_SIZE];
-	if (tile & Field::Pellet)
+	if ((tile & Field::Pellet) == Field::Pellet)
 	{
 		p[YPos / TILE_SIZE] |= (1U << (XPos / TILE_SIZE));
 	}
