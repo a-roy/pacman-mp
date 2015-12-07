@@ -13,7 +13,7 @@ class Game
 {
 public:
 	Field GameField;
-	PelletStatus Pellets;
+	Field::PelletStatus Pellets;
 	std::vector<Player *> Players;
 	unsigned int CurrentFrame;
 

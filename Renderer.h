@@ -52,7 +52,7 @@ class Renderer
 		//! \param frame The sprite's current frame of animation
 		static void DrawSprite(const Sprite &s, int x, int y, float theta,
 				bool flip, int anim, int frame);
-		static void DrawField(const PelletStatus &eaten);
+		static void DrawField(const Field::PelletStatus &pellets);
 		//! Draw a line of text to the window
 		//!
 		//! \param fontIndex The database index of a font

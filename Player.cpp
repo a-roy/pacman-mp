@@ -65,13 +65,16 @@ Pacman::Pacman()
 	NextDir = Left;
 }
 
-void Pacman::Move(const Field *f, PelletStatus &p)
+void Pacman::Move(const Field *f, Field::PelletStatus &p)
 {
 	Player::Move(f, p);
 	Field::TileType tile = f->Tiles[XPos / TILE_SIZE][YPos / TILE_SIZE];
 	if ((tile & Field::Pellet) == Field::Pellet)
 	{
-		p[YPos / TILE_SIZE] |= (1U << (XPos / TILE_SIZE));
+		if (!p.IsEaten(XPos / TILE_SIZE, YPos / TILE_SIZE))
+		{
+			p.Eat(XPos / TILE_SIZE, YPos / TILE_SIZE);
+		}
 	}
 }
 

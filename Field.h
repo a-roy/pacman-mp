@@ -19,8 +19,6 @@
 #include <array>
 #include <string>
 
-typedef std::array<uint32_t, FIELD_HEIGHT> PelletStatus;
-
 class Field
 {
 	public:
@@ -38,6 +36,16 @@ class Field
 			Edge = 0x0B,
 			Pellet = 0x07,
 			PowerPellet = 0x0F
+		};
+		class PelletStatus
+		{
+			public:
+				std::array<uint32_t, FIELD_HEIGHT> Bitfield;
+
+				PelletStatus() { Bitfield.fill(0x00000000); }
+				bool IsEaten(int x, int y) const
+				{ return (Bitfield[y] & (1U << x)) != 0U; }
+				void Eat(int x, int y) { Bitfield[y] |= (1U << x); }
 		};
 
 		std::array<std::array<TileType, FIELD_HEIGHT>, FIELD_WIDTH> Tiles;

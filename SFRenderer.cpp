@@ -163,7 +163,7 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	SFData::Window->draw(sprite);
 }
 
-void Renderer::DrawField(const PelletStatus &eaten)
+void Renderer::DrawField(const Field::PelletStatus &pellets)
 {
 	sf::Vector2f screenSize(SFData::Window->getSize());
 	sf::Vector2f fieldSize =
@@ -194,7 +194,7 @@ void Renderer::DrawField(const PelletStatus &eaten)
 	{
 		for (std::size_t j = 0; j < FIELD_HEIGHT; j++)
 		{
-			if (eaten[j] & (1U << i))
+			if (pellets.IsEaten(i, j))
 			{
 				pellet_mask.setPixel(i, j, sf::Color(255, 255, 255));
 			}

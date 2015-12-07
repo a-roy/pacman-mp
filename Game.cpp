@@ -3,7 +3,6 @@
 Game::Game(Field f, std::vector<Player *> p)
 {
 	GameField = f;
-	Pellets.fill(0x00000000);
 	Players = p;
 	CurrentFrame = 0;
 }

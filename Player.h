@@ -20,7 +20,7 @@ class Player
 		int AnimFrame;
 		std::vector<Animation *> Animations;
 
-		virtual void Move(const Field *f, PelletStatus &p);
+		virtual void Move(const Field *f, Field::PelletStatus &p);
 		virtual bool Move(const Field *f, Direction d);
 		virtual void Draw() = 0;
 		virtual Player *Clone() = 0;
@@ -32,7 +32,7 @@ class Pacman : public Player
 		static Sprite PacmanSprite;
 
 		Pacman();
-		void Move(const Field *f, PelletStatus &p);
+		void Move(const Field *f, Field::PelletStatus &p);
 		void Draw();
 		Player *Clone() { return new Pacman(*this); }
 };
