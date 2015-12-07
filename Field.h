@@ -29,6 +29,7 @@ class Field
 		enum TileType
 		{
 			Wall = 0x00,
+			PacmanZone = 0x01,
 			GhostBox = 0x08,
 			GhostZone = 0x02,
 			GhostDoor = 0x0A,

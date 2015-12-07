@@ -34,6 +34,7 @@ class Player
 		virtual Event CollideWith(const Player *other) = 0;
 		virtual void ProcessEvent(Event event) = 0;
 		virtual void Reset() = 0;
+		virtual Field::TileType MoveFlag() = 0;
 		virtual void Draw() const = 0;
 		virtual Player *Clone() = 0;
 };
@@ -50,6 +51,7 @@ class Pacman : public Player
 		void ProcessEvent(Event event);
 		void Reset();
 		void Draw() const;
+		Field::TileType MoveFlag() { return Field::PacmanZone; }
 		Player *Clone() { return new Pacman(*this); }
 };
 
@@ -66,6 +68,7 @@ class Ghost : public Player
 		void ProcessEvent(Event event);
 		void Reset();
 		void Draw() const;
+		Field::TileType MoveFlag() { return Field::GhostZone; }
 		Player *Clone() { return new Ghost(*this); }
 };
 

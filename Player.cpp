@@ -53,7 +53,8 @@ bool Player::Move(const Field *f, Direction d)
 		% (FIELD_HEIGHT * TILE_SIZE);
 	Field::TileType new_tile = f->InterpolateAtPos(xnew, ynew);
 
-	if (new_tile & Field::Empty)
+	Field::TileType move_flag = MoveFlag();
+	if ((new_tile & move_flag) == move_flag)
 	{
 		XPos = xnew;
 		YPos = ynew;
