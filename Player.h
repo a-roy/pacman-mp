@@ -13,6 +13,13 @@
 class Player
 {
 	public:
+		enum Event
+		{
+			None,
+			PacmanPowered,
+			PacmanDied
+		};
+
 		int XPos;
 		int YPos;
 		int Speed;
@@ -21,11 +28,12 @@ class Player
 		int AnimFrame;
 		std::vector<Animation *> Animations;
 
-		virtual void Move(const Field *f, Field::PelletStatus &p);
+		virtual Event Move(const Field *f, Field::PelletStatus &p);
 		virtual bool Move(const Field *f, Direction d);
-		virtual void CollideWith(const Player *other) = 0;
+		virtual Event CollideWith(const Player *other) = 0;
+		virtual void ProcessEvent(Event event) = 0;
 		virtual void Reset() = 0;
-		virtual void Draw(int fear) const = 0;
+		virtual void Draw() const = 0;
 		virtual Player *Clone() = 0;
 };
 
@@ -33,13 +41,14 @@ class Pacman : public Player
 {
 	public:
 		static Sprite PacmanSprite;
-		int PoweredUp;
+		int Dying;
 
 		Pacman();
-		void Move(const Field *f, Field::PelletStatus &p);
-		void CollideWith(const Player *other);
+		Event Move(const Field *f, Field::PelletStatus &p);
+		Event CollideWith(const Player *other);
+		void ProcessEvent(Event event);
 		void Reset();
-		void Draw(int fear) const;
+		void Draw() const;
 		Player *Clone() { return new Pacman(*this); }
 };
 
@@ -47,12 +56,16 @@ class Ghost : public Player
 {
 	public:
 		static Sprite GhostSprite;
+		int Fear;
+		int Starting;
 
 		Ghost();
+		Event Move(const Field *f, Field::PelletStatus &p);
 		bool Move(const Field *f, Direction d);
-		void CollideWith(const Player *other);
+		Event CollideWith(const Player *other);
+		void ProcessEvent(Event event);
 		void Reset();
-		void Draw(int fear) const;
+		void Draw() const;
 		Player *Clone() { return new Ghost(*this); }
 };
 

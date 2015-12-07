@@ -47,11 +47,15 @@ Game& Game::operator=(const Game& rhs)
 
 void Game::update()
 {
+	Player::Event event = Player::None;
 	for (unsigned int i = 0; i < Players.size(); i++)
 	{
 		Player *p = Players[i];
-		p->Move(&GameField, Pellets);
-		p->AnimFrame++;
+		Player::Event e = p->Move(&GameField, Pellets);
+		if (e > event)
+		{
+			event = e;
+		}
 	}
 	for (unsigned int i = 0; i < Players.size(); i++)
 	{
@@ -63,9 +67,29 @@ void Game::update()
 					&& Players[i]->YPos - Players[j]->YPos < 8
 					&& Players[j]->YPos - Players[i]->YPos < 8)
 			{
-				Players[i]->CollideWith(Players[j]);
-				Players[j]->CollideWith(Players[i]);
+				Player::Event e;
+				Player *clone_i = Players[i]->Clone();
+				Player *clone_j = Players[j]->Clone();
+				e = Players[i]->CollideWith(clone_j);
+				if (e > event)
+				{
+					event = e;
+				}
+				e = Players[j]->CollideWith(clone_i);
+				if (e > event)
+				{
+					event = e;
+				}
+				delete clone_i;
+				delete clone_j;
 			}
+		}
+	}
+	if (event != Player::None)
+	{
+		for (unsigned int i = 0; i < Players.size(); i++)
+		{
+			Players[i]->ProcessEvent(event);
 		}
 	}
 	CurrentFrame++;
@@ -73,17 +97,8 @@ void Game::update()
 
 void Game::draw() const
 {
-	int fear = 0;
 	for (unsigned int i = 0; i < Players.size(); i++)
 	{
-		Pacman *pacman = dynamic_cast<Pacman *>(Players[i]);
-		if (pacman != NULL)
-		{
-			fear = std::max(fear, pacman->PoweredUp);
-		}
-	}
-	for (unsigned int i = 0; i < Players.size(); i++)
-	{
-		Players[i]->Draw(fear);
+		Players[i]->Draw();
 	}
 }
