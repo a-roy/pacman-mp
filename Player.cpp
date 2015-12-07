@@ -67,6 +67,8 @@ Pacman::Pacman()
 	Speed = 11;
 	CurrentDir = Left;
 	NextDir = Left;
+	AnimFrame = 0;
+	PoweredUp = 0;
 }
 
 void Pacman::Move(const Field *f, Field::PelletStatus &p)
@@ -90,6 +92,28 @@ void Pacman::Move(const Field *f, Field::PelletStatus &p)
 	}
 }
 
+void Pacman::CollideWith(const Player *other)
+{
+	const Ghost *ghost = dynamic_cast<const Ghost *>(other);
+
+	if (ghost != NULL)
+	{
+		if (PoweredUp == 0)
+		{
+			Reset();
+		}
+	}
+}
+
+void Pacman::Reset()
+{
+	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	CurrentDir = Left;
+	NextDir = Left;
+	PoweredUp = 0;
+}
+
 void Pacman::Draw(int fear) const
 {
 	Renderer::DrawSprite(
@@ -108,6 +132,7 @@ Ghost::Ghost()
 	Speed = 10;
 	CurrentDir = Left;
 	NextDir = Left;
+	AnimFrame = 0;
 }
 
 bool Ghost::Move(const Field *f, Direction d)
@@ -123,6 +148,25 @@ bool Ghost::Move(const Field *f, Direction d)
 	{
 		return Player::Move(f, d);
 	}
+}
+
+void Ghost::CollideWith(const Player *other)
+{
+	const Pacman *pacman = dynamic_cast<const Pacman *>(other);
+
+	if (pacman != NULL)
+	{
+		Reset();
+	}
+}
+
+void Ghost::Reset()
+{
+	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	CurrentDir = Up;
+	NextDir = Up;
+	AnimFrame = 0;
 }
 
 void Ghost::Draw(int fear) const

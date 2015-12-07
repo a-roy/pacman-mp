@@ -53,6 +53,21 @@ void Game::update()
 		p->Move(&GameField, Pellets);
 		p->AnimFrame++;
 	}
+	for (unsigned int i = 0; i < Players.size(); i++)
+	{
+		for (unsigned int j = 0; j < Players.size(); j++)
+		{
+			if (i != j
+					&& Players[i]->XPos - Players[j]->XPos < 8
+					&& Players[j]->XPos - Players[i]->XPos < 8
+					&& Players[i]->YPos - Players[j]->YPos < 8
+					&& Players[j]->YPos - Players[i]->YPos < 8)
+			{
+				Players[i]->CollideWith(Players[j]);
+				Players[j]->CollideWith(Players[i]);
+			}
+		}
+	}
 	CurrentFrame++;
 }
 

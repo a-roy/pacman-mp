@@ -23,6 +23,8 @@ class Player
 
 		virtual void Move(const Field *f, Field::PelletStatus &p);
 		virtual bool Move(const Field *f, Direction d);
+		virtual void CollideWith(const Player *other) = 0;
+		virtual void Reset() = 0;
 		virtual void Draw(int fear) const = 0;
 		virtual Player *Clone() = 0;
 };
@@ -35,6 +37,8 @@ class Pacman : public Player
 
 		Pacman();
 		void Move(const Field *f, Field::PelletStatus &p);
+		void CollideWith(const Player *other);
+		void Reset();
 		void Draw(int fear) const;
 		Player *Clone() { return new Pacman(*this); }
 };
@@ -46,6 +50,8 @@ class Ghost : public Player
 
 		Ghost();
 		bool Move(const Field *f, Direction d);
+		void CollideWith(const Player *other);
+		void Reset();
 		void Draw(int fear) const;
 		Player *Clone() { return new Ghost(*this); }
 };
