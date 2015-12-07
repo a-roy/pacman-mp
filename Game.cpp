@@ -62,10 +62,10 @@ void Game::update()
 		for (unsigned int j = 0; j < Players.size(); j++)
 		{
 			if (i != j
-					&& Players[i]->XPos - Players[j]->XPos < 8
-					&& Players[j]->XPos - Players[i]->XPos < 8
-					&& Players[i]->YPos - Players[j]->YPos < 8
-					&& Players[j]->YPos - Players[i]->YPos < 8)
+					&& Players[i]->XPos - Players[j]->XPos < TILE_SIZE / 2
+					&& Players[j]->XPos - Players[i]->XPos < TILE_SIZE / 2
+					&& Players[i]->YPos - Players[j]->YPos < TILE_SIZE / 2
+					&& Players[j]->YPos - Players[i]->YPos < TILE_SIZE / 2)
 			{
 				Player::Event e;
 				Player *clone_i = Players[i]->Clone();
