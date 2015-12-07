@@ -1,9 +1,9 @@
 #include "Game.h"
+#include <algorithm>
 
 Game::Game(Field f, std::vector<Player *> p)
 {
 	GameField = f;
-	Pellets.fill(0x00000000);
 	Players = p;
 	CurrentFrame = 0;
 }
@@ -47,11 +47,58 @@ Game& Game::operator=(const Game& rhs)
 
 void Game::update()
 {
-	for (int i = 0; i < Players.size(); i++)
+	Player::Event event = Player::None;
+	for (unsigned int i = 0; i < Players.size(); i++)
 	{
 		Player *p = Players[i];
-		p->Move(&GameField, Pellets);
-		p->AnimFrame++;
+		Player::Event e = p->Move(&GameField, Pellets);
+		if (e > event)
+		{
+			event = e;
+		}
+	}
+	for (unsigned int i = 0; i < Players.size(); i++)
+	{
+		for (unsigned int j = 0; j < Players.size(); j++)
+		{
+			if (i != j
+					&& Players[i]->XPos - Players[j]->XPos < 8
+					&& Players[j]->XPos - Players[i]->XPos < 8
+					&& Players[i]->YPos - Players[j]->YPos < 8
+					&& Players[j]->YPos - Players[i]->YPos < 8)
+			{
+				Player::Event e;
+				Player *clone_i = Players[i]->Clone();
+				Player *clone_j = Players[j]->Clone();
+				e = Players[i]->CollideWith(clone_j);
+				if (e > event)
+				{
+					event = e;
+				}
+				e = Players[j]->CollideWith(clone_i);
+				if (e > event)
+				{
+					event = e;
+				}
+				delete clone_i;
+				delete clone_j;
+			}
+		}
+	}
+	if (event != Player::None)
+	{
+		for (unsigned int i = 0; i < Players.size(); i++)
+		{
+			Players[i]->ProcessEvent(event);
+		}
 	}
 	CurrentFrame++;
+}
+
+void Game::draw() const
+{
+	for (unsigned int i = 0; i < Players.size(); i++)
+	{
+		Players[i]->Draw();
+	}
 }

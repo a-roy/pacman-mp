@@ -13,7 +13,7 @@ class Game
 {
 public:
 	Field GameField;
-	PelletStatus Pellets;
+	Field::PelletStatus Pellets;
 	std::vector<Player *> Players;
 	unsigned int CurrentFrame;
 
@@ -22,4 +22,5 @@ public:
 	~Game();
 	Game& operator=(const Game& rhs);
 	void update();
+	void draw() const;
 };

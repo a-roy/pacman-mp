@@ -157,13 +157,15 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	int fx, fy;
 	GetFieldPos(fx, fy);
 	sprite.setTextureRect(sf::IntRect(tx, ty, tw, th));
-	sprite.setPosition(x * TileScale + fx, y * TileScale + fy);
+	sprite.setPosition(
+			x * TileScale * 8 / TILE_SIZE + fx,
+			y * TileScale * 8 / TILE_SIZE + fy);
 	sprite.setRotation(theta);
 	sprite.setScale(flip ? -SpriteScale : SpriteScale, SpriteScale);
 	SFData::Window->draw(sprite);
 }
 
-void Renderer::DrawField(const PelletStatus &eaten)
+void Renderer::DrawField(const Field::PelletStatus &pellets)
 {
 	sf::Vector2f screenSize(SFData::Window->getSize());
 	sf::Vector2f fieldSize =
@@ -194,7 +196,7 @@ void Renderer::DrawField(const PelletStatus &eaten)
 	{
 		for (std::size_t j = 0; j < FIELD_HEIGHT; j++)
 		{
-			if (eaten[j] & (1U << i))
+			if (pellets.IsEaten(i, j))
 			{
 				pellet_mask.setPixel(i, j, sf::Color(255, 255, 255));
 			}

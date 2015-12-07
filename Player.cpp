@@ -1,16 +1,27 @@
 #include "Player.h"
 #include "Renderer.h"
 
-void Player::Move(const Field *f, PelletStatus &p)
+Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 {
-	if (Move(f, NextDir))
+	if (Starting == 0)
 	{
-		CurrentDir = NextDir;
+		for (int i = 0; i < Speed; i++)
+		{
+			if (Move(f, NextDir))
+			{
+				CurrentDir = NextDir;
+			}
+			else
+			{
+				Move(f, CurrentDir);
+			}
+		}
 	}
 	else
 	{
-		Move(f, CurrentDir);
+		Starting--;
 	}
+	return None;
 }
 
 bool Player::Move(const Field *f, Direction d)
@@ -60,38 +71,115 @@ Sprite Pacman::PacmanSprite;
 Pacman::Pacman()
 {
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	YPos = 17 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	CurrentDir = Right;
-	NextDir = Right;
+	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	Speed = 11;
+	Starting = 300;
+	CurrentDir = Left;
+	NextDir = Left;
+	AnimFrame = 0;
+	Dying = -1;
 }
 
-void Pacman::Move(const Field *f, PelletStatus &p)
+Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 {
+	if (Dying > 0)
+	{
+		if (Dying == 48)
+		{
+			AnimFrame = 0;
+		}
+		else if (Dying < 48)
+		{
+			AnimFrame++;
+		}
+		Dying--;
+		return None;
+	}
+	else if (Dying == 0)
+	{
+		Reset();
+		return None;
+	}
+
 	Player::Move(f, p);
 	Field::TileType tile = f->Tiles[XPos / TILE_SIZE][YPos / TILE_SIZE];
-	if (tile & Field::Pellet)
+	if ((tile & Field::Pellet) == Field::Pellet)
 	{
-		p[YPos / TILE_SIZE] |= (1U << (XPos / TILE_SIZE));
+		if (!p.IsEaten(XPos / TILE_SIZE, YPos / TILE_SIZE))
+		{
+			p.Eat(XPos / TILE_SIZE, YPos / TILE_SIZE);
+			if (tile == Field::PowerPellet)
+			{
+				AnimFrame++;
+				return PacmanPowered;
+			}
+		}
 	}
+	AnimFrame++;
+	return None;
 }
 
-void Pacman::Draw()
+Player::Event Pacman::CollideWith(const Player *other)
 {
+	const Ghost *ghost = dynamic_cast<const Ghost *>(other);
+
+	if (ghost != NULL && Dying < 0)
+	{
+		if (ghost->Fear == 0)
+		{
+			Dying = 64;
+			return PacmanDied;
+		}
+	}
+
+	return None;
+}
+
+void Pacman::ProcessEvent(Player::Event event)
+{
+}
+
+void Pacman::Reset()
+{
+	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	CurrentDir = Left;
+	NextDir = Left;
+	Dying = -1;
+}
+
+void Pacman::Draw() const
+{
+	bool die_anim = (Dying > 0 && Dying <= 48);
 	Renderer::DrawSprite(
 			PacmanSprite,
 			XPos, YPos,
-			CurrentDir * -90.f,
-			true, 0, AnimFrame);
+			die_anim ? 0 : (CurrentDir * -90.f),
+			true, die_anim ? 1 : 0, AnimFrame);
 }
 
 Sprite Ghost::GhostSprite;
 
 Ghost::Ghost()
 {
-	XPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	YPos = 17 * TILE_SIZE + (TILE_SIZE - 1) / 2;
-	CurrentDir = Right;
-	NextDir = Right;
+	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	Speed = 10;
+	Starting = 300;
+	CurrentDir = Left;
+	NextDir = Left;
+	AnimFrame = 0;
+	Fear = 0;
+}
+
+Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
+{
+	if (Fear > 0)
+	{
+		Fear--;
+	}
+
+	return Player::Move(f, p);
 }
 
 bool Ghost::Move(const Field *f, Direction d)
@@ -109,21 +197,70 @@ bool Ghost::Move(const Field *f, Direction d)
 	}
 }
 
-void Ghost::Draw()
+Player::Event Ghost::CollideWith(const Player *other)
+{
+	const Pacman *pacman = dynamic_cast<const Pacman *>(other);
+
+	if (pacman != NULL)
+	{
+		if (Fear > 0)
+		{
+			Reset();
+		}
+		else if (pacman->Dying < 0)
+		{
+			Reset();
+		}
+	}
+
+	return None;
+}
+
+void Ghost::ProcessEvent(Player::Event event)
+{
+	if (event == PacmanPowered)
+	{
+		Fear = 300;
+	}
+	else if (event == PacmanDied)
+	{
+		Reset();
+	}
+}
+
+void Ghost::Reset()
+{
+	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	YPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	CurrentDir = Up;
+	NextDir = Up;
+	AnimFrame = 0;
+	Fear = 0;
+	Starting = 64;
+}
+
+void Ghost::Draw() const
 {
 	int anim = 0;
 	bool flip = false;
-	if (CurrentDir == Right)
+	if (Fear > 0)
 	{
-		flip = true;
+		anim = 3;
 	}
-	else if (CurrentDir == Up)
+	else
 	{
-		anim = 1;
-	}
-	else if (CurrentDir == Down)
-	{
-		anim = 2;
+		if (CurrentDir == Right)
+		{
+			flip = true;
+		}
+		else if (CurrentDir == Up)
+		{
+			anim = 1;
+		}
+		else if (CurrentDir == Down)
+		{
+			anim = 2;
+		}
 	}
 	Renderer::DrawSprite(
 			GhostSprite,

@@ -13,16 +13,28 @@
 class Player
 {
 	public:
+		enum Event
+		{
+			None,
+			PacmanPowered,
+			PacmanDied
+		};
+
 		int XPos;
 		int YPos;
+		int Speed;
+		int Starting;
 		Direction CurrentDir;
 		Direction NextDir;
 		int AnimFrame;
 		std::vector<Animation *> Animations;
 
-		virtual void Move(const Field *f, PelletStatus &p);
+		virtual Event Move(const Field *f, Field::PelletStatus &p);
 		virtual bool Move(const Field *f, Direction d);
-		virtual void Draw() = 0;
+		virtual Event CollideWith(const Player *other) = 0;
+		virtual void ProcessEvent(Event event) = 0;
+		virtual void Reset() = 0;
+		virtual void Draw() const = 0;
 		virtual Player *Clone() = 0;
 };
 
@@ -30,10 +42,14 @@ class Pacman : public Player
 {
 	public:
 		static Sprite PacmanSprite;
+		int Dying;
 
 		Pacman();
-		void Move(const Field *f, PelletStatus &p);
-		void Draw();
+		Event Move(const Field *f, Field::PelletStatus &p);
+		Event CollideWith(const Player *other);
+		void ProcessEvent(Event event);
+		void Reset();
+		void Draw() const;
 		Player *Clone() { return new Pacman(*this); }
 };
 
@@ -41,10 +57,15 @@ class Ghost : public Player
 {
 	public:
 		static Sprite GhostSprite;
+		int Fear;
 
 		Ghost();
+		Event Move(const Field *f, Field::PelletStatus &p);
 		bool Move(const Field *f, Direction d);
-		void Draw();
+		Event CollideWith(const Player *other);
+		void ProcessEvent(Event event);
+		void Reset();
+		void Draw() const;
 		Player *Clone() { return new Ghost(*this); }
 };
 

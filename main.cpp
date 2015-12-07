@@ -79,25 +79,29 @@ int main()
 	pac_move.AddFrame(18, 1, 16, 16);
 	pac_move.AddFrame(1, 1, 16, 16);
 	Pacman::PacmanSprite.Animations.push_back(pac_move);
+	Animation pac_die(4);
+	for (int i = 3; i < 15; i++)
+	{
+		pac_die.AddFrame(1 + 17 * i, 1, 16, 16);
+	}
+	Pacman::PacmanSprite.Animations.push_back(pac_die);
 
-	Animation gho_hori(4);
+	Animation gho_hori(8);
 	gho_hori.AddFrame(1, 18, 16, 16);
-	gho_hori.AddFrame(1, 18, 16, 16);
-	gho_hori.AddFrame(18, 18, 16, 16);
 	gho_hori.AddFrame(18, 18, 16, 16);
 	Ghost::GhostSprite.Animations.push_back(gho_hori);
-	Animation gho_up(4);
+	Animation gho_up(8);
 	gho_up.AddFrame(35, 18, 16, 16);
-	gho_up.AddFrame(35, 18, 16, 16);
-	gho_up.AddFrame(52, 18, 16, 16);
 	gho_up.AddFrame(52, 18, 16, 16);
 	Ghost::GhostSprite.Animations.push_back(gho_up);
-	Animation gho_down(4);
+	Animation gho_down(8);
 	gho_down.AddFrame(69, 18, 16, 16);
-	gho_down.AddFrame(69, 18, 16, 16);
-	gho_down.AddFrame(86, 18, 16, 16);
 	gho_down.AddFrame(86, 18, 16, 16);
 	Ghost::GhostSprite.Animations.push_back(gho_down);
+	Animation gho_fear(8);
+	gho_fear.AddFrame(205, 18, 16, 16);
+	gho_fear.AddFrame(222, 18, 16, 16);
+	Ghost::GhostSprite.Animations.push_back(gho_fear);
 
 	// Initialize NetworkManager
 	NetworkManager::Init();
@@ -152,17 +156,12 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		ClientConnectedState *client =
 			(ClientConnectedState *)states[ClientConnected];
 		GameplayState *gameplay = (GameplayState *)states[Gameplay];
-		//Field f("../stage1.txt");
-		//std::vector<Player *> p(1, new Pacman());
-		//gameplay->Local = new Game(f, p);
 		gameplay->Local = client->StartingGame;
-		//std::vector<Player *> q(1, new Pacman());
-		//gameplay->Synced = new Game(f, q);
 		gameplay->Synced = new Game(*gameplay->Local);
 		gameplay->PlayerNumber = client->PlayerNumber;
 		unsigned int count = gameplay->Local->Players.size();
 		gameplay->PlayerInputs = std::vector<std::vector<Direction> >(
-				count, std::vector<Direction>(InputData_size, Right));
+				count, std::vector<Direction>(InputData_size, Left));
 		gameplay->ReceivedFrames = std::vector<unsigned short>(count);
 	}
 
