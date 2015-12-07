@@ -20,13 +20,25 @@ void InputHandler::PollEvents()
 					case sf::Keyboard::W:
 						newInput = Up;
 						break;
+					case sf::Keyboard::Up:
+						newInput = Up;
+						break;
 					case sf::Keyboard::A:
+						newInput = Left;
+						break;
+					case sf::Keyboard::Left:
 						newInput = Left;
 						break;
 					case sf::Keyboard::S:
 						newInput = Down;
 						break;
+					case sf::Keyboard::Down:
+						newInput = Down;
+						break;
 					case sf::Keyboard::D:
+						newInput = Right;
+						break;
+					case sf::Keyboard::Right:
 						newInput = Right;
 						break;
 					default:
