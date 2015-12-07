@@ -23,6 +23,7 @@ class Player
 		int XPos;
 		int YPos;
 		int Speed;
+		int Starting;
 		Direction CurrentDir;
 		Direction NextDir;
 		int AnimFrame;
@@ -57,7 +58,6 @@ class Ghost : public Player
 	public:
 		static Sprite GhostSprite;
 		int Fear;
-		int Starting;
 
 		Ghost();
 		Event Move(const Field *f, Field::PelletStatus &p);

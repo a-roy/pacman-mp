@@ -3,16 +3,23 @@
 
 Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 {
-	for (int i = 0; i < Speed; i++)
+	if (Starting == 0)
 	{
-		if (Move(f, NextDir))
+		for (int i = 0; i < Speed; i++)
 		{
-			CurrentDir = NextDir;
+			if (Move(f, NextDir))
+			{
+				CurrentDir = NextDir;
+			}
+			else
+			{
+				Move(f, CurrentDir);
+			}
 		}
-		else
-		{
-			Move(f, CurrentDir);
-		}
+	}
+	else
+	{
+		Starting--;
 	}
 	return None;
 }
@@ -66,6 +73,7 @@ Pacman::Pacman()
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	Speed = 11;
+	Starting = 300;
 	CurrentDir = Left;
 	NextDir = Left;
 	AnimFrame = 0;
@@ -157,30 +165,21 @@ Ghost::Ghost()
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	Speed = 10;
+	Starting = 300;
 	CurrentDir = Left;
 	NextDir = Left;
 	AnimFrame = 0;
 	Fear = 0;
-	Starting = 0;
 }
 
 Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
 {
-	if (Starting == 0)
-	{
-		Player::Move(f, p);
-	}
-	else
-	{
-		Starting--;
-	}
-
 	if (Fear > 0)
 	{
 		Fear--;
 	}
 
-	return None;
+	return Player::Move(f, p);
 }
 
 bool Ghost::Move(const Field *f, Direction d)
