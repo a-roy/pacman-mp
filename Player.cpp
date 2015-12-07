@@ -72,12 +72,20 @@ Pacman::Pacman()
 void Pacman::Move(const Field *f, Field::PelletStatus &p)
 {
 	Player::Move(f, p);
+	if (PoweredUp > 0)
+	{
+		PoweredUp--;
+	}
 	Field::TileType tile = f->Tiles[XPos / TILE_SIZE][YPos / TILE_SIZE];
 	if ((tile & Field::Pellet) == Field::Pellet)
 	{
 		if (!p.IsEaten(XPos / TILE_SIZE, YPos / TILE_SIZE))
 		{
 			p.Eat(XPos / TILE_SIZE, YPos / TILE_SIZE);
+			if (tile == Field::PowerPellet)
+			{
+				PoweredUp = 300;
+			}
 		}
 	}
 }

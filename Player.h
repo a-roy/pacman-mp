@@ -31,6 +31,7 @@ class Pacman : public Player
 {
 	public:
 		static Sprite PacmanSprite;
+		int PoweredUp;
 
 		Pacman();
 		void Move(const Field *f, Field::PelletStatus &p);
