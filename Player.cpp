@@ -21,6 +21,7 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 	{
 		Starting--;
 	}
+	AnimFrame++;
 	return None;
 }
 
@@ -111,12 +112,10 @@ Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 			p.Eat(XPos / TILE_SIZE, YPos / TILE_SIZE);
 			if (tile == Field::PowerPellet)
 			{
-				AnimFrame++;
 				return PacmanPowered;
 			}
 		}
 	}
-	AnimFrame++;
 	return None;
 }
 
