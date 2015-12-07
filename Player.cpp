@@ -90,7 +90,7 @@ void Pacman::Move(const Field *f, Field::PelletStatus &p)
 	}
 }
 
-void Pacman::Draw()
+void Pacman::Draw(int fear) const
 {
 	Renderer::DrawSprite(
 			PacmanSprite,
@@ -125,21 +125,28 @@ bool Ghost::Move(const Field *f, Direction d)
 	}
 }
 
-void Ghost::Draw()
+void Ghost::Draw(int fear) const
 {
 	int anim = 0;
 	bool flip = false;
-	if (CurrentDir == Right)
+	if (fear > 0)
 	{
-		flip = true;
+		anim = 3;
 	}
-	else if (CurrentDir == Up)
+	else
 	{
-		anim = 1;
-	}
-	else if (CurrentDir == Down)
-	{
-		anim = 2;
+		if (CurrentDir == Right)
+		{
+			flip = true;
+		}
+		else if (CurrentDir == Up)
+		{
+			anim = 1;
+		}
+		else if (CurrentDir == Down)
+		{
+			anim = 2;
+		}
 	}
 	Renderer::DrawSprite(
 			GhostSprite,

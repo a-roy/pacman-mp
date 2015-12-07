@@ -98,6 +98,12 @@ int main()
 	gho_down.AddFrame(86, 18, 16, 16);
 	gho_down.AddFrame(86, 18, 16, 16);
 	Ghost::GhostSprite.Animations.push_back(gho_down);
+	Animation gho_fear(4);
+	gho_fear.AddFrame(205, 18, 16, 16);
+	gho_fear.AddFrame(205, 18, 16, 16);
+	gho_fear.AddFrame(222, 18, 16, 16);
+	gho_fear.AddFrame(222, 18, 16, 16);
+	Ghost::GhostSprite.Animations.push_back(gho_fear);
 
 	// Initialize NetworkManager
 	NetworkManager::Init();

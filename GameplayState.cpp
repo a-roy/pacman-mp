@@ -122,8 +122,5 @@ MainStateEnum GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 void GameplayState::Render() const
 {
 	Renderer::DrawField(Local->Pellets);
-	for (unsigned int i = 0; i < Local->Players.size(); i++)
-	{
-		Local->Players[i]->Draw();
-	}
+	Local->draw();
 }

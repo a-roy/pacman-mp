@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <algorithm>
 
 Game::Game(Field f, std::vector<Player *> p)
 {
@@ -46,11 +47,28 @@ Game& Game::operator=(const Game& rhs)
 
 void Game::update()
 {
-	for (int i = 0; i < Players.size(); i++)
+	for (unsigned int i = 0; i < Players.size(); i++)
 	{
 		Player *p = Players[i];
 		p->Move(&GameField, Pellets);
 		p->AnimFrame++;
 	}
 	CurrentFrame++;
+}
+
+void Game::draw() const
+{
+	int fear = 0;
+	for (unsigned int i = 0; i < Players.size(); i++)
+	{
+		Pacman *pacman = dynamic_cast<Pacman *>(Players[i]);
+		if (pacman != NULL)
+		{
+			fear = std::max(fear, pacman->PoweredUp);
+		}
+	}
+	for (unsigned int i = 0; i < Players.size(); i++)
+	{
+		Players[i]->Draw(fear);
+	}
 }

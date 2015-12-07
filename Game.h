@@ -22,4 +22,5 @@ public:
 	~Game();
 	Game& operator=(const Game& rhs);
 	void update();
+	void draw() const;
 };
