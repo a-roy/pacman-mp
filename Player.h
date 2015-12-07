@@ -15,6 +15,7 @@ class Player
 	public:
 		int XPos;
 		int YPos;
+		int Speed;
 		Direction CurrentDir;
 		Direction NextDir;
 		int AnimFrame;

@@ -157,7 +157,9 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	int fx, fy;
 	GetFieldPos(fx, fy);
 	sprite.setTextureRect(sf::IntRect(tx, ty, tw, th));
-	sprite.setPosition(x * TileScale + fx, y * TileScale + fy);
+	sprite.setPosition(
+			x * TileScale * 8 / TILE_SIZE + fx,
+			y * TileScale * 8 / TILE_SIZE + fy);
 	sprite.setRotation(theta);
 	sprite.setScale(flip ? -SpriteScale : SpriteScale, SpriteScale);
 	SFData::Window->draw(sprite);

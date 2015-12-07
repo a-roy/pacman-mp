@@ -1,15 +1,18 @@
 #include "Player.h"
 #include "Renderer.h"
 
-void Player::Move(const Field *f, PelletStatus &p)
+void Player::Move(const Field *f, Field::PelletStatus &p)
 {
-	if (Move(f, NextDir))
+	for (int i = 0; i < Speed; i++)
 	{
-		CurrentDir = NextDir;
-	}
-	else
-	{
-		Move(f, CurrentDir);
+		if (Move(f, NextDir))
+		{
+			CurrentDir = NextDir;
+		}
+		else
+		{
+			Move(f, CurrentDir);
+		}
 	}
 }
 
@@ -61,6 +64,7 @@ Pacman::Pacman()
 {
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	Speed = 11;
 	CurrentDir = Left;
 	NextDir = Left;
 }
@@ -93,6 +97,7 @@ Ghost::Ghost()
 {
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
+	Speed = 10;
 	CurrentDir = Left;
 	NextDir = Left;
 }
