@@ -166,8 +166,8 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		gameplay->Synced = new Game(*gameplay->Local);
 		gameplay->PlayerNumber = client->PlayerNumber;
 		unsigned int count = gameplay->Local->Players.size();
-		gameplay->PlayerInputs = std::vector<std::vector<Direction> >(
-				count, std::vector<Direction>(InputData_size, Left));
+		gameplay->PlayerInputs = std::vector<std::vector<Position> >(
+				count, std::vector<Position>(InputData_size, Left));
 		gameplay->ReceivedFrames = std::vector<unsigned short>(count);
 	}
 

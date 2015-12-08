@@ -2,7 +2,7 @@
 #include "SFML/Window.hpp"
 #include "SFData.h"
 
-Direction InputHandler::LastInput;
+Position InputHandler::LastInput;
 int InputHandler::InputTime;
 bool InputHandler::WindowClosed = false;
 
@@ -11,7 +11,7 @@ void InputHandler::PollEvents()
     sf::Event event;
     while (SFData::Window->pollEvent(event))
     {
-		Direction newInput = (Direction)-1;
+		Position newInput(0, 0);
 		switch (event.type)
 		{
 			case sf::Event::KeyPressed:

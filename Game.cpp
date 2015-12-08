@@ -91,11 +91,11 @@ bool Game::update()
 	{
 		for (unsigned int j = 0; j < Players.size(); j++)
 		{
+			Position difference =
+				Players[i]->CurrentPos + (Players[j]->CurrentPos * -1);
 			if (i != j
-					&& Players[i]->XPos - Players[j]->XPos < TILE_SIZE / 2
-					&& Players[j]->XPos - Players[i]->XPos < TILE_SIZE / 2
-					&& Players[i]->YPos - Players[j]->YPos < TILE_SIZE / 2
-					&& Players[j]->YPos - Players[i]->YPos < TILE_SIZE / 2)
+					&& difference.X > -8 && difference.X < 8
+					&& difference.Y > -8 && difference.Y < 8)
 			{
 				Player::Event e;
 				Player *clone_i = Players[i]->Clone();

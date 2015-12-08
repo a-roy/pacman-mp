@@ -51,11 +51,13 @@ Field::Field(std::string file)
 	}
 }
 
-Field::TileType Field::InterpolateAtPos(int x, int y) const
+Field::TileType Field::InterpolateAtPos(Position pos) const
 {
 	// Looks confusing, but all it's doing is checking a half-tile neighborhood
 	// of the given position and doing a bitwise AND (so walls have priority
 	// over open space).
+	int x = pos.X;
+	int y = pos.Y;
 	int w = FIELD_WIDTH * TILE_SIZE;
 	int h = FIELD_HEIGHT * TILE_SIZE;
 	int d_sm = (TILE_SIZE - 1) / 2;

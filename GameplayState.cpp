@@ -15,8 +15,8 @@ MainStateEnum GameplayState::LocalUpdate()
 		PlayerInputs[PlayerNumber].push_back(InputHandler::LastInput);
 		for (unsigned int i = 0; i < PlayerInputs.size(); i++)
 		{
-			Local->Players[i]->NextDir =
-				PlayerInputs[i][InputData_size - 1 - NetworkDelay];
+			Local->Players[i]->SetDirection(
+				PlayerInputs[i][InputData_size - 1 - NetworkDelay]);
 		}
 		Local->update();
 	}
@@ -32,9 +32,9 @@ MainStateEnum GameplayState::LocalUpdate()
 	{
 		for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
 		{
-			Synced->Players[i]->NextDir = PlayerInputs[i][
+			Synced->Players[i]->SetDirection(PlayerInputs[i][
 				InputData_size - NetworkDelay
-					+ Synced->CurrentFrame - Local->CurrentFrame];
+					+ Synced->CurrentFrame - Local->CurrentFrame]);
 		}
 		bool ongoing;
 		ongoing = Synced->update();
@@ -47,9 +47,9 @@ MainStateEnum GameplayState::LocalUpdate()
 	*Local = *Synced;
 	while (Local->CurrentFrame < currentFrame)
 	{
-		Local->Players[PlayerNumber]->NextDir = PlayerInputs[PlayerNumber][
+		Local->Players[PlayerNumber]->SetDirection(PlayerInputs[PlayerNumber][
 			InputData_size - NetworkDelay
-				+ Local->CurrentFrame - currentFrame];
+				+ Local->CurrentFrame - currentFrame]);
 		Local->update();
 	}
 
@@ -60,10 +60,11 @@ MainStateEnum GameplayState::LocalUpdate()
 		data_s[i] = (char)(f & 0xFF);
 		f = f >> 8;
 	}
-	std::copy(
+	std::transform(
 			PlayerInputs[PlayerNumber].begin(),
 			PlayerInputs[PlayerNumber].end(),
-			&data_s[OwnInputs_InputData]);
+			&data_s[OwnInputs_InputData],
+			Position::ByteEncode);
 	NetworkManager::Send(NetworkManager::OwnInputs, data_s, 0);
 
 	return Gameplay;
@@ -93,10 +94,8 @@ MainStateEnum GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 							&data_r[OtherInputs_InputData] + difference,
 							&data_r[OtherInputs_InputData] + InputData_size,
 							&PlayerInputs[num][0],
-							[](char c)
-							{ return static_cast<Direction>(c); });
-					Direction d =
-						static_cast<Direction>(
+							Position::ByteDecode);
+					Position d = Position::ByteDecode(
 						data_r[OtherInputs_InputData + InputData_size - 1]);
 					if (difference > 0)
 					{
@@ -113,8 +112,7 @@ MainStateEnum GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 						&data_r[OtherInputs_InputData]
 						+ InputData_size + difference,
 						&PlayerInputs[num][0] - difference,
-						[](char c)
-						{ return static_cast<Direction>(c); });
+						Position::ByteDecode);
 					ReceivedFrames[num] = Local->CurrentFrame + NetworkDelay;
 				}
 			}

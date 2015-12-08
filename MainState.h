@@ -95,7 +95,7 @@ class GameplayState : public MainState
 	public:
 		Game *Local;
 		Game *Synced;
-		std::vector<std::vector<Direction> > PlayerInputs;
+		std::vector<std::vector<Position> > PlayerInputs;
 		std::vector<unsigned short> ReceivedFrames;
 		unsigned int PlayerNumber;
 
