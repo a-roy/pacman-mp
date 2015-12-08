@@ -24,7 +24,7 @@ class Player
 		int XPos;
 		int YPos;
 		int Speed;
-		int Starting;
+		int Paused;
 		Direction CurrentDir;
 		Direction NextDir;
 		int AnimFrame;

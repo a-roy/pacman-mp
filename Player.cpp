@@ -3,7 +3,7 @@
 
 Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 {
-	if (Starting == 0)
+	if (Paused == 0)
 	{
 		for (int i = 0; i < Speed; i++)
 		{
@@ -19,7 +19,7 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 	}
 	else
 	{
-		Starting--;
+		Paused--;
 	}
 	AnimFrame++;
 	return None;
@@ -75,7 +75,7 @@ Pacman::Pacman()
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	Speed = 11;
-	Starting = 180;
+	Paused = 180;
 	CurrentDir = Left;
 	NextDir = Left;
 	AnimFrame = 0;
@@ -165,7 +165,7 @@ Ghost::Ghost()
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	Speed = 10;
-	Starting = 180;
+	Paused = 180;
 	CurrentDir = Left;
 	NextDir = Left;
 	AnimFrame = 0;
@@ -236,7 +236,7 @@ void Ghost::Reset()
 	NextDir = Up;
 	AnimFrame = 0;
 	Fear = 0;
-	Starting = 64;
+	Paused = 64;
 }
 
 void Ghost::Draw() const
