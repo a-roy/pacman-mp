@@ -15,15 +15,16 @@ class Player
 	public:
 		enum Event
 		{
-			None,
-			PacmanPowered,
-			PacmanDied,
-			PacmanRespawned
+			None = 0x00,
+			PacmanPowered = 0x01,
+			PacmanDied = 0x02,
+			PacmanRespawned = 0x04,
+			GhostDied = 0x08
 		};
 
 		Position CurrentPos;
-		int Speed;
 		int Paused;
+		int Dying;
 		bool Cornering;
 		Position CurrentDir;
 		Position NextDir;
@@ -33,6 +34,7 @@ class Player
 		void SetDirection(Position direction);
 		virtual bool CanGo(const Field *f, Position delta);
 		virtual Event Move(const Field *f, Field::PelletStatus &p);
+		virtual int Speed() = 0;
 		virtual int CornerRange() = 0;
 		virtual Field::TileType MoveFlag() = 0;
 		virtual Event CollideWith(const Player *other) = 0;
@@ -46,12 +48,12 @@ class Pacman : public Player
 {
 	public:
 		static Sprite PacmanSprite;
-		int Dying;
 
 		Pacman();
+		Event Move(const Field *f, Field::PelletStatus &p);
+		int Speed();
 		int CornerRange() { return TILE_SIZE / 2; }
 		Field::TileType MoveFlag() { return Field::PacmanZone; }
-		Event Move(const Field *f, Field::PelletStatus &p);
 		Event CollideWith(const Player *other);
 		void ProcessEvent(Event event);
 		void Reset();
@@ -66,10 +68,11 @@ class Ghost : public Player
 		int Fear;
 
 		Ghost();
-		int CornerRange() { return 0; }
 		bool CanGo(const Field *f, Position delta);
-		Field::TileType MoveFlag() { return Field::GhostZone; }
 		Event Move(const Field *f, Field::PelletStatus &p);
+		int Speed();
+		int CornerRange() { return 0; }
+		Field::TileType MoveFlag() { return Field::GhostZone; }
 		Event CollideWith(const Player *other);
 		void ProcessEvent(Event event);
 		void Reset();

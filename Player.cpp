@@ -28,7 +28,7 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 	if (Paused == 0)
 	{
 		int corner_range = CornerRange();
-		for (int i = 0; i < Speed; i++)
+		for (int i = 0, distance = Speed(); i < distance; i++)
 		{
 			if (CanGo(f, NextDir))
 			{
@@ -71,7 +71,6 @@ Pacman::Pacman()
 	CurrentPos = Position(
 			13 * TILE_SIZE + (TILE_SIZE - 1) / 2,
 			23 * TILE_SIZE + (TILE_SIZE - 1) / 2);
-	Speed = 11;
 	Paused = 180;
 	Cornering = false;
 	CurrentDir = Left;
@@ -111,17 +110,22 @@ Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 			p.Eat(CurrentPos.X / TILE_SIZE, CurrentPos.Y / TILE_SIZE);
 			if (tile == Field::Pellet)
 			{
-				Paused = 1;
+				Paused += 1;
 				return None;
 			}
 			if (tile == Field::PowerPellet)
 			{
-				Paused = 3;
+				Paused += 3;
 				return PacmanPowered;
 			}
 		}
 	}
 	return None;
+}
+
+int Pacman::Speed()
+{
+	return 11;
 }
 
 Player::Event Pacman::CollideWith(const Player *other)
@@ -198,8 +202,8 @@ Ghost::Ghost()
 	CurrentPos = Position(
 			13 * TILE_SIZE + (TILE_SIZE - 1) / 2,
 			11 * TILE_SIZE + (TILE_SIZE - 1) / 2);
-	Speed = 10;
 	Paused = 180;
+	Dying = -1;
 	Cornering = false;
 	CurrentDir = Left;
 	NextDir = Left;
@@ -225,8 +229,36 @@ Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
 	{
 		Fear--;
 	}
+	if (Dying > 0)
+	{
+		Dying--;
+		return None;
+	}
+	else if (Dying == 0)
+	{
+		Reset();
+		return None;
+	}
 
 	return Player::Move(f, p);
+}
+
+int Ghost::Speed()
+{
+	int x_tile = CurrentPos.X / TILE_SIZE;
+	int y_tile = CurrentPos.Y / TILE_SIZE;
+	if (y_tile == 15 && (x_tile < 5 || x_tile >= FIELD_WIDTH - 5))
+	{
+		return 5;
+	}
+	else if (Fear > 0)
+	{
+		return 6;
+	}
+	else
+	{
+		return 10;
+	}
 }
 
 Player::Event Ghost::CollideWith(const Player *other)
@@ -237,7 +269,8 @@ Player::Event Ghost::CollideWith(const Player *other)
 	{
 		if (Fear > 0)
 		{
-			Reset();
+			Dying = 0;
+			return GhostDied;
 		}
 		else if (pacman->Dying < 0)
 		{
@@ -250,11 +283,11 @@ Player::Event Ghost::CollideWith(const Player *other)
 
 void Ghost::ProcessEvent(Player::Event event)
 {
-	if (event == PacmanPowered)
+	if (event & PacmanPowered)
 	{
 		Fear = 300;
 	}
-	else if (event == PacmanDied)
+	if (event & PacmanDied)
 	{
 		Reset();
 	}
@@ -270,6 +303,7 @@ void Ghost::Reset()
 	AnimFrame = 0;
 	Fear = 0;
 	Paused = 64;
+	Dying = -1;
 }
 
 void Ghost::Draw() const
