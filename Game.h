@@ -17,6 +17,7 @@ public:
 	Field::PelletStatus Pellets;
 	std::vector<Player *> Players;
 	unsigned int CurrentFrame;
+	unsigned int PacmanLives;
 	unsigned int GameOver;
 
 	Game(Field f, std::vector<Player *> p);

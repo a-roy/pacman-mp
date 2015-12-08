@@ -17,7 +17,8 @@ class Player
 		{
 			None,
 			PacmanPowered,
-			PacmanDied
+			PacmanDied,
+			PacmanRespawned
 		};
 
 		int XPos;

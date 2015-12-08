@@ -6,6 +6,7 @@ Game::Game(Field f, std::vector<Player *> p)
 	GameField = f;
 	Players = p;
 	CurrentFrame = 0;
+	PacmanLives = 3;
 	GameOver = 0;
 
 	for (unsigned int i = 0; i < FIELD_WIDTH; i++)
@@ -26,6 +27,7 @@ Game::Game(const Game &other)
 	AllPellets = other.AllPellets;
 	Pellets = other.Pellets;
 	CurrentFrame = other.CurrentFrame;
+	PacmanLives = other.PacmanLives;
 	GameOver = other.GameOver;
 	Players = std::vector<Player *>();
 	for (unsigned int i = 0, size = other.Players.size(); i < size; i++)
@@ -48,6 +50,7 @@ Game& Game::operator=(const Game& rhs)
 	AllPellets = rhs.AllPellets;
 	Pellets = rhs.Pellets;
 	CurrentFrame = rhs.CurrentFrame;
+	PacmanLives = rhs.PacmanLives;
 	GameOver = rhs.GameOver;
 	for (unsigned int i = 0, size = Players.size(); i < size; i++)
 	{
@@ -114,6 +117,10 @@ bool Game::update()
 	}
 	if (event != Player::None)
 	{
+		if (event == Player::PacmanRespawned)
+		{
+			PacmanLives--;
+		}
 		for (unsigned int i = 0; i < Players.size(); i++)
 		{
 			Players[i]->ProcessEvent(event);
@@ -121,6 +128,10 @@ bool Game::update()
 	}
 
 	if (Pellets == AllPellets)
+	{
+		GameOver = 180;
+	}
+	else if (PacmanLives == 0)
 	{
 		GameOver = 180;
 	}

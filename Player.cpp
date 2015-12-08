@@ -100,7 +100,7 @@ Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 	else if (Dying == 0)
 	{
 		Reset();
-		return None;
+		return PacmanRespawned;
 	}
 
 	Player::Move(f, p);
