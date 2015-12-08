@@ -20,11 +20,11 @@ Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 {
 	if (Dying > 0)
 	{
-		if (Dying == 48)
+		if (Dying == 52)
 		{
 			AnimFrame = 0;
 		}
-		else if (Dying < 48)
+		else if (Dying < 52)
 		{
 			AnimFrame++;
 		}
@@ -73,7 +73,7 @@ Player::Event Pacman::CollideWith(const Player *other)
 	{
 		if (ghost->Fear == 0)
 		{
-			Dying = 64;
+			Dying = 68;
 			return PacmanDied;
 		}
 	}
@@ -97,7 +97,7 @@ void Pacman::Reset()
 
 void Pacman::Draw() const
 {
-	bool die_anim = (Dying > 0 && Dying <= 48);
+	bool die_anim = (Dying >= 0 && Dying <= 52);
 	float rotation = 0.f;
 	int anim;
 	if (die_anim)

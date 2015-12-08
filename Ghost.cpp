@@ -108,7 +108,7 @@ void Ghost::Reset()
 	NextDir = Up;
 	AnimFrame = 0;
 	Fear = 0;
-	Paused = 64;
+	Paused = 68;
 	Dying = -1;
 }
 
