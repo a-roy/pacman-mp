@@ -36,7 +36,12 @@ MainStateEnum GameplayState::LocalUpdate()
 				InputData_size - NetworkDelay
 					+ Synced->CurrentFrame - Local->CurrentFrame];
 		}
-		Synced->update();
+		bool ongoing;
+		ongoing = Synced->update();
+		if (!ongoing)
+		{
+			return MainMenu;
+		}
 	}
 
 	*Local = *Synced;

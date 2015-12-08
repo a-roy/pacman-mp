@@ -47,6 +47,15 @@ class Field
 				bool IsEaten(int x, int y) const
 				{ return (Bitfield[y] & (1U << x)) != 0U; }
 				void Eat(int x, int y) { Bitfield[y] |= (1U << x); }
+				bool operator==(const PelletStatus &other) const
+				{
+					bool equal = true;
+					for (std::size_t i = 0; i < FIELD_HEIGHT; i++)
+					{
+						equal = equal && (Bitfield[i] == other.Bitfield[i]);
+					}
+					return equal;
+				}
 		};
 
 		std::array<std::array<TileType, FIELD_HEIGHT>, FIELD_WIDTH> Tiles;

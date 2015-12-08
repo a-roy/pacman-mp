@@ -6,13 +6,27 @@ Game::Game(Field f, std::vector<Player *> p)
 	GameField = f;
 	Players = p;
 	CurrentFrame = 0;
+	GameOver = 0;
+
+	for (unsigned int i = 0; i < FIELD_WIDTH; i++)
+	{
+		for (unsigned int j = 0; j < FIELD_HEIGHT; j++)
+		{
+			if ((f.Tiles[i][j] & Field::Pellet) == Field::Pellet)
+			{
+				AllPellets.Eat(i, j);
+			}
+		}
+	}
 }
 
 Game::Game(const Game &other)
 {
 	GameField = other.GameField;
+	AllPellets = other.AllPellets;
 	Pellets = other.Pellets;
 	CurrentFrame = other.CurrentFrame;
+	GameOver = other.GameOver;
 	Players = std::vector<Player *>();
 	for (unsigned int i = 0, size = other.Players.size(); i < size; i++)
 	{
@@ -31,8 +45,10 @@ Game::~Game()
 Game& Game::operator=(const Game& rhs)
 {
 	GameField = rhs.GameField;
+	AllPellets = rhs.AllPellets;
 	Pellets = rhs.Pellets;
 	CurrentFrame = rhs.CurrentFrame;
+	GameOver = rhs.GameOver;
 	for (unsigned int i = 0, size = Players.size(); i < size; i++)
 	{
 		delete Players[i];
@@ -45,8 +61,19 @@ Game& Game::operator=(const Game& rhs)
 	return *this;
 }
 
-void Game::update()
+bool Game::update()
 {
+	if (GameOver > 0)
+	{
+		GameOver--;
+		CurrentFrame++;
+		if (GameOver == 0)
+		{
+			return false;
+		}
+		return true;
+	}
+
 	Player::Event event = Player::None;
 	for (unsigned int i = 0; i < Players.size(); i++)
 	{
@@ -92,7 +119,13 @@ void Game::update()
 			Players[i]->ProcessEvent(event);
 		}
 	}
+
+	if (Pellets == AllPellets)
+	{
+		GameOver = 180;
+	}
 	CurrentFrame++;
+	return true;
 }
 
 void Game::draw() const
