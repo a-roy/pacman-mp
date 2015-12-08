@@ -34,7 +34,7 @@ MainStateEnum HostState::LocalUpdate()
 	{
 		if (InputHandler::LastInput == Right)
 		{
-			bool ready = true;
+			bool ready = PlayerCount > 0;
 			for (unsigned int i = 0; i < PlayerCount; i++)
 			{
 				if (!PlayersReady[i])
