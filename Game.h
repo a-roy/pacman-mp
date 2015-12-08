@@ -19,6 +19,7 @@ public:
 	unsigned int CurrentFrame;
 	unsigned int PacmanLives;
 	unsigned int GameOver;
+	unsigned int Paused;
 
 	Game(Field f, std::vector<Player *> p);
 	Game(const Game &other);

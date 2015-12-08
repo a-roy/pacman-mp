@@ -8,6 +8,7 @@ Game::Game(Field f, std::vector<Player *> p)
 	CurrentFrame = 0;
 	PacmanLives = 3;
 	GameOver = 0;
+	Paused = 0;
 
 	for (unsigned int i = 0; i < FIELD_WIDTH; i++)
 	{
@@ -29,6 +30,7 @@ Game::Game(const Game &other)
 	CurrentFrame = other.CurrentFrame;
 	PacmanLives = other.PacmanLives;
 	GameOver = other.GameOver;
+	Paused = other.Paused;
 	Players = std::vector<Player *>();
 	for (unsigned int i = 0, size = other.Players.size(); i < size; i++)
 	{
@@ -52,6 +54,7 @@ Game& Game::operator=(const Game& rhs)
 	CurrentFrame = rhs.CurrentFrame;
 	PacmanLives = rhs.PacmanLives;
 	GameOver = rhs.GameOver;
+	Paused = rhs.Paused;
 	for (unsigned int i = 0, size = Players.size(); i < size; i++)
 	{
 		delete Players[i];
@@ -66,6 +69,13 @@ Game& Game::operator=(const Game& rhs)
 
 bool Game::update()
 {
+	if (Paused > 0)
+	{
+		Paused--;
+		CurrentFrame++;
+		return true;
+	}
+
 	if (GameOver > 0)
 	{
 		GameOver--;
@@ -81,11 +91,7 @@ bool Game::update()
 	for (unsigned int i = 0; i < Players.size(); i++)
 	{
 		Player *p = Players[i];
-		Player::Event e = p->Move(&GameField, Pellets);
-		if (e > event)
-		{
-			event = e;
-		}
+		event = (Player::Event)(event | p->Move(&GameField, Pellets));
 	}
 	for (unsigned int i = 0; i < Players.size(); i++)
 	{
@@ -100,16 +106,8 @@ bool Game::update()
 				Player::Event e;
 				Player *clone_i = Players[i]->Clone();
 				Player *clone_j = Players[j]->Clone();
-				e = Players[i]->CollideWith(clone_j);
-				if (e > event)
-				{
-					event = e;
-				}
-				e = Players[j]->CollideWith(clone_i);
-				if (e > event)
-				{
-					event = e;
-				}
+				event = (Player::Event)(event | Players[i]->CollideWith(clone_j));
+				event = (Player::Event)(event | Players[j]->CollideWith(clone_i));
 				delete clone_i;
 				delete clone_j;
 			}
@@ -117,9 +115,13 @@ bool Game::update()
 	}
 	if (event != Player::None)
 	{
-		if (event == Player::PacmanRespawned)
+		if (event & Player::PacmanRespawned)
 		{
 			PacmanLives--;
+		}
+		if (event & Player::GhostDied)
+		{
+			Paused += 30;
 		}
 		for (unsigned int i = 0; i < Players.size(); i++)
 		{
