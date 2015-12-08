@@ -1,7 +1,5 @@
 #version 130
 
-#define TILE_PIXELS 8
-
 uniform sampler2D fieldTexture;
 uniform sampler2D eatenTexture;
 
