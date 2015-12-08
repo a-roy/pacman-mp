@@ -24,7 +24,8 @@ int main()
 
 	states = std::vector<MainState *>(MAINSTATEENUM_NUMITEMS);
 	states[MainMenu] = new MainMenuState();
-	states[Host] = new HostState();
+	states[HostLobby] = new HostLobbyState();
+	states[HostGameplay] = new HostGameplayState();
 	states[Join] = new JoinState();
 	states[ClientWaiting] = new ClientWaitingState();
 	states[ClientConnected] = new ClientConnectedState();
@@ -32,7 +33,9 @@ int main()
 	states[Exiting] = new ExitingState();
 
 	MainMenuState *State_MainMenu = (MainMenuState *)states[MainMenu];
-	HostState *State_Host = (HostState *)states[Host];
+	HostLobbyState *State_HostLobby = (HostLobbyState *)states[HostLobby];
+	HostGameplayState *State_HostGameplay =
+		(HostGameplayState *)states[HostGameplay];
 	JoinState *State_Join = (JoinState *)states[Join];
 	ClientWaitingState *State_ClientWaiting =
 		(ClientWaitingState *)states[ClientWaiting];
@@ -49,7 +52,7 @@ int main()
 
 	MenuItem item1, item2, item3;
 	item1.Text = 0;
-	item1.Function = Host;
+	item1.Function = HostLobby;
 	State_MainMenu->MenuItems.push_back(item1);
 	item2.Text = 1;
 	item2.Function = Join;
@@ -141,10 +144,17 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		return;
 	}
 
-	if (nextState == Host)
+	if (nextState == HostLobby)
 	{
-		HostState *host = (HostState *)states[Host];
+		HostLobbyState *host = (HostLobbyState *)states[HostLobby];
 		host->PlayerCount = 0;
+	}
+	else if (nextState == HostGameplay)
+	{
+		HostLobbyState *host_lobby = (HostLobbyState *)states[HostLobby];
+		HostGameplayState *host_game = (HostGameplayState *)states[HostGameplay];
+		host_game->PlayerCount = host_lobby->PlayerCount;
+		host_game->Characters = host_lobby->Characters;
 	}
 	else if (nextState == ClientConnected)
 	{

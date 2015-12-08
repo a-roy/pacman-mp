@@ -1,10 +1,10 @@
 //! \file
-//! HostState class declaration/implementation
+//! HostLobbyState class implementation
 
 #include "MainState.h"
 #include <sstream>
 
-MainStateEnum HostState::LocalUpdate()
+MainStateEnum HostLobbyState::LocalUpdate()
 {
 	unsigned int renumber = PlayerCount;
 
@@ -55,6 +55,7 @@ MainStateEnum HostState::LocalUpdate()
 						&data_s[StartGame_Character]);
 				NetworkManager::Broadcast(
 						NetworkManager::StartGame, data_s);
+				return HostGameplay;
 			}
 		}
 		else if (InputHandler::LastInput == Left)
@@ -67,10 +68,10 @@ MainStateEnum HostState::LocalUpdate()
 		std::vector<char> data_s(PingClient_size);
 		NetworkManager::Broadcast(NetworkManager::PingClient, data_s);
 	}
-	return Host;
+	return HostLobby;
 }
 
-MainStateEnum HostState::ProcessPacket(NetworkManager::MessageType mtype,
+MainStateEnum HostLobbyState::ProcessPacket(NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
 	if (id < PlayerCount)
@@ -121,30 +122,17 @@ MainStateEnum HostState::ProcessPacket(NetworkManager::MessageType mtype,
 			NetworkManager::Send(NetworkManager::ConfirmClient, data_s, id);
 		}
 	}
-	else if (mtype == NetworkManager::OwnInputs)
-	{
-		std::vector<char> data_s(OtherInputs_size);
-		data_s[OtherInputs_PlayerNumber] = id;
-		std::copy(
-				&data_r[OwnInputs_Frame],
-				&data_r[OwnInputs_Frame] + Frame_size,
-				&data_s[OtherInputs_Frame]);
-		std::copy(
-				&data_r[OwnInputs_InputData],
-				&data_r[OwnInputs_InputData] + InputData_size,
-				&data_s[OtherInputs_InputData]);
-		NetworkManager::Broadcast(NetworkManager::OtherInputs, data_s);
-	}
+
 	if (id >= PlayerCount)
 	{
 		NetworkManager::CurrentConnections.resize(PlayerCount);
 		Characters.resize(PlayerCount);
 		PlayersReady.resize(PlayerCount);
 	}
-	return Host;
+	return HostLobby;
 }
 
-void HostState::Render() const
+void HostLobbyState::Render() const
 {
 	std::string address = NetworkManager::GetAddress();
 	unsigned short port = NetworkManager::GetPort();

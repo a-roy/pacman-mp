@@ -6,7 +6,8 @@
 enum MainStateEnum
 {
 	MainMenu,
-	Host,
+	HostLobby,
+	HostGameplay,
 	Join,
 	ClientWaiting,
 	ClientConnected,

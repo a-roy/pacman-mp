@@ -48,15 +48,28 @@ class JoinState : public MainState
 		void AddrIncrement(int amount);
 };
 
-class HostState : public MainState
+class HostLobbyState : public MainState
 {
 	public:
 		unsigned int PlayerCount;
 		std::vector<bool> PlayersReady;
 		std::vector<Character> Characters;
 
-		MainStateEnum GetEnum() { return Host; }
+		MainStateEnum GetEnum() { return HostLobby; }
 		MainStateEnum LocalUpdate();
+		MainStateEnum ProcessPacket(NetworkManager::MessageType mtype,
+				std::vector<char> &data_r, unsigned int id);
+		void Render() const;
+};
+
+class HostGameplayState : public MainState
+{
+	public:
+		unsigned int PlayerCount;
+		std::vector<Character> Characters;
+
+		MainStateEnum GetEnum() { return HostGameplay; }
+		MainStateEnum LocalUpdate() { return HostGameplay; }
 		MainStateEnum ProcessPacket(NetworkManager::MessageType mtype,
 				std::vector<char> &data_r, unsigned int id);
 		void Render() const;

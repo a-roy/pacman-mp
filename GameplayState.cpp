@@ -40,6 +40,8 @@ MainStateEnum GameplayState::LocalUpdate()
 		ongoing = Synced->update();
 		if (!ongoing)
 		{
+			std::vector<char> data_s(EndedGame_size);
+			NetworkManager::Send(NetworkManager::EndedGame, data_s, 0);
 			return MainMenu;
 		}
 	}
