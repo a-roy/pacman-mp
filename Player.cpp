@@ -75,7 +75,7 @@ Pacman::Pacman()
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 23 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	Speed = 11;
-	Starting = 300;
+	Starting = 180;
 	CurrentDir = Left;
 	NextDir = Left;
 	AnimFrame = 0;
@@ -165,7 +165,7 @@ Ghost::Ghost()
 	XPos = 13 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	YPos = 11 * TILE_SIZE + (TILE_SIZE - 1) / 2;
 	Speed = 10;
-	Starting = 300;
+	Starting = 180;
 	CurrentDir = Left;
 	NextDir = Left;
 	AnimFrame = 0;
