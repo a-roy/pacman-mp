@@ -53,7 +53,7 @@ int Ghost::Speed()
 {
 	int x_tile = CurrentPos.X / TILE_SIZE;
 	int y_tile = CurrentPos.Y / TILE_SIZE;
-	if (y_tile == 15 && (x_tile < 5 || x_tile >= FIELD_WIDTH - 5))
+	if (y_tile == 14 && (x_tile < 5 || x_tile >= FIELD_WIDTH - 5))
 	{
 		return 5;
 	}
