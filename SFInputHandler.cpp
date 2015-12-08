@@ -47,6 +47,33 @@ void InputHandler::PollEvents()
 				LastInput = newInput;
 				InputTime = -1;
 				break;
+			case sf::Event::JoystickMoved:
+				switch (event.joystickMove.axis)
+				{
+					case sf::Joystick::PovX:
+						if (event.joystickMove.position > 0.f)
+						{
+							newInput = Right;
+						}
+						else if (event.joystickMove.position < 0.f)
+						{
+							newInput = Left;
+						}
+						break;
+					case sf::Joystick::PovY:
+						if (event.joystickMove.position > 0.f)
+						{
+							newInput = Up;
+						}
+						else if (event.joystickMove.position < 0.f)
+						{
+							newInput = Down;
+						}
+						break;
+				}
+				LastInput = newInput;
+				InputTime = -1;
+				break;
 			case sf::Event::Closed:
 				WindowClosed = true;
 				break;
