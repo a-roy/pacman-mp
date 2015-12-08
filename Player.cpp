@@ -110,8 +110,14 @@ Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 		if (!p.IsEaten(XPos / TILE_SIZE, YPos / TILE_SIZE))
 		{
 			p.Eat(XPos / TILE_SIZE, YPos / TILE_SIZE);
+			if (tile == Field::Pellet)
+			{
+				Paused = 1;
+				return None;
+			}
 			if (tile == Field::PowerPellet)
 			{
+				Paused = 3;
 				return PacmanPowered;
 			}
 		}
