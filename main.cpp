@@ -80,10 +80,10 @@ int main()
 		Renderer::CreateSprite("../spritesheet.png");
 
 	Animation pac_move(4);
+	pac_move.AddFrame(1, 1, 16, 16);
 	pac_move.AddFrame(18, 1, 16, 16);
 	pac_move.AddFrame(35, 1, 16, 16);
 	pac_move.AddFrame(18, 1, 16, 16);
-	pac_move.AddFrame(1, 1, 16, 16);
 	Pacman::PacmanSprite.Animations.push_back(pac_move);
 	Animation pac_die(4);
 	for (int i = 3; i < 15; i++)
