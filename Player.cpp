@@ -55,11 +55,11 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 					(CurrentPos.Y + (FIELD_HEIGHT * TILE_SIZE))
 					% (FIELD_HEIGHT * TILE_SIZE));
 		}
+		AnimFrame++;
 	}
 	else
 	{
 		Paused--;
 	}
-	AnimFrame++;
 	return None;
 }
