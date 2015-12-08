@@ -6,7 +6,7 @@ Sprite Pacman::PacmanSprite;
 Pacman::Pacman()
 {
 	CurrentPos = Position(
-			13 * TILE_SIZE + (TILE_SIZE - 1) / 2,
+			14 * TILE_SIZE,
 			23 * TILE_SIZE + (TILE_SIZE - 1) / 2);
 	Paused = 180;
 	Cornering = false;
