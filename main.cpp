@@ -59,10 +59,16 @@ int main()
 	State_MainMenu->MenuItems.push_back(item3);
 
 	State_Join->Index = 0;
-	State_Join->IP[0] = 127;
-	State_Join->IP[1] = 0;
-	State_Join->IP[2] = 0;
-	State_Join->IP[3] = 1;
+	std::string myAddress = NetworkManager::GetAddress();
+	std::stringstream addr(myAddress);
+	std::string part;
+	for (unsigned int i = 0; i < 4 && std::getline(addr, part, '.'); i++)
+	{
+		std::stringstream num(part);
+		unsigned short n;
+		num >> n;
+		State_Join->IP[i] = n;
+	}
 	State_Join->Port = 0;
 
 	State_ClientConnected->Index = 0;
