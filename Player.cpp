@@ -28,6 +28,7 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 	if (Paused == 0)
 	{
 		int corner_range = CornerRange();
+		bool pos_changed = false;
 		for (int i = 0, distance = Speed(); i < distance; i++)
 		{
 			if (CanGo(f, NextDir))
@@ -35,6 +36,7 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 				CurrentPos += NextDir;
 				CurrentDir = NextDir;
 				Cornering = false;
+				pos_changed = true;
 			}
 			else if (Cornering
 					|| corner_range > 0
@@ -44,10 +46,12 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 			{
 				CurrentPos += CurrentDir + NextDir;
 				Cornering = true;
+				pos_changed = true;
 			}
 			else if (CanGo(f, CurrentDir))
 			{
 				CurrentPos += CurrentDir;
+				pos_changed = true;
 			}
 			CurrentPos = Position(
 					(CurrentPos.X + (FIELD_WIDTH * TILE_SIZE))
@@ -55,7 +59,10 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 					(CurrentPos.Y + (FIELD_HEIGHT * TILE_SIZE))
 					% (FIELD_HEIGHT * TILE_SIZE));
 		}
-		AnimFrame++;
+		if (pos_changed)
+		{
+			AnimFrame++;
+		}
 	}
 	else
 	{
