@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <array>
 #include <string>
+#include "Position.h"
 
 class Field
 {
@@ -29,6 +30,7 @@ class Field
 		enum TileType
 		{
 			Wall = 0x00,
+			PacmanZone = 0x01,
 			GhostBox = 0x08,
 			GhostZone = 0x02,
 			GhostDoor = 0x0A,
@@ -46,13 +48,22 @@ class Field
 				bool IsEaten(int x, int y) const
 				{ return (Bitfield[y] & (1U << x)) != 0U; }
 				void Eat(int x, int y) { Bitfield[y] |= (1U << x); }
+				bool operator==(const PelletStatus &other) const
+				{
+					bool equal = true;
+					for (std::size_t i = 0; i < FIELD_HEIGHT; i++)
+					{
+						equal = equal && (Bitfield[i] == other.Bitfield[i]);
+					}
+					return equal;
+				}
 		};
 
 		std::array<std::array<TileType, FIELD_HEIGHT>, FIELD_WIDTH> Tiles;
 
 		Field() { }
 		Field(std::string file);
-		TileType InterpolateAtPos(int x, int y) const;
+		TileType InterpolateAtPos(Position pos) const;
 		void NeighborhoodInfo(
 				std::size_t x, std::size_t y, TileType wall, TileType edge,
 				uint8_t &neighborhood, uint8_t &outercardinal) const;

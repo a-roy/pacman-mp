@@ -2,7 +2,7 @@
 #include "SFML/Window.hpp"
 #include "SFData.h"
 
-Direction InputHandler::LastInput;
+Position InputHandler::LastInput;
 int InputHandler::InputTime;
 bool InputHandler::WindowClosed = false;
 
@@ -11,7 +11,7 @@ void InputHandler::PollEvents()
     sf::Event event;
     while (SFData::Window->pollEvent(event))
     {
-		Direction newInput = (Direction)-1;
+		Position newInput(0, 0);
 		switch (event.type)
 		{
 			case sf::Event::KeyPressed:
@@ -43,6 +43,33 @@ void InputHandler::PollEvents()
 						break;
 					default:
 						continue;
+				}
+				LastInput = newInput;
+				InputTime = -1;
+				break;
+			case sf::Event::JoystickMoved:
+				switch (event.joystickMove.axis)
+				{
+					case sf::Joystick::PovX:
+						if (event.joystickMove.position > 0.f)
+						{
+							newInput = Right;
+						}
+						else if (event.joystickMove.position < 0.f)
+						{
+							newInput = Left;
+						}
+						break;
+					case sf::Joystick::PovY:
+						if (event.joystickMove.position > 0.f)
+						{
+							newInput = Up;
+						}
+						else if (event.joystickMove.position < 0.f)
+						{
+							newInput = Down;
+						}
+						break;
 				}
 				LastInput = newInput;
 				InputTime = -1;

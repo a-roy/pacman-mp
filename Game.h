@@ -13,14 +13,18 @@ class Game
 {
 public:
 	Field GameField;
+	Field::PelletStatus AllPellets;
 	Field::PelletStatus Pellets;
 	std::vector<Player *> Players;
 	unsigned int CurrentFrame;
+	unsigned int PacmanLives;
+	unsigned int GameOver;
+	unsigned int Paused;
 
 	Game(Field f, std::vector<Player *> p);
 	Game(const Game &other);
 	~Game();
 	Game& operator=(const Game& rhs);
-	void update();
+	bool update();
 	void draw() const;
 };

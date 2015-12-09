@@ -5,7 +5,7 @@
 
 #include <array>
 #include <vector>
-#include "Direction.h"
+#include "Position.h"
 #include "Field.h"
 #include "Sprite.h"
 #include "Animation.h"
@@ -15,22 +15,32 @@ class Player
 	public:
 		enum Event
 		{
-			None,
-			PacmanPowered,
-			PacmanDied
+			None = 0x00,
+			PacmanPowered = 0x01,
+			PacmanDied = 0x02,
+			PacmanRespawned = 0x04,
+			GhostDied = 0x08
 		};
 
-		int XPos;
-		int YPos;
-		int Speed;
-		int Starting;
-		Direction CurrentDir;
-		Direction NextDir;
+		Position CurrentPos;
+		int Paused;
+		int Dying;
+		bool Cornering;
+		Position StartingPos;
+		Position CurrentDir;
+		Position NextDir;
 		int AnimFrame;
 		std::vector<Animation *> Animations;
+		Sprite PlayerSprite;
 
+		Player(const Sprite &playerSprite,
+				Position startingPos, Position startingDir);
+		void SetDirection(Position direction);
+		virtual bool CanGo(const Field *f, Position delta);
 		virtual Event Move(const Field *f, Field::PelletStatus &p);
-		virtual bool Move(const Field *f, Direction d);
+		virtual int Speed() = 0;
+		virtual int CornerRange() = 0;
+		virtual Field::TileType MoveFlag() = 0;
 		virtual Event CollideWith(const Player *other) = 0;
 		virtual void ProcessEvent(Event event) = 0;
 		virtual void Reset() = 0;
@@ -41,11 +51,12 @@ class Player
 class Pacman : public Player
 {
 	public:
-		static Sprite PacmanSprite;
-		int Dying;
-
-		Pacman();
+		Pacman(const Sprite &playerSprite,
+				Position startingPos, Position startingDir);
 		Event Move(const Field *f, Field::PelletStatus &p);
+		int Speed();
+		int CornerRange() { return TILE_SIZE / 2; }
+		Field::TileType MoveFlag() { return Field::PacmanZone; }
 		Event CollideWith(const Player *other);
 		void ProcessEvent(Event event);
 		void Reset();
@@ -56,12 +67,15 @@ class Pacman : public Player
 class Ghost : public Player
 {
 	public:
-		static Sprite GhostSprite;
 		int Fear;
 
-		Ghost();
+		Ghost(const Sprite &playerSprite,
+				Position startingPos, Position startingDir);
+		bool CanGo(const Field *f, Position delta);
 		Event Move(const Field *f, Field::PelletStatus &p);
-		bool Move(const Field *f, Direction d);
+		int Speed();
+		int CornerRange() { return 0; }
+		Field::TileType MoveFlag() { return Field::GhostZone; }
 		Event CollideWith(const Player *other);
 		void ProcessEvent(Event event);
 		void Reset();
@@ -71,6 +85,9 @@ class Ghost : public Player
 
 enum Character
 {
-	Pacman_c,
-	Ghost_c
+	PacMan,
+	Blinky,
+	Inky,
+	Pinky,
+	Clyde
 };

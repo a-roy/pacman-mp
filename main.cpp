@@ -24,7 +24,8 @@ int main()
 
 	states = std::vector<MainState *>(MAINSTATEENUM_NUMITEMS);
 	states[MainMenu] = new MainMenuState();
-	states[Host] = new HostState();
+	states[HostLobby] = new HostLobbyState();
+	states[HostGameplay] = new HostGameplayState();
 	states[Join] = new JoinState();
 	states[ClientWaiting] = new ClientWaitingState();
 	states[ClientConnected] = new ClientConnectedState();
@@ -32,7 +33,9 @@ int main()
 	states[Exiting] = new ExitingState();
 
 	MainMenuState *State_MainMenu = (MainMenuState *)states[MainMenu];
-	HostState *State_Host = (HostState *)states[Host];
+	HostLobbyState *State_HostLobby = (HostLobbyState *)states[HostLobby];
+	HostGameplayState *State_HostGameplay =
+		(HostGameplayState *)states[HostGameplay];
 	JoinState *State_Join = (JoinState *)states[Join];
 	ClientWaitingState *State_ClientWaiting =
 		(ClientWaitingState *)states[ClientWaiting];
@@ -49,7 +52,7 @@ int main()
 
 	MenuItem item1, item2, item3;
 	item1.Text = 0;
-	item1.Function = Host;
+	item1.Function = HostLobby;
 	State_MainMenu->MenuItems.push_back(item1);
 	item2.Text = 1;
 	item2.Function = Join;
@@ -59,49 +62,59 @@ int main()
 	State_MainMenu->MenuItems.push_back(item3);
 
 	State_Join->Index = 0;
-	State_Join->IP[0] = 127;
-	State_Join->IP[1] = 0;
-	State_Join->IP[2] = 0;
-	State_Join->IP[3] = 1;
+	std::string myAddress = NetworkManager::GetAddress();
+	std::stringstream addr(myAddress);
+	std::string part;
+	for (unsigned int i = 0; i < 4 && std::getline(addr, part, '.'); i++)
+	{
+		std::stringstream num(part);
+		unsigned short n;
+		num >> n;
+		State_Join->IP[i] = n;
+	}
 	State_Join->Port = 0;
 
 	State_ClientConnected->Index = 0;
 
 	// Initialize sprites
-	Pacman::PacmanSprite.Index =
-		Renderer::CreateSprite("../spritesheet.png");
-	Ghost::GhostSprite.Index =
+	State_ClientConnected->PacmanSprite.Index =
 		Renderer::CreateSprite("../spritesheet.png");
 
 	Animation pac_move(4);
+	pac_move.AddFrame(1, 1, 16, 16);
 	pac_move.AddFrame(18, 1, 16, 16);
 	pac_move.AddFrame(35, 1, 16, 16);
 	pac_move.AddFrame(18, 1, 16, 16);
-	pac_move.AddFrame(1, 1, 16, 16);
-	Pacman::PacmanSprite.Animations.push_back(pac_move);
+	State_ClientConnected->PacmanSprite.Animations.push_back(pac_move);
 	Animation pac_die(4);
-	for (int i = 3; i < 15; i++)
+	for (int i = 3; i <= 15; i++)
 	{
 		pac_die.AddFrame(1 + 17 * i, 1, 16, 16);
 	}
-	Pacman::PacmanSprite.Animations.push_back(pac_die);
+	State_ClientConnected->PacmanSprite.Animations.push_back(pac_die);
 
-	Animation gho_hori(8);
-	gho_hori.AddFrame(1, 18, 16, 16);
-	gho_hori.AddFrame(18, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_hori);
-	Animation gho_up(8);
-	gho_up.AddFrame(35, 18, 16, 16);
-	gho_up.AddFrame(52, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_up);
-	Animation gho_down(8);
-	gho_down.AddFrame(69, 18, 16, 16);
-	gho_down.AddFrame(86, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_down);
-	Animation gho_fear(8);
-	gho_fear.AddFrame(205, 18, 16, 16);
-	gho_fear.AddFrame(222, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_fear);
+	State_ClientConnected->GhostSprites.resize(4);
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		State_ClientConnected->GhostSprites[i].Index =
+			Renderer::CreateSprite("../spritesheet.png");
+		Animation gho_hori(8);
+		gho_hori.AddFrame(1, 18 + 17 * i, 16, 16);
+		gho_hori.AddFrame(18, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_hori);
+		Animation gho_up(8);
+		gho_up.AddFrame(35, 18 + 17 * i, 16, 16);
+		gho_up.AddFrame(52, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_up);
+		Animation gho_down(8);
+		gho_down.AddFrame(69, 18 + 17 * i, 16, 16);
+		gho_down.AddFrame(86, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_down);
+		Animation gho_fear(8);
+		gho_fear.AddFrame(205, 18 + 17 * i, 16, 16);
+		gho_fear.AddFrame(222, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_fear);
+	}
 
 	// Initialize NetworkManager
 	NetworkManager::Init();
@@ -135,10 +148,17 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		return;
 	}
 
-	if (nextState == Host)
+	if (nextState == HostLobby)
 	{
-		HostState *host = (HostState *)states[Host];
+		HostLobbyState *host = (HostLobbyState *)states[HostLobby];
 		host->PlayerCount = 0;
+	}
+	else if (nextState == HostGameplay)
+	{
+		HostLobbyState *host_lobby = (HostLobbyState *)states[HostLobby];
+		HostGameplayState *host_game = (HostGameplayState *)states[HostGameplay];
+		host_game->PlayerCount = host_lobby->PlayerCount;
+		host_game->Characters = host_lobby->Characters;
 	}
 	else if (nextState == ClientConnected)
 	{
@@ -147,7 +167,7 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		ClientConnectedState *connected =
 			(ClientConnectedState *)states[ClientConnected];
 		connected->PlayerNumber = waiting->PlayerNumber;
-		connected->SelectedCharacter = Pacman_c;
+		connected->SelectedCharacter = PacMan;
 		connected->Ready = false;
 		connected->StartingGame = NULL;
 	}
@@ -160,8 +180,8 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		gameplay->Synced = new Game(*gameplay->Local);
 		gameplay->PlayerNumber = client->PlayerNumber;
 		unsigned int count = gameplay->Local->Players.size();
-		gameplay->PlayerInputs = std::vector<std::vector<Direction> >(
-				count, std::vector<Direction>(InputData_size, Left));
+		gameplay->PlayerInputs = std::vector<std::vector<Position> >(
+				count, std::vector<Position>(InputData_size, Left));
 		gameplay->ReceivedFrames = std::vector<unsigned short>(count);
 	}
 

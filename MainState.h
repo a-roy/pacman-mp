@@ -48,15 +48,28 @@ class JoinState : public MainState
 		void AddrIncrement(int amount);
 };
 
-class HostState : public MainState
+class HostLobbyState : public MainState
 {
 	public:
 		unsigned int PlayerCount;
 		std::vector<bool> PlayersReady;
 		std::vector<Character> Characters;
 
-		MainStateEnum GetEnum() { return Host; }
+		MainStateEnum GetEnum() { return HostLobby; }
 		MainStateEnum LocalUpdate();
+		MainStateEnum ProcessPacket(NetworkManager::MessageType mtype,
+				std::vector<char> &data_r, unsigned int id);
+		void Render() const;
+};
+
+class HostGameplayState : public MainState
+{
+	public:
+		unsigned int PlayerCount;
+		std::vector<Character> Characters;
+
+		MainStateEnum GetEnum() { return HostGameplay; }
+		MainStateEnum LocalUpdate() { return HostGameplay; }
 		MainStateEnum ProcessPacket(NetworkManager::MessageType mtype,
 				std::vector<char> &data_r, unsigned int id);
 		void Render() const;
@@ -82,6 +95,8 @@ class ClientConnectedState : public MainState
 		Character SelectedCharacter;
 		bool Ready;
 		Game *StartingGame;
+		Sprite PacmanSprite;
+		std::vector<Sprite> GhostSprites;
 
 		MainStateEnum GetEnum() { return ClientConnected; }
 		MainStateEnum LocalUpdate();
@@ -95,7 +110,7 @@ class GameplayState : public MainState
 	public:
 		Game *Local;
 		Game *Synced;
-		std::vector<std::vector<Direction> > PlayerInputs;
+		std::vector<std::vector<Position> > PlayerInputs;
 		std::vector<unsigned short> ReceivedFrames;
 		unsigned int PlayerNumber;
 
