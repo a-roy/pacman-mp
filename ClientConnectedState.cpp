@@ -169,23 +169,48 @@ void ClientConnectedState::Render() const
 
 	if (c == PacMan)
 	{
-		Renderer::DrawText(0, "< Pac-Man >", 18, 60, 140);
+		Renderer::DrawText(0, "< Pac-Man    >", 18, 60, 140);
+		Renderer::DrawSprite(
+				PacmanSprite,
+				9 * TILE_SIZE, 5 * TILE_SIZE,
+				0.f, true,
+				0, 4);
 	}
 	else if (c == Blinky)
 	{
-		Renderer::DrawText(0, "< Blinky >", 18, 60, 140);
+		Renderer::DrawText(0, "< Blinky     >", 18, 60, 140);
+		Renderer::DrawSprite(
+				GhostSprites[0],
+				9 * TILE_SIZE, 5 * TILE_SIZE,
+				0.f, false,
+				0, 0);
 	}
 	else if (c == Inky)
 	{
-		Renderer::DrawText(0, "< Inky >", 18, 60, 140);
+		Renderer::DrawText(0, "< Inky       >", 18, 60, 140);
+		Renderer::DrawSprite(
+				GhostSprites[2],
+				9 * TILE_SIZE, 5 * TILE_SIZE,
+				0.f, false,
+				0, 0);
 	}
 	else if (c == Pinky)
 	{
-		Renderer::DrawText(0, "< Pinky >", 18, 60, 140);
+		Renderer::DrawText(0, "< Pinky      >", 18, 60, 140);
+		Renderer::DrawSprite(
+				GhostSprites[1],
+				9 * TILE_SIZE, 5 * TILE_SIZE,
+				0.f, false,
+				0, 0);
 	}
 	else if (c == Clyde)
 	{
-		Renderer::DrawText(0, "< Clyde >", 18, 60, 140);
+		Renderer::DrawText(0, "< Clyde      >", 18, 60, 140);
+		Renderer::DrawSprite(
+				GhostSprites[3],
+				9 * TILE_SIZE, 5 * TILE_SIZE,
+				0.f, false,
+				0, 0);
 	}
 
 	if (ready)
