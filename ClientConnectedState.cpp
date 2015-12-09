@@ -32,6 +32,8 @@ MainStateEnum ClientConnectedState::LocalUpdate()
 			if (InputHandler::LastInput == Up)
 			{
 				Ready = false;
+				std::vector<char> data_s(PlayerNotReady_size);
+				NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
 				Index = 0;
 			}
 			else if (InputHandler::LastInput == Right)
