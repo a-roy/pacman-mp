@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Renderer.h"
 #include <algorithm>
 
 Game::Game(Field f, std::vector<Player *> p)
@@ -86,6 +87,16 @@ bool Game::update()
 		}
 		return true;
 	}
+	else if (GameOver < 0)
+	{
+		GameOver++;
+		CurrentFrame++;
+		if (GameOver == 0)
+		{
+			return false;
+		}
+		return true;
+	}
 
 	Player::Event event = Player::None;
 	for (unsigned int i = 0; i < Players.size(); i++)
@@ -135,7 +146,7 @@ bool Game::update()
 	}
 	else if (PacmanLives == 0)
 	{
-		GameOver = 180;
+		GameOver = -180;
 	}
 	CurrentFrame++;
 	return true;
@@ -146,5 +157,13 @@ void Game::draw() const
 	for (unsigned int i = 0; i < Players.size(); i++)
 	{
 		Players[i]->Draw();
+	}
+	if (GameOver > 0)
+	{
+		Renderer::DrawText(0, "Pac-Man wins!", 24, 228, 444);
+	}
+	else if (GameOver < 0)
+	{
+		Renderer::DrawText(0, "Ghosts win!", 24, 252, 444);
 	}
 }

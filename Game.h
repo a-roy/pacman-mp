@@ -18,8 +18,8 @@ public:
 	std::vector<Player *> Players;
 	unsigned int CurrentFrame;
 	unsigned int PacmanLives;
-	unsigned int GameOver;
-	unsigned int Paused;
+	int GameOver;
+	int Paused;
 
 	Game(Field f, std::vector<Player *> p);
 	Game(const Game &other);
