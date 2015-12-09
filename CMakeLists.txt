@@ -30,18 +30,16 @@ add_executable(${PROJECT_NAME} ${PAC_SRC_FILES})
 
 if (WIN32)
 target_link_libraries(${PROJECT_NAME}
-	sfml-system-d
-	sfml-window-d
-	sfml-graphics-d
-	sfml-network-d
-	sfml-audio-d)
+	debug sfml-system-d optimized sfml-system
+	debug sfml-window-d optimized sfml-window
+	debug sfml-graphics-d optimized sfml-graphics
+	debug sfml-network-d optimized sfml-network)
 else()
 target_link_libraries(${PROJECT_NAME}
 	sfml-system
 	sfml-window
 	sfml-graphics
-	sfml-network
-	sfml-audio)
+	sfml-network)
 endif()
 
 foreach(lib ${EXT_LIBS})
