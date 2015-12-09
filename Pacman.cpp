@@ -1,10 +1,9 @@
 #include "Player.h"
 #include "Renderer.h"
 
-Sprite Pacman::PacmanSprite;
-
-Pacman::Pacman()
+Pacman::Pacman(const Sprite &playerSprite)
 {
+	PlayerSprite = playerSprite;
 	CurrentPos = Position(
 			14 * TILE_SIZE,
 			23 * TILE_SIZE + (TILE_SIZE - 1) / 2);
@@ -126,7 +125,7 @@ void Pacman::Draw() const
 		anim = 0;
 	}
 	Renderer::DrawSprite(
-			PacmanSprite,
+			PlayerSprite,
 			CurrentPos.X, CurrentPos.Y,
 			rotation,
 			true, anim, AnimFrame);

@@ -1,10 +1,9 @@
 #include "Player.h"
 #include "Renderer.h"
 
-Sprite Ghost::GhostSprite;
-
-Ghost::Ghost()
+Ghost::Ghost(const Sprite &playerSprite)
 {
+	PlayerSprite = playerSprite;
 	CurrentPos = Position(
 			13 * TILE_SIZE + (TILE_SIZE - 1) / 2,
 			11 * TILE_SIZE + (TILE_SIZE - 1) / 2);
@@ -136,6 +135,6 @@ void Ghost::Draw() const
 		}
 	}
 	Renderer::DrawSprite(
-			GhostSprite,
+			PlayerSprite,
 			CurrentPos.X, CurrentPos.Y, 0.f, flip, anim, AnimFrame);
 }

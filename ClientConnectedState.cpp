@@ -14,16 +14,26 @@ MainStateEnum ClientConnectedState::LocalUpdate()
 			{
 				Index = 1;
 			}
-			else if (InputHandler::LastInput == Left
-					|| InputHandler::LastInput == Right)
+			else if (InputHandler::LastInput == Left)
 			{
-				if (SelectedCharacter == Pacman_c)
+				if (SelectedCharacter == PacMan)
 				{
-					SelectedCharacter = Ghost_c;
+					SelectedCharacter = Clyde;
 				}
 				else
 				{
-					SelectedCharacter = Pacman_c;
+					SelectedCharacter = (Character)(SelectedCharacter - 1);
+				}
+			}
+			else if (InputHandler::LastInput == Right)
+			{
+				if (SelectedCharacter == Clyde)
+				{
+					SelectedCharacter = PacMan;
+				}
+				else
+				{
+					SelectedCharacter = (Character)(SelectedCharacter + 1);
 				}
 			}
 		}
@@ -97,13 +107,25 @@ MainStateEnum ClientConnectedState::ProcessPacket(NetworkManager::MessageType mt
 			for (unsigned int i = 0; i < count; i++)
 			{
 				Character c = (Character)data_r[StartGame_Character + i];
-				if (c == Pacman_c)
+				if (c == PacMan)
 				{
-					players.push_back(new Pacman());
+					players.push_back(new Pacman(PacmanSprite));
 				}
-				else if (c == Ghost_c)
+				else if (c == Blinky)
 				{
-					players.push_back(new Ghost());
+					players.push_back(new Ghost(GhostSprites[0]));
+				}
+				else if (c == Inky)
+				{
+					players.push_back(new Ghost(GhostSprites[2]));
+				}
+				else if (c == Pinky)
+				{
+					players.push_back(new Ghost(GhostSprites[1]));
+				}
+				else if (c == Clyde)
+				{
+					players.push_back(new Ghost(GhostSprites[3]));
 				}
 			}
 			StartingGame = new Game(gameField, players);
@@ -124,14 +146,28 @@ void ClientConnectedState::Render() const
 	Character c = SelectedCharacter;
 	bool ready = Ready;
 	unsigned int index = Index;
-	if (c == Pacman_c)
+
+	if (c == PacMan)
 	{
 		Renderer::DrawText(0, "< Pac-Man >", 18, 60, 140);
 	}
-	else
+	else if (c == Blinky)
 	{
-		Renderer::DrawText(0, "<  Ghost  >", 18, 60, 140);
+		Renderer::DrawText(0, "< Blinky >", 18, 60, 140);
 	}
+	else if (c == Inky)
+	{
+		Renderer::DrawText(0, "< Inky >", 18, 60, 140);
+	}
+	else if (c == Pinky)
+	{
+		Renderer::DrawText(0, "< Pinky >", 18, 60, 140);
+	}
+	else if (c == Clyde)
+	{
+		Renderer::DrawText(0, "< Clyde >", 18, 60, 140);
+	}
+
 	if (ready)
 	{
 		Renderer::DrawText(0, "< Ready!", 18, 60, 180);

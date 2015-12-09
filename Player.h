@@ -30,6 +30,7 @@ class Player
 		Position NextDir;
 		int AnimFrame;
 		std::vector<Animation *> Animations;
+		Sprite PlayerSprite;
 
 		void SetDirection(Position direction);
 		virtual bool CanGo(const Field *f, Position delta);
@@ -47,9 +48,7 @@ class Player
 class Pacman : public Player
 {
 	public:
-		static Sprite PacmanSprite;
-
-		Pacman();
+		Pacman(const Sprite &playerSprite);
 		Event Move(const Field *f, Field::PelletStatus &p);
 		int Speed();
 		int CornerRange() { return TILE_SIZE / 2; }
@@ -64,10 +63,9 @@ class Pacman : public Player
 class Ghost : public Player
 {
 	public:
-		static Sprite GhostSprite;
 		int Fear;
 
-		Ghost();
+		Ghost(const Sprite &playerSprite);
 		bool CanGo(const Field *f, Position delta);
 		Event Move(const Field *f, Field::PelletStatus &p);
 		int Speed();
@@ -82,6 +80,9 @@ class Ghost : public Player
 
 enum Character
 {
-	Pacman_c,
-	Ghost_c
+	PacMan,
+	Blinky,
+	Inky,
+	Pinky,
+	Clyde
 };

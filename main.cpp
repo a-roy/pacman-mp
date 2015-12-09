@@ -77,9 +77,7 @@ int main()
 	State_ClientConnected->Index = 0;
 
 	// Initialize sprites
-	Pacman::PacmanSprite.Index =
-		Renderer::CreateSprite("../spritesheet.png");
-	Ghost::GhostSprite.Index =
+	State_ClientConnected->PacmanSprite.Index =
 		Renderer::CreateSprite("../spritesheet.png");
 
 	Animation pac_move(4);
@@ -87,30 +85,36 @@ int main()
 	pac_move.AddFrame(18, 1, 16, 16);
 	pac_move.AddFrame(35, 1, 16, 16);
 	pac_move.AddFrame(18, 1, 16, 16);
-	Pacman::PacmanSprite.Animations.push_back(pac_move);
+	State_ClientConnected->PacmanSprite.Animations.push_back(pac_move);
 	Animation pac_die(4);
 	for (int i = 3; i <= 15; i++)
 	{
 		pac_die.AddFrame(1 + 17 * i, 1, 16, 16);
 	}
-	Pacman::PacmanSprite.Animations.push_back(pac_die);
+	State_ClientConnected->PacmanSprite.Animations.push_back(pac_die);
 
-	Animation gho_hori(8);
-	gho_hori.AddFrame(1, 18, 16, 16);
-	gho_hori.AddFrame(18, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_hori);
-	Animation gho_up(8);
-	gho_up.AddFrame(35, 18, 16, 16);
-	gho_up.AddFrame(52, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_up);
-	Animation gho_down(8);
-	gho_down.AddFrame(69, 18, 16, 16);
-	gho_down.AddFrame(86, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_down);
-	Animation gho_fear(8);
-	gho_fear.AddFrame(205, 18, 16, 16);
-	gho_fear.AddFrame(222, 18, 16, 16);
-	Ghost::GhostSprite.Animations.push_back(gho_fear);
+	State_ClientConnected->GhostSprites.resize(4);
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		State_ClientConnected->GhostSprites[i].Index =
+			Renderer::CreateSprite("../spritesheet.png");
+		Animation gho_hori(8);
+		gho_hori.AddFrame(1, 18 + 17 * i, 16, 16);
+		gho_hori.AddFrame(18, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_hori);
+		Animation gho_up(8);
+		gho_up.AddFrame(35, 18 + 17 * i, 16, 16);
+		gho_up.AddFrame(52, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_up);
+		Animation gho_down(8);
+		gho_down.AddFrame(69, 18 + 17 * i, 16, 16);
+		gho_down.AddFrame(86, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_down);
+		Animation gho_fear(8);
+		gho_fear.AddFrame(205, 18 + 17 * i, 16, 16);
+		gho_fear.AddFrame(222, 18 + 17 * i, 16, 16);
+		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_fear);
+	}
 
 	// Initialize NetworkManager
 	NetworkManager::Init();
@@ -163,7 +167,7 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		ClientConnectedState *connected =
 			(ClientConnectedState *)states[ClientConnected];
 		connected->PlayerNumber = waiting->PlayerNumber;
-		connected->SelectedCharacter = Pacman_c;
+		connected->SelectedCharacter = PacMan;
 		connected->Ready = false;
 		connected->StartingGame = NULL;
 	}

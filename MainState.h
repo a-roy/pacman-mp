@@ -95,6 +95,8 @@ class ClientConnectedState : public MainState
 		Character SelectedCharacter;
 		bool Ready;
 		Game *StartingGame;
+		Sprite PacmanSprite;
+		std::vector<Sprite> GhostSprites;
 
 		MainStateEnum GetEnum() { return ClientConnected; }
 		MainStateEnum LocalUpdate();
