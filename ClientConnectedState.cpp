@@ -80,7 +80,6 @@ MainStateEnum ClientConnectedState::ProcessPacket(NetworkManager::MessageType mt
 {
 	if (id == 0)
 	{
-		NetworkManager::CurrentConnections[0].Lag = 0;
 		if (mtype == NetworkManager::PingClient)
 		{
 			// No action needed

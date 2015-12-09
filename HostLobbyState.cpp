@@ -74,10 +74,6 @@ MainStateEnum HostLobbyState::LocalUpdate()
 MainStateEnum HostLobbyState::ProcessPacket(NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
-	if (id < PlayerCount)
-	{
-		NetworkManager::CurrentConnections[id].Lag = 0;
-	}
 	if (mtype == NetworkManager::RequestServer)
 	{
 		// check if client is already in lobby

@@ -128,6 +128,10 @@ MainStateEnum GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 				}
 			}
 		}
+		else if (mtype == NetworkManager::EndGame)
+		{
+			return MainMenu;
+		}
 	}
 
 	return Gameplay;

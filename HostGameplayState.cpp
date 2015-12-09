@@ -8,6 +8,16 @@ MainStateEnum HostGameplayState::ProcessPacket(
 		NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
+	for (unsigned int i = 0; i < PlayerCount; i++)
+	{
+		if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
+		{
+			std::vector<char> data_s(EndGame_size);
+			NetworkManager::Broadcast(NetworkManager::EndGame, data_s);
+			return MainMenu;
+		}
+	}
+
 	if (mtype == NetworkManager::PingServer)
 	{
 		std::vector<char> data_s(StartGame_minsize + PlayerCount);
@@ -34,6 +44,16 @@ MainStateEnum HostGameplayState::ProcessPacket(
 	}
 	else if (mtype == NetworkManager::EndedGame)
 	{
+		GameEnded[id] = true;
+		for (std::size_t i = 0; i < GameEnded.size(); i++)
+		{
+			if (!GameEnded[i])
+			{
+				return HostGameplay;
+			}
+		}
+		std::vector<char> data_s(EndGame_size);
+		NetworkManager::Broadcast(NetworkManager::EndGame, data_s);
 		return MainMenu;
 	}
 

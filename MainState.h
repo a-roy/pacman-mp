@@ -67,6 +67,7 @@ class HostGameplayState : public MainState
 	public:
 		unsigned int PlayerCount;
 		std::vector<Character> Characters;
+		std::vector<bool> GameEnded;
 
 		MainStateEnum GetEnum() { return HostGameplay; }
 		MainStateEnum LocalUpdate() { return HostGameplay; }

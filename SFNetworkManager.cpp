@@ -33,6 +33,7 @@ void NetworkManager::Receive(MessageType &mtype, std::vector<char> &data,
 			mtype = None;
 		}
 		sender = GetConnection(senderIp.toString(), port);
+		CurrentConnections[sender].Lag = 0;
 	}
 	else
 	{
