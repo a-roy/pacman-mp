@@ -59,6 +59,10 @@ void InputHandler::PollEvents()
 						{
 							newInput = Left;
 						}
+						else
+						{
+							continue;
+						}
 						break;
 					case sf::Joystick::PovY:
 						if (event.joystickMove.position > 0.f)
@@ -69,7 +73,13 @@ void InputHandler::PollEvents()
 						{
 							newInput = Down;
 						}
+						else
+						{
+							continue;
+						}
 						break;
+					default:
+						continue;
 				}
 				LastInput = newInput;
 				InputTime = -1;
