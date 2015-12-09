@@ -11,10 +11,19 @@ MainStateEnum GameplayState::LocalUpdate()
 	if ((Local->CurrentFrame - Synced->CurrentFrame + 1 + NetworkDelay) * 2
 			< InputData_size)
 	{
-		PlayerInputs[PlayerNumber].erase(PlayerInputs[PlayerNumber].begin());
-		PlayerInputs[PlayerNumber].push_back(InputHandler::LastInput);
 		for (unsigned int i = 0; i < PlayerInputs.size(); i++)
 		{
+			PlayerInputs[i].erase(PlayerInputs[i].begin());
+			if (i == PlayerNumber)
+			{
+				PlayerInputs[i].push_back(InputHandler::LastInput);
+			}
+			else
+			{
+				int diff = ReceivedFrames[PlayerNumber] - ReceivedFrames[i];
+				int last = InputData_size - 2 - NetworkDelay - diff;
+				PlayerInputs[i].push_back(PlayerInputs[i][last]);
+			}
 			Local->Players[i]->SetDirection(
 				PlayerInputs[i][InputData_size - 1 - NetworkDelay]);
 		}
