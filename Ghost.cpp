@@ -1,18 +1,10 @@
 #include "Player.h"
 #include "Renderer.h"
 
-Ghost::Ghost(const Sprite &playerSprite)
+Ghost::Ghost(const Sprite &playerSprite,
+		Position startingPos, Position startingDir) :
+	Player(playerSprite, startingPos, startingDir)
 {
-	PlayerSprite = playerSprite;
-	CurrentPos = Position(
-			13 * TILE_SIZE + (TILE_SIZE - 1) / 2,
-			11 * TILE_SIZE + (TILE_SIZE - 1) / 2);
-	Paused = 180;
-	Dying = -1;
-	Cornering = false;
-	CurrentDir = Left;
-	NextDir = Left;
-	AnimFrame = 0;
 	Fear = 0;
 }
 
@@ -100,9 +92,7 @@ void Ghost::ProcessEvent(Player::Event event)
 
 void Ghost::Reset()
 {
-	CurrentPos = Position(
-			13 * TILE_SIZE + (TILE_SIZE - 1) / 2,
-			13 * TILE_SIZE + (TILE_SIZE - 1) / 2);
+	CurrentPos = StartingPos;
 	CurrentDir = Up;
 	NextDir = Up;
 	AnimFrame = 0;

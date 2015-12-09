@@ -1,19 +1,10 @@
 #include "Player.h"
 #include "Renderer.h"
 
-Pacman::Pacman(const Sprite &playerSprite)
-{
-	PlayerSprite = playerSprite;
-	CurrentPos = Position(
-			14 * TILE_SIZE,
-			23 * TILE_SIZE + (TILE_SIZE - 1) / 2);
-	Paused = 180;
-	Cornering = false;
-	CurrentDir = Left;
-	NextDir = Left;
-	AnimFrame = 0;
-	Dying = -1;
-}
+Pacman::Pacman(const Sprite &playerSprite,
+		Position startingPos, Position startingDir) :
+	Player(playerSprite, startingPos, startingDir)
+{ }
 
 Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 {
@@ -86,9 +77,7 @@ void Pacman::ProcessEvent(Player::Event event)
 
 void Pacman::Reset()
 {
-	CurrentPos = Position(
-			13 * TILE_SIZE + (TILE_SIZE - 1) / 2,
-			23 * TILE_SIZE + (TILE_SIZE - 1) / 2);
+	CurrentPos = StartingPos;
 	CurrentDir = Left;
 	NextDir = Left;
 	Dying = -1;

@@ -26,12 +26,15 @@ class Player
 		int Paused;
 		int Dying;
 		bool Cornering;
+		Position StartingPos;
 		Position CurrentDir;
 		Position NextDir;
 		int AnimFrame;
 		std::vector<Animation *> Animations;
 		Sprite PlayerSprite;
 
+		Player(const Sprite &playerSprite,
+				Position startingPos, Position startingDir);
 		void SetDirection(Position direction);
 		virtual bool CanGo(const Field *f, Position delta);
 		virtual Event Move(const Field *f, Field::PelletStatus &p);
@@ -48,7 +51,8 @@ class Player
 class Pacman : public Player
 {
 	public:
-		Pacman(const Sprite &playerSprite);
+		Pacman(const Sprite &playerSprite,
+				Position startingPos, Position startingDir);
 		Event Move(const Field *f, Field::PelletStatus &p);
 		int Speed();
 		int CornerRange() { return TILE_SIZE / 2; }
@@ -65,7 +69,8 @@ class Ghost : public Player
 	public:
 		int Fear;
 
-		Ghost(const Sprite &playerSprite);
+		Ghost(const Sprite &playerSprite,
+				Position startingPos, Position startingDir);
 		bool CanGo(const Field *f, Position delta);
 		Event Move(const Field *f, Field::PelletStatus &p);
 		int Speed();

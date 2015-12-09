@@ -1,6 +1,20 @@
 #include "Player.h"
 #include "Renderer.h"
 
+Player::Player(const Sprite &playerSprite,
+		Position startingPos, Position startingDir)
+{
+	PlayerSprite = playerSprite;
+	StartingPos = startingPos;
+	CurrentPos = StartingPos;
+	CurrentDir = startingDir;
+	NextDir = CurrentDir;
+	Paused = 180;
+	Dying = -1;
+	Cornering = false;
+	AnimFrame = 0;
+}
+
 void Player::SetDirection(Position direction)
 {
 	if (!Cornering)

@@ -109,23 +109,43 @@ MainStateEnum ClientConnectedState::ProcessPacket(NetworkManager::MessageType mt
 				Character c = (Character)data_r[StartGame_Character + i];
 				if (c == PacMan)
 				{
-					players.push_back(new Pacman(PacmanSprite));
+					players.push_back(new Pacman(PacmanSprite,
+								Position(
+									14 * TILE_SIZE,
+									23 * TILE_SIZE + (TILE_SIZE - 1) / 2),
+								Left));
 				}
 				else if (c == Blinky)
 				{
-					players.push_back(new Ghost(GhostSprites[0]));
+					players.push_back(new Ghost(GhostSprites[0],
+								Position(
+									14 * TILE_SIZE,
+									11 * TILE_SIZE + (TILE_SIZE - 1) / 2),
+								Left));
 				}
 				else if (c == Inky)
 				{
-					players.push_back(new Ghost(GhostSprites[2]));
+					players.push_back(new Ghost(GhostSprites[2],
+								Position(
+									12 * TILE_SIZE,
+									14 * TILE_SIZE + (TILE_SIZE - 1) / 2),
+								Up));
 				}
 				else if (c == Pinky)
 				{
-					players.push_back(new Ghost(GhostSprites[1]));
+					players.push_back(new Ghost(GhostSprites[1],
+								Position(
+									14 * TILE_SIZE,
+									14 * TILE_SIZE + (TILE_SIZE - 1) / 2),
+								Down));
 				}
 				else if (c == Clyde)
 				{
-					players.push_back(new Ghost(GhostSprites[3]));
+					players.push_back(new Ghost(GhostSprites[3],
+								Position(
+									16 * TILE_SIZE,
+									14 * TILE_SIZE + (TILE_SIZE - 1) / 2),
+								Up));
 				}
 			}
 			StartingGame = new Game(gameField, players);
