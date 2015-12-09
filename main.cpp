@@ -159,6 +159,7 @@ static void change(MainState *&currentState, MainStateEnum nextState)
 		HostGameplayState *host_game = (HostGameplayState *)states[HostGameplay];
 		host_game->PlayerCount = host_lobby->PlayerCount;
 		host_game->Characters = host_lobby->Characters;
+		host_game->GameEnded = std::vector<bool>(host_game->PlayerCount);
 	}
 	else if (nextState == ClientConnected)
 	{
