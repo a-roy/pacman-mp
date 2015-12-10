@@ -147,6 +147,8 @@ void GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 		}
 		else if (mtype == NetworkManager::EndGame)
 		{
+			delete Local;
+			delete Synced;
 			StateMachine::Change(new MainMenuState());
 			return;
 		}

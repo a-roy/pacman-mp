@@ -42,5 +42,6 @@ int main()
     }
 
 	Renderer::Deinit();
+	delete StateMachine::CurrentState;
 	return 0;
 }
