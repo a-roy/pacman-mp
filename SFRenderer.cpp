@@ -114,6 +114,7 @@ void Renderer::LoadField(Field *field, std::string texpath)
 		}
 	}
 	const sf::Texture &texture = SFData::GetTexture(texpath);
+	SFData::FieldTexture->clear();
 	SFData::FieldTexture->draw(
 			vertices,
 			6 * FIELD_WIDTH * FIELD_HEIGHT,

@@ -32,7 +32,23 @@ MainStateEnum HostLobbyState::LocalUpdate()
 
 	if (InputHandler::InputTime == 0)
 	{
-		if (InputHandler::LastInput == Right)
+		if (InputHandler::LastInput == Up && Index > 0)
+		{
+			Index--;
+		}
+		else if (InputHandler::LastInput == Down && Index < 2)
+		{
+			Index++;
+		}
+		else if (InputHandler::LastInput == Left && Index == 0)
+		{
+			Field = (Field - 1 + 2) % 2;
+		}
+		else if (InputHandler::LastInput == Right && Index == 0)
+		{
+			Field = (Field + 1) % 2;
+		}
+		else if (InputHandler::LastInput == Right && Index == 1)
 		{
 			bool ready = PlayerCount > 0;
 			for (unsigned int i = 0; i < PlayerCount; i++)
@@ -48,8 +64,7 @@ MainStateEnum HostLobbyState::LocalUpdate()
 				std::vector<char> data_s(
 						StartGame_minsize + PlayerCount);
 				data_s[StartGame_PlayerCount] = (char)PlayerCount;
-				// TODO add field selection
-				data_s[StartGame_Field] = 0;
+				data_s[StartGame_Field] = Field;
 				std::copy(Characters.begin(),
 						Characters.end(),
 						&data_s[StartGame_Character]);
@@ -58,7 +73,7 @@ MainStateEnum HostLobbyState::LocalUpdate()
 				return HostGameplay;
 			}
 		}
-		else if (InputHandler::LastInput == Left)
+		else if (InputHandler::LastInput == Left && Index == 2)
 		{
 			return MainMenu;
 		}
@@ -142,11 +157,6 @@ void HostLobbyState::Render() const
 	str = ss.str();
 	Renderer::DrawText(0, str, 24, 60, 140);
 
-	ss.str("");
-	ss << "Field " << 0;
-	str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 180);
-
 	for (int i = 0; i < PlayerCount; i++)
 	{
 		ss.str("");
@@ -155,11 +165,14 @@ void HostLobbyState::Render() const
 			<< NetworkManager::CurrentConnections[i].Port
 			<< (PlayersReady[i] ? " Ready" : " Not ready");
 		str = ss.str();
-		Renderer::DrawText(0, str, 18, 60, 220 + 40 * i);
+		Renderer::DrawText(0, str, 18, 60, 180 + 40 * i);
 	}
 
 	ss.str("");
-	ss << "Start Game >";
+	ss << "< Field " << Field + 1 << " >";
 	str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 420);
+	Renderer::DrawText(0, str, 24, 60, 380);
+	Renderer::DrawText(0, "  Start Game >", 24, 60, 420);
+	Renderer::DrawText(0, "< Close Lobby", 24, 60, 460);
+	Renderer::DrawText(0, ">", 24, 20, 380 + 40 * Index);
 }

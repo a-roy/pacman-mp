@@ -51,6 +51,8 @@ class JoinState : public MainState
 class HostLobbyState : public MainState
 {
 	public:
+		unsigned int Index;
+		unsigned int Field;
 		unsigned int PlayerCount;
 		std::vector<bool> PlayersReady;
 		std::vector<Character> Characters;

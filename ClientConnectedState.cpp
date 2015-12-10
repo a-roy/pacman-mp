@@ -98,8 +98,15 @@ MainStateEnum ClientConnectedState::ProcessPacket(NetworkManager::MessageType mt
 			unsigned char count = data_r[StartGame_PlayerCount];
 			unsigned char field = data_r[StartGame_Field];
 
-			/// \TODO Add field selection
-			Field gameField("../stage1.txt");
+			Field gameField;
+			if (field == 0U)
+			{
+				gameField = Field("../stage1.txt");
+			}
+			else
+			{
+				gameField = Field("../stage2.txt");
+			}
 			Renderer::LoadField(&gameField, "../spritesheet.png");
 
 			std::vector<Player *> players;
@@ -163,8 +170,6 @@ void ClientConnectedState::Render() const
 	std::string str = ss.str();
 	Renderer::DrawText(0, str, 24, 60, 100);
 	Character c = SelectedCharacter;
-	bool ready = Ready;
-	unsigned int index = Index;
 
 	if (c == PacMan)
 	{
@@ -212,7 +217,7 @@ void ClientConnectedState::Render() const
 				0, 0);
 	}
 
-	if (ready)
+	if (Ready)
 	{
 		Renderer::DrawText(0, "< Ready!", 18, 60, 180);
 	}
@@ -220,5 +225,5 @@ void ClientConnectedState::Render() const
 	{
 		Renderer::DrawText(0, "  Ready? >", 18, 60, 180);
 	}
-	Renderer::DrawText(0, ">", 18, 20, 140 + 40 * index);
+	Renderer::DrawText(0, ">", 18, 20, 140 + 40 * Index);
 }
