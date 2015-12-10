@@ -2,23 +2,24 @@
 //! ClientWaitingState class implementation
 
 #include "MainState.h"
+#include "StateMachine.h"
 
-MainStateEnum ClientWaitingState::LocalUpdate()
+unsigned int ClientWaitingState::PlayerNumber;
+
+void ClientWaitingState::LocalUpdate()
 {
 	if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
 	{
-		return Join;
+		StateMachine::Change(new JoinState());
 	}
 	else
 	{
 		std::vector<char> data_s(RequestServer_size);
 		NetworkManager::Send(NetworkManager::RequestServer, data_s, 0);
 	}
-
-	return ClientWaiting;
 }
 
-MainStateEnum ClientWaitingState::ProcessPacket(
+void ClientWaitingState::ProcessPacket(
 		NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
@@ -27,11 +28,9 @@ MainStateEnum ClientWaitingState::ProcessPacket(
 		if (mtype == NetworkManager::ConfirmClient)
 		{
 			PlayerNumber = data_r[ConfirmClient_PlayerNumber];
-			return ClientConnected;
+			StateMachine::Change(new ClientConnectedState());
 		}
 	}
-
-	return ClientWaiting;
 }
 
 void ClientWaitingState::Render() const

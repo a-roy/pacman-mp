@@ -7,13 +7,10 @@
 #include <sstream>
 #include <iomanip>
 #include "MainState.h"
+#include "StateMachine.h"
 #include "Renderer.h"
 #include "InputHandler.h"
 #include "NetworkManager.h"
-
-static void change(MainState *&currentState, MainStateEnum nextState);
-
-std::vector<MainState *> states;
 
 int main()
 {
@@ -22,46 +19,21 @@ int main()
 	Renderer::SpriteScale = 3.0f;
 	Renderer::CreateWindow(768, 768, "My window");
 
-	states = std::vector<MainState *>(MAINSTATEENUM_NUMITEMS);
-	states[MainMenu] = new MainMenuState();
-	states[HostLobby] = new HostLobbyState();
-	states[HostGameplay] = new HostGameplayState();
-	states[Join] = new JoinState();
-	states[ClientWaiting] = new ClientWaitingState();
-	states[ClientConnected] = new ClientConnectedState();
-	states[Gameplay] = new GameplayState();
-	states[Exiting] = new ExitingState();
-
-	MainMenuState *State_MainMenu = (MainMenuState *)states[MainMenu];
-	HostLobbyState *State_HostLobby = (HostLobbyState *)states[HostLobby];
-	HostGameplayState *State_HostGameplay =
-		(HostGameplayState *)states[HostGameplay];
-	JoinState *State_Join = (JoinState *)states[Join];
-	ClientWaitingState *State_ClientWaiting =
-		(ClientWaitingState *)states[ClientWaiting];
-	ClientConnectedState *State_ClientConnected =
-		(ClientConnectedState *)states[ClientConnected];
-	GameplayState *State_Gameplay = (GameplayState *)states[Gameplay];
-
 	// Initialize state data
-	State_MainMenu->Index = 0;
+	MainMenuState::MenuItems.AddItem(
+			new FunctionalMenuItem("Host game",
+			[](){ StateMachine::Change(new HostLobbyState()); },
+			[](){ }));
+	MainMenuState::MenuItems.AddItem(
+			new FunctionalMenuItem("Join game",
+			[](){ StateMachine::Change(new JoinState()); },
+			[](){ }));
+	MainMenuState::MenuItems.AddItem(
+			new FunctionalMenuItem("Quit",
+			[](){ StateMachine::Change(new ExitingState()); },
+			[](){ }));
 
-	State_MainMenu->Menu_EN.push_back("Host game");
-	State_MainMenu->Menu_EN.push_back("Join game");
-	State_MainMenu->Menu_EN.push_back("Quit");
-
-	MenuItem item1, item2, item3;
-	item1.Text = 0;
-	item1.Function = HostLobby;
-	State_MainMenu->MenuItems.push_back(item1);
-	item2.Text = 1;
-	item2.Function = Join;
-	State_MainMenu->MenuItems.push_back(item2);
-	item3.Text = 2;
-	item3.Function = Exiting;
-	State_MainMenu->MenuItems.push_back(item3);
-
-	State_Join->Index = 0;
+	JoinState::Index = 0;
 	std::string myAddress = NetworkManager::GetAddress();
 	std::stringstream addr(myAddress);
 	std::string part;
@@ -70,14 +42,26 @@ int main()
 		std::stringstream num(part);
 		unsigned short n;
 		num >> n;
-		State_Join->IP[i] = n;
+		JoinState::IP[i] = n;
 	}
-	State_Join->Port = 0;
+	JoinState::Port = 0;
 
-	State_ClientConnected->Index = 0;
+	HostLobbyState::MenuItems.AddItem(
+			new FieldMenuItem(&HostLobbyState::Field));
+	HostLobbyState::MenuItems.AddItem(
+			new FunctionalMenuItem(
+				"  Start Game >", &HostLobbyState::StartGame, [](){ }));
+	HostLobbyState::MenuItems.AddItem(
+			new FunctionalMenuItem(
+				"< Close Lobby", [](){ }, &HostLobbyState::CloseLobby));
+
+	ClientConnectedState::MenuItems.AddItem(
+			new CharacterMenuItem(&ClientConnectedState::SelectedCharacter));
+	ClientConnectedState::MenuItems.AddItem(
+			new ReadyMenuItem(&ClientConnectedState::Ready));
 
 	// Initialize sprites
-	State_ClientConnected->PacmanSprite.Index =
+	ClientConnectedState::PacmanSprite.Index =
 		Renderer::CreateSprite("../spritesheet.png");
 
 	Animation pac_move(4);
@@ -85,43 +69,41 @@ int main()
 	pac_move.AddFrame(18, 1, 16, 16);
 	pac_move.AddFrame(35, 1, 16, 16);
 	pac_move.AddFrame(18, 1, 16, 16);
-	State_ClientConnected->PacmanSprite.Animations.push_back(pac_move);
+	ClientConnectedState::PacmanSprite.Animations.push_back(pac_move);
 	Animation pac_die(4);
 	for (int i = 3; i <= 15; i++)
 	{
 		pac_die.AddFrame(1 + 17 * i, 1, 16, 16);
 	}
-	State_ClientConnected->PacmanSprite.Animations.push_back(pac_die);
+	ClientConnectedState::PacmanSprite.Animations.push_back(pac_die);
 
-	State_ClientConnected->GhostSprites.resize(4);
+	ClientConnectedState::GhostSprites.resize(4);
 	for (unsigned int i = 0; i < 4; i++)
 	{
-		State_ClientConnected->GhostSprites[i].Index =
+		ClientConnectedState::GhostSprites[i].Index =
 			Renderer::CreateSprite("../spritesheet.png");
 		Animation gho_hori(8);
 		gho_hori.AddFrame(1, 18 + 17 * i, 16, 16);
 		gho_hori.AddFrame(18, 18 + 17 * i, 16, 16);
-		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_hori);
+		ClientConnectedState::GhostSprites[i].Animations.push_back(gho_hori);
 		Animation gho_up(8);
 		gho_up.AddFrame(35, 18 + 17 * i, 16, 16);
 		gho_up.AddFrame(52, 18 + 17 * i, 16, 16);
-		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_up);
+		ClientConnectedState::GhostSprites[i].Animations.push_back(gho_up);
 		Animation gho_down(8);
 		gho_down.AddFrame(69, 18 + 17 * i, 16, 16);
 		gho_down.AddFrame(86, 18 + 17 * i, 16, 16);
-		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_down);
+		ClientConnectedState::GhostSprites[i].Animations.push_back(gho_down);
 		Animation gho_fear(8);
 		gho_fear.AddFrame(205, 18 + 17 * i, 16, 16);
 		gho_fear.AddFrame(222, 18 + 17 * i, 16, 16);
-		State_ClientConnected->GhostSprites[i].Animations.push_back(gho_fear);
+		ClientConnectedState::GhostSprites[i].Animations.push_back(gho_fear);
 	}
 
 	// Initialize NetworkManager
 	NetworkManager::Init();
 
-	// Start the state machine
-	MainState* currentState = states[MainMenu];
-
+	StateMachine::Change(new MainMenuState());
     while (Renderer::WindowOpen())
     {
 		InputHandler::PollEvents();
@@ -130,61 +112,13 @@ int main()
 			break;
 		}
 
-		change(currentState, currentState->ProcessData());
-		change(currentState, currentState->LocalUpdate());
+		StateMachine::CurrentState->ProcessData();
+		StateMachine::CurrentState->LocalUpdate();
 		Renderer::Clear();
-		currentState->Render();
+		StateMachine::CurrentState->Render();
 		Renderer::Display();
     }
 
 	Renderer::Deinit();
 	return 0;
-}
-
-static void change(MainState *&currentState, MainStateEnum nextState)
-{
-	if (currentState == states[nextState])
-	{
-		return;
-	}
-
-	if (nextState == HostLobby)
-	{
-		HostLobbyState *host = (HostLobbyState *)states[HostLobby];
-		host->PlayerCount = 0;
-	}
-	else if (nextState == HostGameplay)
-	{
-		HostLobbyState *host_lobby = (HostLobbyState *)states[HostLobby];
-		HostGameplayState *host_game = (HostGameplayState *)states[HostGameplay];
-		host_game->PlayerCount = host_lobby->PlayerCount;
-		host_game->Characters = host_lobby->Characters;
-		host_game->GameEnded = std::vector<bool>(host_game->PlayerCount);
-	}
-	else if (nextState == ClientConnected)
-	{
-		ClientWaitingState *waiting =
-			(ClientWaitingState *)states[ClientWaiting];
-		ClientConnectedState *connected =
-			(ClientConnectedState *)states[ClientConnected];
-		connected->PlayerNumber = waiting->PlayerNumber;
-		connected->SelectedCharacter = PacMan;
-		connected->Ready = false;
-		connected->StartingGame = NULL;
-	}
-	else if (nextState == Gameplay)
-	{
-		ClientConnectedState *client =
-			(ClientConnectedState *)states[ClientConnected];
-		GameplayState *gameplay = (GameplayState *)states[Gameplay];
-		gameplay->Local = client->StartingGame;
-		gameplay->Synced = new Game(*gameplay->Local);
-		gameplay->PlayerNumber = client->PlayerNumber;
-		unsigned int count = gameplay->Local->Players.size();
-		gameplay->PlayerInputs = std::vector<std::vector<Position> >(
-				count, std::vector<Position>(InputData_size, Left));
-		gameplay->ReceivedFrames = std::vector<unsigned short>(count);
-	}
-
-	currentState = states[nextState];
 }

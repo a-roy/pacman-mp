@@ -2,9 +2,21 @@
 //! HostGameplayState class implementation
 
 #include "MainState.h"
+#include "StateMachine.h"
 #include <sstream>
 
-MainStateEnum HostGameplayState::ProcessPacket(
+unsigned int HostGameplayState::PlayerCount;
+std::vector<Character> HostGameplayState::Characters;
+std::vector<bool> HostGameplayState::GameEnded;
+
+void HostGameplayState::Change()
+{
+	PlayerCount = HostLobbyState::PlayerCount;
+	Characters = HostLobbyState::Characters;
+	GameEnded = std::vector<bool>(PlayerCount);
+}
+
+void HostGameplayState::ProcessPacket(
 		NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
@@ -14,7 +26,8 @@ MainStateEnum HostGameplayState::ProcessPacket(
 		{
 			std::vector<char> data_s(EndGame_size);
 			NetworkManager::Broadcast(NetworkManager::EndGame, data_s);
-			return MainMenu;
+			StateMachine::Change(new MainMenuState());
+			return;
 		}
 	}
 
@@ -49,15 +62,14 @@ MainStateEnum HostGameplayState::ProcessPacket(
 		{
 			if (!GameEnded[i])
 			{
-				return HostGameplay;
+				return;
 			}
 		}
 		std::vector<char> data_s(EndGame_size);
 		NetworkManager::Broadcast(NetworkManager::EndGame, data_s);
-		return MainMenu;
+		StateMachine::Change(new MainMenuState());
+		return;
 	}
-
-	return HostGameplay;
 }
 
 void HostGameplayState::Render() const

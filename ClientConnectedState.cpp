@@ -2,80 +2,42 @@
 //! ClientConnectedState class implementation
 
 #include "MainState.h"
+#include "StateMachine.h"
 #include <sstream>
 
-MainStateEnum ClientConnectedState::LocalUpdate()
+unsigned int ClientConnectedState::Index;
+unsigned int ClientConnectedState::PlayerNumber;
+Character ClientConnectedState::SelectedCharacter;
+bool ClientConnectedState::Ready;
+Game *ClientConnectedState::StartingGame;
+Sprite ClientConnectedState::PacmanSprite;
+std::vector<Sprite> ClientConnectedState::GhostSprites;
+Menu ClientConnectedState::MenuItems;
+
+void ClientConnectedState::Change()
 {
-	if (InputHandler::InputTime == 0)
-	{
-		if (Index == 0)
-		{
-			if (InputHandler::LastInput == Down)
-			{
-				Index = 1;
-			}
-			else if (InputHandler::LastInput == Left)
-			{
-				if (SelectedCharacter == PacMan)
-				{
-					SelectedCharacter = Clyde;
-				}
-				else
-				{
-					SelectedCharacter = (Character)(SelectedCharacter - 1);
-				}
-			}
-			else if (InputHandler::LastInput == Right)
-			{
-				if (SelectedCharacter == Clyde)
-				{
-					SelectedCharacter = PacMan;
-				}
-				else
-				{
-					SelectedCharacter = (Character)(SelectedCharacter + 1);
-				}
-			}
-		}
-		else
-		{
-			if (InputHandler::LastInput == Up)
-			{
-				Ready = false;
-				std::vector<char> data_s(PlayerNotReady_size);
-				NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
-				Index = 0;
-			}
-			else if (InputHandler::LastInput == Right)
-			{
-				Ready = true;
-				std::vector<char> data_s(PlayerReady_size);
-				data_s[PlayerReady_Character] = SelectedCharacter;
-				NetworkManager::Send(
-						NetworkManager::PlayerReady, data_s, 0);
-			}
-			else if (InputHandler::LastInput == Left)
-			{
-				Ready = false;
-				std::vector<char> data_s(PlayerNotReady_size);
-				NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
-			}
-		}
-	}
+	PlayerNumber = ClientWaitingState::PlayerNumber;
+	SelectedCharacter = PacMan;
+	Ready = false;
+	StartingGame = NULL;
+}
+
+void ClientConnectedState::LocalUpdate()
+{
+	MenuItems.Update();
 
 	if (NetworkManager::CurrentConnections[0].Lag > NetworkTimeout)
 	{
-		return Join;
+		StateMachine::Change(new JoinState());
+		return;
 	}
 
 	// ping server
 	std::vector<char> data_s(PingServer_size);
 	NetworkManager::Send(NetworkManager::PingServer, data_s, 0);
-
-	return ClientConnected;
 }
 
-MainStateEnum ClientConnectedState::ProcessPacket(NetworkManager::MessageType mtype,
+void ClientConnectedState::ProcessPacket(NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
 	if (id == 0)
@@ -91,7 +53,8 @@ MainStateEnum ClientConnectedState::ProcessPacket(NetworkManager::MessageType mt
 		}
 		else if (mtype == NetworkManager::DisconnectClient)
 		{
-			return Join;
+			StateMachine::Change(new JoinState());
+			return;
 		}
 		else if (mtype == NetworkManager::StartGame)
 		{
@@ -155,11 +118,9 @@ MainStateEnum ClientConnectedState::ProcessPacket(NetworkManager::MessageType mt
 				}
 			}
 			StartingGame = new Game(gameField, players);
-			return Gameplay;
+			StateMachine::Change(new GameplayState());
 		}
 	}
-
-	return ClientConnected;
 }
 
 void ClientConnectedState::Render() const
@@ -169,61 +130,5 @@ void ClientConnectedState::Render() const
 	ss << PlayerNumber + 1;
 	std::string str = ss.str();
 	Renderer::DrawText(0, str, 24, 60, 100);
-	Character c = SelectedCharacter;
-
-	if (c == PacMan)
-	{
-		Renderer::DrawText(0, "< Pac-Man    >", 18, 60, 140);
-		Renderer::DrawSprite(
-				PacmanSprite,
-				9 * TILE_SIZE, 5 * TILE_SIZE,
-				0.f, true,
-				0, 4);
-	}
-	else if (c == Blinky)
-	{
-		Renderer::DrawText(0, "< Blinky     >", 18, 60, 140);
-		Renderer::DrawSprite(
-				GhostSprites[0],
-				9 * TILE_SIZE, 5 * TILE_SIZE,
-				0.f, false,
-				0, 0);
-	}
-	else if (c == Inky)
-	{
-		Renderer::DrawText(0, "< Inky       >", 18, 60, 140);
-		Renderer::DrawSprite(
-				GhostSprites[2],
-				9 * TILE_SIZE, 5 * TILE_SIZE,
-				0.f, false,
-				0, 0);
-	}
-	else if (c == Pinky)
-	{
-		Renderer::DrawText(0, "< Pinky      >", 18, 60, 140);
-		Renderer::DrawSprite(
-				GhostSprites[1],
-				9 * TILE_SIZE, 5 * TILE_SIZE,
-				0.f, false,
-				0, 0);
-	}
-	else if (c == Clyde)
-	{
-		Renderer::DrawText(0, "< Clyde      >", 18, 60, 140);
-		Renderer::DrawSprite(
-				GhostSprites[3],
-				9 * TILE_SIZE, 5 * TILE_SIZE,
-				0.f, false,
-				0, 0);
-	}
-
-	if (Ready)
-	{
-		Renderer::DrawText(0, "< Ready!", 18, 60, 180);
-	}
-	else
-	{
-		Renderer::DrawText(0, "  Ready? >", 18, 60, 180);
-	}
-	Renderer::DrawText(0, ">", 18, 20, 140 + 40 * Index);
+	MenuItems.Render(20, 140);
 }

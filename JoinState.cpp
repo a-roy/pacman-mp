@@ -2,10 +2,15 @@
 //! JoinState class declaration
 
 #include "MainState.h"
+#include "StateMachine.h"
 #include <iomanip>
 #include <sstream>
 
-MainStateEnum JoinState::LocalUpdate()
+unsigned int JoinState::Index;
+unsigned char JoinState::IP[4];
+unsigned short JoinState::Port;
+
+void JoinState::LocalUpdate()
 {
 	if (InputHandler::InputTime == 0)
 	{
@@ -17,7 +22,7 @@ MainStateEnum JoinState::LocalUpdate()
 			}
 			else
 			{
-				return MainMenu;
+				StateMachine::Change(new MainMenuState());
 			}
 		}
 		else if (InputHandler::LastInput == Right)
@@ -35,7 +40,7 @@ MainStateEnum JoinState::LocalUpdate()
 					<< (unsigned short)IP[3];
 				NetworkManager::ResetConnections();
 				NetworkManager::GetConnection(ss.str(), Port);
-				return ClientWaiting;
+				StateMachine::Change(new ClientWaitingState());
 			}
 		}
 		else if (InputHandler::LastInput == Up)
@@ -47,8 +52,6 @@ MainStateEnum JoinState::LocalUpdate()
 			AddrIncrement(-1);
 		}
 	}
-
-	return Join;
 }
 
 void JoinState::Render() const

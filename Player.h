@@ -89,5 +89,6 @@ enum Character
 	Blinky,
 	Inky,
 	Pinky,
-	Clyde
+	Clyde,
+	Character_NUMITEMS
 };
