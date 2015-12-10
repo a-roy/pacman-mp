@@ -15,8 +15,7 @@
 int main()
 {
 	Renderer::LoadFont("../prstartk.ttf");
-	Renderer::TileScale = 3.0f;
-	Renderer::SpriteScale = 3.0f;
+	Renderer::Scale = 3.0f;
 	Renderer::CreateWindow(768, 768, "My window");
 
 	// Initialize state data

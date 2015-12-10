@@ -1,7 +1,6 @@
 #include "Renderer.h"
 
-float Renderer::TileScale;
-float Renderer::SpriteScale;
+float Renderer::Scale;
 
 #define NB_N  0x00
 #define NB_R  0x01

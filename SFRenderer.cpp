@@ -26,7 +26,7 @@ int Renderer::CreateSprite(std::string texpath)
 {
 	sf::Sprite sprite;
 	sprite.setTexture(SFData::GetTexture(texpath));
-	sprite.setScale(sf::Vector2f(SpriteScale, SpriteScale));
+	sprite.setScale(sf::Vector2f(Scale, Scale));
 	sprite.setOrigin(sf::Vector2f(8, 8));
 
 	int index = SFData::Sprites.size();
@@ -126,8 +126,8 @@ void Renderer::LoadField(Field *field, std::string texpath)
 void Renderer::GetFieldPos(int &x, int &y)
 {
 	sf::Vector2u size = SFData::Window->getSize();
-	x = (size.x - SpriteScale * 8 * FIELD_WIDTH) / 2;
-	y = (size.y - SpriteScale * 8 * FIELD_HEIGHT) / 2;
+	x = (size.x - Scale * 8 * FIELD_WIDTH) / 2;
+	y = (size.y - Scale * 8 * FIELD_HEIGHT) / 2;
 }
 
 int Renderer::LoadFont(std::string fontpath)
@@ -159,10 +159,10 @@ void Renderer::DrawSprite(const Sprite &s, int x, int y, float theta,
 	GetFieldPos(fx, fy);
 	sprite.setTextureRect(sf::IntRect(tx, ty, tw, th));
 	sprite.setPosition(
-			x * TileScale * 8 / TILE_SIZE + fx,
-			y * TileScale * 8 / TILE_SIZE + fy);
+			x * Scale * 8 / TILE_SIZE + fx,
+			y * Scale * 8 / TILE_SIZE + fy);
 	sprite.setRotation(theta);
-	sprite.setScale(flip ? -SpriteScale : SpriteScale, SpriteScale);
+	sprite.setScale(flip ? -Scale : Scale, Scale);
 	SFData::Window->draw(sprite);
 }
 
@@ -171,7 +171,7 @@ void Renderer::DrawField(const Field::PelletStatus &pellets)
 	sf::Vector2f screenSize(SFData::Window->getSize());
 	sf::Vector2f fieldSize =
 		8.f * sf::Vector2f(FIELD_WIDTH, FIELD_HEIGHT);
-	sf::Vector2f scaledSize = SpriteScale * fieldSize;
+	sf::Vector2f scaledSize = Scale * fieldSize;
 	sf::Vector2f offset = (screenSize - scaledSize) / 2.f;
 	sf::Vertex vertices[] =
 	{
