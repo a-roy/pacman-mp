@@ -173,6 +173,6 @@ void ClientConnectedState::Render() const
 	ss << "You are Player ";
 	ss << PlayerNumber + 1;
 	std::string str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 100);
+	Renderer::DrawText(str, 24, 60, 100);
 	MenuItems.Render(20, 140);
 }

@@ -130,13 +130,9 @@ void Renderer::GetFieldPos(int &x, int &y)
 	y = (size.y - Scale * 8 * FIELD_HEIGHT) / 2;
 }
 
-int Renderer::LoadFont(std::string fontpath)
+void Renderer::LoadFont(std::string fontpath)
 {
-	sf::Font font;
-	font.loadFromFile(fontpath);
-	int index = SFData::Fonts.size();
-	SFData::Fonts.push_back(font);
-	return index;
+	SFData::Font.loadFromFile(fontpath);
 }
 
 void Renderer::Clear()
@@ -209,11 +205,10 @@ void Renderer::DrawField(const Field::PelletStatus &pellets)
 	SFData::Window->draw(vertices, 4, sf::TrianglesStrip, renderStates);
 }
 
-void Renderer::DrawText(int fontIndex, std::string text,
-		unsigned int charSize, int x, int y)
+void Renderer::DrawText(std::string text, unsigned int charSize,
+		int x, int y)
 {
-	const sf::Font &font = SFData::Fonts[fontIndex];
-	const sf::Texture &texture = font.getTexture(charSize);
+	const sf::Texture &texture = SFData::Font.getTexture(charSize);
 	float xi = (float)x;
 	std::wstring wtext;
 	wtext.assign(text.begin(), text.end());
@@ -222,7 +217,8 @@ void Renderer::DrawText(int fontIndex, std::string text,
 	unsigned int j = 0;
 	for (unsigned int i = 0; i < len; i++)
 	{
-		const sf::Glyph &glyph = font.getGlyph(wtext[i], charSize, false);
+		const sf::Glyph &glyph =
+			SFData::Font.getGlyph(wtext[i], charSize, false);
 		if (glyph.bounds.width > 0.f)
 		{
 			sf::Vertex topleft = sf::Vertex(

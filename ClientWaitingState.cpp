@@ -35,5 +35,5 @@ void ClientWaitingState::ProcessPacket(
 
 void ClientWaitingState::Render() const
 {
-	Renderer::DrawText(0, "Connecting...", 24, 60, 100);
+	Renderer::DrawText("Connecting...", 24, 60, 100);
 }

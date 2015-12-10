@@ -160,10 +160,10 @@ void Game::draw() const
 	}
 	if (GameOver > 0)
 	{
-		Renderer::DrawText(0, "Pac-Man wins!", 24, 228, 444);
+		Renderer::DrawText("Pac-Man wins!", 24, 228, 444);
 	}
 	else if (GameOver < 0)
 	{
-		Renderer::DrawText(0, "Ghosts win!", 24, 252, 444);
+		Renderer::DrawText("Ghosts win!", 24, 252, 444);
 	}
 }

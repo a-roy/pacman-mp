@@ -119,12 +119,12 @@ void HostLobbyState::Render() const
 	std::ostringstream ss;
 	ss << address << ":" << port;
 	std::string str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 100);
+	Renderer::DrawText(str, 24, 60, 100);
 
 	ss.str("");
 	ss << "Clients connected: " << PlayerCount;
 	str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 140);
+	Renderer::DrawText(str, 24, 60, 140);
 
 	for (int i = 0; i < PlayerCount; i++)
 	{
@@ -134,7 +134,7 @@ void HostLobbyState::Render() const
 			<< NetworkManager::CurrentConnections[i].Port
 			<< (PlayersReady[i] ? " Ready" : " Not ready");
 		str = ss.str();
-		Renderer::DrawText(0, str, 18, 60, 180 + 40 * i);
+		Renderer::DrawText(str, 18, 60, 180 + 40 * i);
 	}
 	MenuItems.Render(20, 380);
 }

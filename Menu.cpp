@@ -45,5 +45,5 @@ void Menu::Render(int x, int y) const
 		Items[i]->Render(x + 48, y + 48 * i);
 	}
 
-	Renderer::DrawText(0, ">", 24, x, y + 48 * Index);
+	Renderer::DrawText(">", 24, x, y + 48 * Index);
 }

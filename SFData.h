@@ -27,8 +27,8 @@ class SFData
 		static std::map<std::string, sf::Texture> Textures;
 		//! SFML Sprite database
 		static std::vector<sf::Sprite> Sprites;
-		//! SFML Font database
-		static std::vector<sf::Font> Fonts;
+		//!
+		static sf::Font Font;
 		//! SFML IP database
 		static std::vector<sf::IpAddress> Addresses;
 

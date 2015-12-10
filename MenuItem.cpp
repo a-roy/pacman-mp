@@ -6,7 +6,7 @@
 
 void FunctionalMenuItem::Render(int x, int y) const
 {
-	Renderer::DrawText(0, Text, 24, x, y);
+	Renderer::DrawText(Text, 24, x, y);
 }
 
 void FieldMenuItem::Render(int x, int y) const
@@ -14,7 +14,7 @@ void FieldMenuItem::Render(int x, int y) const
 	std::ostringstream ss;
 	ss << "< Field " << *Value << " >";
 	std::string str = ss.str();
-	Renderer::DrawText(0, str, 24, x, y);
+	Renderer::DrawText(str, 24, x, y);
 }
 
 void CharacterMenuItem::Render(int x, int y) const
@@ -50,7 +50,7 @@ void CharacterMenuItem::Render(int x, int y) const
 		text = "< Clyde      >";
 		sprite = &ClientConnectedState::GhostSprites[3];
 	}
-	Renderer::DrawText(0, text, 18, x, y);
+	Renderer::DrawText(text, 18, x, y);
 	int s_x = (x + 9 * 18 - 12) * TILE_SIZE / 24;
 	int s_y = (y - 24) * TILE_SIZE / 24;
 	Renderer::DrawSprite(*sprite, s_x, s_y, 0.f, flip, 0, frame);
@@ -82,10 +82,10 @@ void ReadyMenuItem::Render(int x, int y) const
 {
 	if (*Value)
 	{
-		Renderer::DrawText(0, "< Ready!", 18, x, y);
+		Renderer::DrawText("< Ready!", 18, x, y);
 	}
 	else
 	{
-		Renderer::DrawText(0, "  Ready? >", 18, x, y);
+		Renderer::DrawText("  Ready? >", 18, x, y);
 	}
 }

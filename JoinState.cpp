@@ -81,13 +81,13 @@ void JoinState::Render() const
 		<< std::setw(3) << (unsigned short)IP[3] << ":"
 		<< std::setw(5) << Port;
 	std::string disp = ss.str();
-	Renderer::DrawText(0, disp, 24, 60, 100);
+	Renderer::DrawText(disp, 24, 60, 100);
 	int iPos = Index;
 	if (Index > 2) iPos++;
 	if (Index > 5) iPos++;
 	if (Index > 8) iPos++;
 	if (Index > 11) iPos++;
-	Renderer::DrawText(0, "^", 24, 60 + 24 * iPos, 136);
+	Renderer::DrawText("^", 24, 60 + 24 * iPos, 136);
 }
 
 void JoinState::AddrIncrement(int amount)

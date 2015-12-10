@@ -77,5 +77,5 @@ void HostGameplayState::Render() const
 	std::ostringstream ss;
 	ss << "Clients connected: " << PlayerCount;
 	std::string str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 100);
+	Renderer::DrawText(str, 24, 60, 100);
 }
