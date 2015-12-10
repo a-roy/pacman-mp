@@ -214,8 +214,8 @@ void Renderer::DrawText(std::string text, unsigned int charSize,
 	wtext.assign(text.begin(), text.end());
 	std::size_t len = wtext.size();
 	sf::Vertex *vertices = (sf::Vertex *)malloc(len * 6 * sizeof(sf::Vertex));
-	unsigned int j = 0;
-	for (unsigned int i = 0; i < len; i++)
+	std::size_t j = 0;
+	for (std::size_t i = 0; i < len; i++)
 	{
 		const sf::Glyph &glyph =
 			SFData::Font.getGlyph(wtext[i], charSize, false);

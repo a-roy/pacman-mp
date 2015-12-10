@@ -67,7 +67,7 @@ void NetworkManager::Broadcast(MessageType mtype, const std::vector<char> &data)
 
 bool NetworkManager::HasConnection(std::string address, unsigned short port)
 {
-	for (unsigned int i = 0, size = CurrentConnections.size(); i < size; i++)
+	for (std::size_t i = 0, size = CurrentConnections.size(); i < size; i++)
 	{
 		if (CurrentConnections[i].Address == address
 				&& CurrentConnections[i].Port == port)
@@ -81,7 +81,7 @@ bool NetworkManager::HasConnection(std::string address, unsigned short port)
 unsigned int
 NetworkManager::GetConnection(std::string address, unsigned short port)
 {
-	for (unsigned int i = 0, size = CurrentConnections.size(); i < size; i++)
+	for (std::size_t i = 0, size = CurrentConnections.size(); i < size; i++)
 	{
 		if (CurrentConnections[i].Address == address
 				&& CurrentConnections[i].Port == port)
@@ -102,7 +102,7 @@ NetworkManager::GetConnection(std::string address, unsigned short port)
 
 void NetworkManager::LagIncrement()
 {
-	for (unsigned int i = 0, end = CurrentConnections.size(); i < end; i++)
+	for (std::size_t i = 0, size = CurrentConnections.size(); i < size; i++)
 	{
 		CurrentConnections[i].Lag++;
 	}

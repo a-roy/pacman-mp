@@ -29,7 +29,7 @@ void HostLobbyState::LocalUpdate()
 {
 	unsigned int renumber = PlayerCount;
 
-	for (unsigned int i = 0; i < PlayerCount; i++)
+	for (std::size_t i = 0; i < PlayerCount; i++)
 	{
 		if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
 		{
@@ -126,7 +126,7 @@ void HostLobbyState::Render() const
 	str = ss.str();
 	Renderer::DrawText(str, 24, 60, 140);
 
-	for (int i = 0; i < PlayerCount; i++)
+	for (std::size_t i = 0; i < PlayerCount; i++)
 	{
 		ss.str("");
 		ss << NetworkManager::CurrentConnections[i].Address
@@ -142,7 +142,7 @@ void HostLobbyState::Render() const
 void HostLobbyState::StartGame()
 {
 	bool ready = PlayerCount > 0;
-	for (unsigned int i = 0; i < PlayerCount; i++)
+	for (std::size_t i = 0; i < PlayerCount; i++)
 	{
 		if (!PlayersReady[i])
 		{

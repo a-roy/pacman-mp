@@ -20,7 +20,7 @@ void HostGameplayState::ProcessPacket(
 		NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
-	for (unsigned int i = 0; i < PlayerCount; i++)
+	for (std::size_t i = 0; i < PlayerCount; i++)
 	{
 		if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
 		{
@@ -58,7 +58,7 @@ void HostGameplayState::ProcessPacket(
 	else if (mtype == NetworkManager::EndedGame)
 	{
 		GameEnded[id] = true;
-		for (std::size_t i = 0; i < GameEnded.size(); i++)
+		for (std::size_t i = 0, size = GameEnded.size(); i < size; i++)
 		{
 			if (!GameEnded[i])
 			{

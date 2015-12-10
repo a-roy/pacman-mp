@@ -35,7 +35,7 @@ void ClientConnectedState::Init()
 	PacmanSprite.Animations.push_back(pac_die);
 
 	GhostSprites.resize(4);
-	for (unsigned int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		GhostSprites[i].Index =
 			Renderer::CreateSprite("../spritesheet.png");
@@ -117,7 +117,7 @@ void ClientConnectedState::ProcessPacket(NetworkManager::MessageType mtype,
 			Renderer::LoadField(&gameField, "../spritesheet.png");
 
 			std::vector<Player *> players;
-			for (unsigned int i = 0; i < count; i++)
+			for (std::size_t i = 0; i < count; i++)
 			{
 				Character c = (Character)data_r[StartGame_Character + i];
 				if (c == PacMan)

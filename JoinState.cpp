@@ -17,7 +17,7 @@ void JoinState::Init()
 	std::string myAddress = NetworkManager::GetAddress();
 	std::stringstream addr(myAddress);
 	std::string part;
-	for (unsigned int i = 0; i < 4 && std::getline(addr, part, '.'); i++)
+	for (std::size_t i = 0; i < 4 && std::getline(addr, part, '.'); i++)
 	{
 		std::stringstream num(part);
 		unsigned short n;
