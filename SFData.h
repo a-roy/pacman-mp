@@ -15,6 +15,12 @@ class SFData
 	public:
 		//! SFML RenderWindow
 		static sf::RenderWindow *Window;
+		//! SFML RenderTexture for backgrounds
+		static sf::RenderTexture *FieldTexture;
+		//!
+		static sf::Shader FieldShader;
+		//!
+		static sf::Texture PelletTexture;
 		//!
 		static sf::UdpSocket Socket;
 		//! SFML Texture database, where keys are file paths

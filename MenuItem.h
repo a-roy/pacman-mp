@@ -4,12 +4,12 @@
 #pragma once
 
 #include <vector>
-#include "MainState.h"
+#include "MainStateEnum.h"
 
 struct MenuItem
 {
 	int Text;
-	MainState Function;
+	MainStateEnum Function;
 };
 
 typedef std::vector<MenuItem> Menu;

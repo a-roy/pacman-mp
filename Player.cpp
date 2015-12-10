@@ -1,115 +1,86 @@
 #include "Player.h"
 #include "Renderer.h"
-#include "Data.h"
 
-void Player::Move(Field *f)
+Player::Player(const Sprite &playerSprite,
+		Position startingPos, Position startingDir)
 {
-	if (Move(f, NextDir))
+	PlayerSprite = playerSprite;
+	StartingPos = startingPos;
+	CurrentPos = StartingPos;
+	CurrentDir = startingDir;
+	NextDir = CurrentDir;
+	Paused = 180;
+	Dying = -1;
+	Cornering = false;
+	AnimFrame = 0;
+}
+
+void Player::SetDirection(Position direction)
+{
+	if (!Cornering)
 	{
-		CurrentDir = NextDir;
+		NextDir = direction;
+	}
+}
+
+bool Player::CanGo(const Field *f, Position delta)
+{
+	Position sum = CurrentPos + delta;
+	Position newPos(
+			(sum.X + (FIELD_WIDTH * TILE_SIZE))
+			% (FIELD_WIDTH * TILE_SIZE),
+			(sum.Y + (FIELD_HEIGHT * TILE_SIZE))
+			% (FIELD_HEIGHT * TILE_SIZE));
+	Field::TileType new_tile = f->InterpolateAtPos(newPos);
+
+	Field::TileType move_flag = MoveFlag();
+	return (new_tile & move_flag) == move_flag;
+}
+
+Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
+{
+	if (Paused == 0)
+	{
+		int corner_range = CornerRange();
+		bool pos_changed = false;
+		for (int i = 0, distance = Speed(f); i < distance; i++)
+		{
+			if (CanGo(f, NextDir))
+			{
+				CurrentPos += NextDir;
+				CurrentDir = NextDir;
+				Cornering = false;
+				pos_changed = true;
+			}
+			else if (Cornering
+					|| corner_range > 0
+					&& CanGo(
+						f,
+						CurrentDir * CornerRange() + NextDir * CornerRange()))
+			{
+				CurrentPos += CurrentDir + NextDir;
+				Cornering = true;
+				pos_changed = true;
+			}
+			else if (CanGo(f, CurrentDir))
+			{
+				CurrentPos += CurrentDir;
+				pos_changed = true;
+			}
+			CurrentPos = Position(
+					(CurrentPos.X + (FIELD_WIDTH * TILE_SIZE))
+					% (FIELD_WIDTH * TILE_SIZE),
+					(CurrentPos.Y + (FIELD_HEIGHT * TILE_SIZE))
+					% (FIELD_HEIGHT * TILE_SIZE));
+		}
+		if (pos_changed)
+		{
+			AnimFrame++;
+		}
 	}
 	else
 	{
-		Move(f, CurrentDir);
+		Paused--;
 	}
-}
-
-bool Player::Move(Field *f, Player::Direction d)
-{
-	int dx, dy;
-	switch (d)
-	{
-		case Right:
-			dx = 1;
-			dy = 0;
-			break;
-		case Up:
-			dx = 0;
-			dy = -1;
-			break;
-		case Left:
-			dx = -1;
-			dy = 0;
-			break;
-		case Down:
-			dx = 0;
-			dy = 1;
-			break;
-	}
-	int xnew, ynew;
-	xnew = ((XPos + dx) + (FIELD_WIDTH * TILE_SIZE)) % (FIELD_WIDTH * TILE_SIZE);
-	ynew = ((YPos + dy) + (FIELD_HEIGHT * TILE_SIZE)) % (FIELD_HEIGHT * TILE_SIZE);
-
-	if (f->Tiles[xnew / TILE_SIZE][ynew / TILE_SIZE] & Field::Empty)
-	{
-		XPos = xnew;
-		YPos = ynew;
-		return true;
-		CurrentDir = NextDir;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-Pacman::Pacman()
-{
-	XPos = 10 * TILE_SIZE;
-	YPos = 12 * TILE_SIZE;
-	CurrentDir = Right;
-	NextDir = Right;
-}
-
-void Pacman::Draw()
-{
-	Renderer::DrawSprite(
-			Data::GameplayData.PacmanSprite,
-			XPos, YPos,
-			CurrentDir * -90.f,
-			true, 0, AnimFrame);
-}
-
-Ghost::Ghost()
-{
-	XPos = 10 * TILE_SIZE;
-	YPos = 10 * TILE_SIZE;
-	CurrentDir = Right;
-	NextDir = Right;
-}
-
-bool Ghost::Move(Field *f, Direction d)
-{
-	if ((CurrentDir == Right && d == Left)
-			|| (CurrentDir == Up && d == Down)
-			|| (CurrentDir == Left && d == Right)
-			|| (CurrentDir == Down && d == Up))
-	{
-		return false;
-	}
-	else
-	{
-		return Player::Move(f, d);
-	}
-}
-
-void Ghost::Draw()
-{
-	int anim = 0;
-	bool flip = false;
-	if (CurrentDir == Right)
-	{
-		flip = true;
-	}
-	else if (CurrentDir == Up)
-	{
-		anim = 1;
-	}
-	else if (CurrentDir == Down)
-	{
-		anim = 2;
-	}
-	Renderer::DrawSprite(
-			Data::GameplayData.GhostSprite,
-			XPos, YPos, 0.f, flip, anim, AnimFrame);
+	return None;
 }

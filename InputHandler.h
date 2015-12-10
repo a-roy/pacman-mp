@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "Player.h"
+#include "Position.h"
 
 class InputHandler
 {
 	public:
-		static Player::Direction LastInput;
+		static Position LastInput;
 		static int InputTime;
 		static bool WindowClosed;
 
