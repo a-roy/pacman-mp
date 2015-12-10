@@ -8,7 +8,6 @@
 #include "Position.h"
 #include "Field.h"
 #include "Sprite.h"
-#include "Animation.h"
 
 class Player
 {
@@ -45,7 +44,6 @@ class Player
 		Position CurrentDir;
 		Position NextDir;
 		int AnimFrame;
-		std::vector<Animation *> Animations;
 		Sprite PlayerSprite;
 };
 
