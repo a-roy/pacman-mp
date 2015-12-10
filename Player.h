@@ -23,15 +23,7 @@ class Player
 		};
 
 		Position CurrentPos;
-		int Paused;
 		int Dying;
-		bool Cornering;
-		Position StartingPos;
-		Position CurrentDir;
-		Position NextDir;
-		int AnimFrame;
-		std::vector<Animation *> Animations;
-		Sprite PlayerSprite;
 
 		Player(const Sprite &playerSprite,
 				Position startingPos, Position startingDir);
@@ -46,6 +38,15 @@ class Player
 		virtual void Reset() = 0;
 		virtual void Draw() const = 0;
 		virtual Player *Clone() = 0;
+	protected:
+		int Paused;
+		bool Cornering;
+		Position StartingPos;
+		Position CurrentDir;
+		Position NextDir;
+		int AnimFrame;
+		std::vector<Animation *> Animations;
+		Sprite PlayerSprite;
 };
 
 class Pacman : public Player

@@ -15,11 +15,6 @@ class Animation
 			int X, Y, Width, Height;
 		};
 
-		//! Texture coordinates for each animation frame
-		std::vector<Rectangle> Frames;
-		//! Length of each animation frame
-		int Delay;
-
 		//! Constructor
 		//!
 		//! \param delay Delay between animation frames
@@ -39,4 +34,10 @@ class Animation
 		//! \param[out] width  Width
 		//! \param[out] height Height
 		void GetRect(int frame, int &x, int &y, int &width, int &height) const;
+
+	private:
+		//! Texture coordinates for each animation frame
+		std::vector<Rectangle> Frames;
+		//! Length of each animation frame
+		int Delay;
 };
