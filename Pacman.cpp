@@ -6,7 +6,7 @@ Pacman::Pacman(const Sprite &playerSprite,
 	Player(playerSprite, startingPos, startingDir)
 { }
 
-Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
+Player::Event Pacman::Update(const Field *f, Field::PelletStatus &p)
 {
 	if (Dying > 0)
 	{
@@ -27,7 +27,7 @@ Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 		return PacmanRespawned;
 	}
 
-	Player::Move(f, p);
+	Player::Update(f, p);
 	Field::TileType tile =
 		f->Tiles[CurrentPos.X / TILE_SIZE][CurrentPos.Y / TILE_SIZE];
 	if ((tile & Field::Pellet) == Field::Pellet)

@@ -20,7 +20,7 @@ bool Ghost::CanGo(const Field *f, Position delta)
 	}
 }
 
-Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
+Player::Event Ghost::Update(const Field *f, Field::PelletStatus &p)
 {
 	if (Fear > 0)
 	{
@@ -37,7 +37,7 @@ Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
 		return None;
 	}
 
-	return Player::Move(f, p);
+	return Player::Update(f, p);
 }
 
 int Ghost::Speed(const Field *f) const

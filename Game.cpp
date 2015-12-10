@@ -102,7 +102,7 @@ bool Game::update()
 	for (std::size_t i = 0, size = Players.size(); i < size; i++)
 	{
 		Player *p = Players[i];
-		event = (Player::Event)(event | p->Move(&GameField, Pellets));
+		event = (Player::Event)(event | p->Update(&GameField, Pellets));
 	}
 	for (unsigned int i = 0, size = Players.size(); i < size; i++)
 	{
