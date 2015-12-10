@@ -9,9 +9,10 @@ Field::Field(std::string file)
 	if (fs.is_open())
 	{
 		std::string line;
-		for (int i = 0; i < FIELD_HEIGHT && getline(fs, line); i++)
+		for (std::size_t i = 0; i < FIELD_HEIGHT && getline(fs, line); i++)
 		{
-			for (unsigned int j = 0; j < FIELD_WIDTH && j < line.size(); j++)
+			for (std::size_t j = 0, size = line.size();
+					j < FIELD_WIDTH && j < size; j++)
 			{
 				if (line[j] == WALL_CHAR)
 				{

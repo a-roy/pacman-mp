@@ -2,8 +2,9 @@
 //! MainState class implementation
 
 #include "MainState.h"
+#include "StateMachine.h"
 
-MainStateEnum MainState::ProcessData()
+void MainState::ProcessData()
 {
 	NetworkManager::LagIncrement();
 	NetworkManager::MessageType mtype;
@@ -12,13 +13,11 @@ MainStateEnum MainState::ProcessData()
 	NetworkManager::Receive(mtype, data_r, id);
 	while (mtype != NetworkManager::None)
 	{
-		MainStateEnum s = ProcessPacket(mtype, data_r, id);
-		if (s != GetEnum())
+		ProcessPacket(mtype, data_r, id);
+		if (StateMachine::CurrentState != this)
 		{
-			return s;
+			return;
 		}
 		NetworkManager::Receive(mtype, data_r, id);
 	}
-
-	return GetEnum();
 }

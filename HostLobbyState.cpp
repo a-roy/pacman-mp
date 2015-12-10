@@ -2,13 +2,34 @@
 //! HostLobbyState class implementation
 
 #include "MainState.h"
+#include "StateMachine.h"
 #include <sstream>
 
-MainStateEnum HostLobbyState::LocalUpdate()
+unsigned int HostLobbyState::Field;
+unsigned int HostLobbyState::PlayerCount;
+std::vector<bool> HostLobbyState::PlayersReady;
+std::vector<Character> HostLobbyState::Characters;
+Menu HostLobbyState::MenuItems;
+
+void HostLobbyState::Init()
+{
+	MenuItems.AddItem(new FieldMenuItem(&Field));
+	MenuItems.AddItem(
+			new FunctionalMenuItem("  Start Game >", &StartGame, [](){ }));
+	MenuItems.AddItem(
+			new FunctionalMenuItem("< Close Lobby", [](){ }, &CloseLobby));
+}
+
+void HostLobbyState::Change()
+{
+	PlayerCount = 0;
+}
+
+void HostLobbyState::LocalUpdate()
 {
 	unsigned int renumber = PlayerCount;
 
-	for (unsigned int i = 0; i < PlayerCount; i++)
+	for (std::size_t i = 0; i < PlayerCount; i++)
 	{
 		if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
 		{
@@ -30,63 +51,12 @@ MainStateEnum HostLobbyState::LocalUpdate()
 		NetworkManager::Send(NetworkManager::ConfirmClient, data_s, i);
 	}
 
-	if (InputHandler::InputTime == 0)
-	{
-		if (InputHandler::LastInput == Up && Index > 0)
-		{
-			Index--;
-		}
-		else if (InputHandler::LastInput == Down && Index < 2)
-		{
-			Index++;
-		}
-		else if (InputHandler::LastInput == Left && Index == 0)
-		{
-			Field = (Field - 1 + 2) % 2;
-		}
-		else if (InputHandler::LastInput == Right && Index == 0)
-		{
-			Field = (Field + 1) % 2;
-		}
-		else if (InputHandler::LastInput == Right && Index == 1)
-		{
-			bool ready = PlayerCount > 0;
-			for (unsigned int i = 0; i < PlayerCount; i++)
-			{
-				if (!PlayersReady[i])
-				{
-					ready = false;
-					break;
-				}
-			}
-			if (ready)
-			{
-				std::vector<char> data_s(
-						StartGame_minsize + PlayerCount);
-				data_s[StartGame_PlayerCount] = (char)PlayerCount;
-				data_s[StartGame_Field] = Field;
-				std::copy(Characters.begin(),
-						Characters.end(),
-						&data_s[StartGame_Character]);
-				NetworkManager::Broadcast(
-						NetworkManager::StartGame, data_s);
-				return HostGameplay;
-			}
-		}
-		else if (InputHandler::LastInput == Left && Index == 2)
-		{
-			return MainMenu;
-		}
-	}
-	else
-	{
-		std::vector<char> data_s(PingClient_size);
-		NetworkManager::Broadcast(NetworkManager::PingClient, data_s);
-	}
-	return HostLobby;
+	MenuItems.Update();
+	std::vector<char> data_s(PingClient_size);
+	NetworkManager::Broadcast(NetworkManager::PingClient, data_s);
 }
 
-MainStateEnum HostLobbyState::ProcessPacket(NetworkManager::MessageType mtype,
+void HostLobbyState::ProcessPacket(NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
 	if (mtype == NetworkManager::RequestServer)
@@ -140,7 +110,6 @@ MainStateEnum HostLobbyState::ProcessPacket(NetworkManager::MessageType mtype,
 		Characters.resize(PlayerCount);
 		PlayersReady.resize(PlayerCount);
 	}
-	return HostLobby;
 }
 
 void HostLobbyState::Render() const
@@ -150,14 +119,14 @@ void HostLobbyState::Render() const
 	std::ostringstream ss;
 	ss << address << ":" << port;
 	std::string str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 100);
+	Renderer::DrawText(str, 24, 60, 100);
 
 	ss.str("");
 	ss << "Clients connected: " << PlayerCount;
 	str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 140);
+	Renderer::DrawText(str, 24, 60, 140);
 
-	for (int i = 0; i < PlayerCount; i++)
+	for (std::size_t i = 0; i < PlayerCount; i++)
 	{
 		ss.str("");
 		ss << NetworkManager::CurrentConnections[i].Address
@@ -165,14 +134,38 @@ void HostLobbyState::Render() const
 			<< NetworkManager::CurrentConnections[i].Port
 			<< (PlayersReady[i] ? " Ready" : " Not ready");
 		str = ss.str();
-		Renderer::DrawText(0, str, 18, 60, 180 + 40 * i);
+		Renderer::DrawText(str, 18, 60, 180 + 40 * i);
 	}
+	MenuItems.Render(20, 380);
+}
 
-	ss.str("");
-	ss << "< Field " << Field + 1 << " >";
-	str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 380);
-	Renderer::DrawText(0, "  Start Game >", 24, 60, 420);
-	Renderer::DrawText(0, "< Close Lobby", 24, 60, 460);
-	Renderer::DrawText(0, ">", 24, 20, 380 + 40 * Index);
+void HostLobbyState::StartGame()
+{
+	bool ready = PlayerCount > 0;
+	for (std::size_t i = 0; i < PlayerCount; i++)
+	{
+		if (!PlayersReady[i])
+		{
+			ready = false;
+			break;
+		}
+	}
+	if (ready)
+	{
+		std::vector<char> data_s(
+				StartGame_minsize + PlayerCount);
+		data_s[StartGame_PlayerCount] = (char)PlayerCount;
+		data_s[StartGame_Field] = Field;
+		std::copy(Characters.begin(),
+				Characters.end(),
+				&data_s[StartGame_Character]);
+		NetworkManager::Broadcast(
+				NetworkManager::StartGame, data_s);
+		StateMachine::Change(new HostGameplayState());
+	}
+}
+
+void HostLobbyState::CloseLobby()
+{
+	StateMachine::Change(new MainMenuState());
 }

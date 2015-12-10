@@ -8,7 +8,6 @@
 #include "Position.h"
 #include "Field.h"
 #include "Sprite.h"
-#include "Animation.h"
 
 class Player
 {
@@ -23,15 +22,7 @@ class Player
 		};
 
 		Position CurrentPos;
-		int Paused;
 		int Dying;
-		bool Cornering;
-		Position StartingPos;
-		Position CurrentDir;
-		Position NextDir;
-		int AnimFrame;
-		std::vector<Animation *> Animations;
-		Sprite PlayerSprite;
 
 		Player(const Sprite &playerSprite,
 				Position startingPos, Position startingDir);
@@ -46,6 +37,14 @@ class Player
 		virtual void Reset() = 0;
 		virtual void Draw() const = 0;
 		virtual Player *Clone() = 0;
+	protected:
+		int Paused;
+		bool Cornering;
+		Position StartingPos;
+		Position CurrentDir;
+		Position NextDir;
+		int AnimFrame;
+		Sprite PlayerSprite;
 };
 
 class Pacman : public Player
@@ -89,5 +88,6 @@ enum Character
 	Blinky,
 	Inky,
 	Pinky,
-	Clyde
+	Clyde,
+	Character_NUMITEMS
 };

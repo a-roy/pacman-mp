@@ -7,7 +7,7 @@ sf::Texture SFData::PelletTexture;
 sf::UdpSocket SFData::Socket;
 std::map<std::string, sf::Texture> SFData::Textures;
 std::vector<sf::Sprite> SFData::Sprites;
-std::vector<sf::Font> SFData::Fonts;
+sf::Font SFData::Font;
 std::vector<sf::IpAddress> SFData::Addresses;
 
 const sf::Texture &SFData::GetTexture(std::string path)
