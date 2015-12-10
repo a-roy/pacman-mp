@@ -55,6 +55,10 @@ void ClientConnectedState::Init()
 		gho_fear.AddFrame(205, 18 + 17 * i, 16, 16);
 		gho_fear.AddFrame(222, 18 + 17 * i, 16, 16);
 		GhostSprites[i].Animations.push_back(gho_fear);
+		Animation gho_flash(8);
+		gho_flash.AddFrame(239, 18 + 17 * i, 16, 16);
+		gho_flash.AddFrame(256, 18 + 17 * i, 16, 16);
+		GhostSprites[i].Animations.push_back(gho_flash);
 	}
 }
 

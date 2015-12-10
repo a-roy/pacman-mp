@@ -105,9 +105,16 @@ void Ghost::Draw() const
 {
 	int anim = 0;
 	bool flip = false;
-	if (Fear > 0)
+	if (Fear > 0 )
 	{
-		anim = 3;
+		if (Fear < 120 && (Fear / 16) % 2 == 0)
+		{
+			anim = 4;
+		}
+		else
+		{
+			anim = 3;
+		}
 	}
 	else
 	{
