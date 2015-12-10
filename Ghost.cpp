@@ -20,7 +20,7 @@ bool Ghost::CanGo(const Field *f, Position delta)
 	}
 }
 
-Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
+Player::Event Ghost::Update(const Field *f, Field::PelletStatus &p)
 {
 	if (Fear > 0)
 	{
@@ -37,7 +37,7 @@ Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
 		return None;
 	}
 
-	return Player::Move(f, p);
+	return Player::Update(f, p);
 }
 
 int Ghost::Speed(const Field *f) const
@@ -105,9 +105,16 @@ void Ghost::Draw() const
 {
 	int anim = 0;
 	bool flip = false;
-	if (Fear > 0)
+	if (Fear > 0 )
 	{
-		anim = 3;
+		if (Fear < 120 && (Fear / 16) % 2 == 0)
+		{
+			anim = 4;
+		}
+		else
+		{
+			anim = 3;
+		}
 	}
 	else
 	{

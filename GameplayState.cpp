@@ -2,16 +2,34 @@
 //! GameplayState class implementation
 
 #include "MainState.h"
+#include "StateMachine.h"
 #include <algorithm>
 
-MainStateEnum GameplayState::LocalUpdate()
+Game *GameplayState::Local;
+Game *GameplayState::Synced;
+std::vector<std::vector<Position> > GameplayState::PlayerInputs;
+std::vector<unsigned short> GameplayState::ReceivedFrames;
+unsigned int GameplayState::PlayerNumber;
+
+void GameplayState::Change()
+{
+	Local = ClientConnectedState::StartingGame;
+	Synced = new Game(*GameplayState::Local);
+	PlayerNumber = ClientConnectedState::PlayerNumber;
+	unsigned int count = GameplayState::Local->Players.size();
+	PlayerInputs = std::vector<std::vector<Position> >(
+			count, std::vector<Position>(InputData_size, Left));
+	ReceivedFrames = std::vector<unsigned short>(count);
+}
+
+void GameplayState::LocalUpdate()
 {
 	// Instead of changing our frame number, we use the delay to read inputs
 	// from previous frames
 	if ((Local->CurrentFrame - Synced->CurrentFrame + 1 + NetworkDelay) * 2
 			< InputData_size)
 	{
-		for (unsigned int i = 0; i < PlayerInputs.size(); i++)
+		for (std::size_t i = 0, size = PlayerInputs.size(); i < size; i++)
 		{
 			PlayerInputs[i].erase(PlayerInputs[i].begin());
 			if (i == PlayerNumber)
@@ -39,7 +57,7 @@ MainStateEnum GameplayState::LocalUpdate()
 	while (Synced->CurrentFrame < all_received
 			&& Synced->CurrentFrame < currentFrame)
 	{
-		for (unsigned int i = 0; i < ReceivedFrames.size(); i++)
+		for (std::size_t i = 0, size = ReceivedFrames.size(); i < size; i++)
 		{
 			Synced->Players[i]->SetDirection(PlayerInputs[i][
 				InputData_size - NetworkDelay
@@ -51,7 +69,8 @@ MainStateEnum GameplayState::LocalUpdate()
 		{
 			std::vector<char> data_s(EndedGame_size);
 			NetworkManager::Send(NetworkManager::EndedGame, data_s, 0);
-			return MainMenu;
+			StateMachine::Change(new MainMenuState());
+			return;
 		}
 	}
 
@@ -77,11 +96,9 @@ MainStateEnum GameplayState::LocalUpdate()
 			&data_s[OwnInputs_InputData],
 			Position::ByteEncode);
 	NetworkManager::Send(NetworkManager::OwnInputs, data_s, 0);
-
-	return Gameplay;
 }
 
-MainStateEnum GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
+void GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
 	if (id == 0)
@@ -90,7 +107,7 @@ MainStateEnum GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 		{
 			unsigned int num = data_r[OtherInputs_PlayerNumber];
 			unsigned short f = 0;
-			for (unsigned int i = 0; i < Frame_size; i++)
+			for (std::size_t i = 0; i < Frame_size; i++)
 			{
 				f = f << 8;
 				f += (unsigned char)data_r[OtherInputs_Frame + i];
@@ -130,11 +147,12 @@ MainStateEnum GameplayState::ProcessPacket(NetworkManager::MessageType mtype,
 		}
 		else if (mtype == NetworkManager::EndGame)
 		{
-			return MainMenu;
+			delete Local;
+			delete Synced;
+			StateMachine::Change(new MainMenuState());
+			return;
 		}
 	}
-
-	return Gameplay;
 }
 
 void GameplayState::Render() const

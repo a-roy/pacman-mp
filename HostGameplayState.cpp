@@ -2,19 +2,32 @@
 //! HostGameplayState class implementation
 
 #include "MainState.h"
+#include "StateMachine.h"
 #include <sstream>
 
-MainStateEnum HostGameplayState::ProcessPacket(
+unsigned int HostGameplayState::PlayerCount;
+std::vector<Character> HostGameplayState::Characters;
+std::vector<bool> HostGameplayState::GameEnded;
+
+void HostGameplayState::Change()
+{
+	PlayerCount = HostLobbyState::PlayerCount;
+	Characters = HostLobbyState::Characters;
+	GameEnded = std::vector<bool>(PlayerCount);
+}
+
+void HostGameplayState::ProcessPacket(
 		NetworkManager::MessageType mtype,
 		std::vector<char> &data_r, unsigned int id)
 {
-	for (unsigned int i = 0; i < PlayerCount; i++)
+	for (std::size_t i = 0; i < PlayerCount; i++)
 	{
 		if (NetworkManager::CurrentConnections[i].Lag > NetworkTimeout)
 		{
 			std::vector<char> data_s(EndGame_size);
 			NetworkManager::Broadcast(NetworkManager::EndGame, data_s);
-			return MainMenu;
+			StateMachine::Change(new MainMenuState());
+			return;
 		}
 	}
 
@@ -45,19 +58,18 @@ MainStateEnum HostGameplayState::ProcessPacket(
 	else if (mtype == NetworkManager::EndedGame)
 	{
 		GameEnded[id] = true;
-		for (std::size_t i = 0; i < GameEnded.size(); i++)
+		for (std::size_t i = 0, size = GameEnded.size(); i < size; i++)
 		{
 			if (!GameEnded[i])
 			{
-				return HostGameplay;
+				return;
 			}
 		}
 		std::vector<char> data_s(EndGame_size);
 		NetworkManager::Broadcast(NetworkManager::EndGame, data_s);
-		return MainMenu;
+		StateMachine::Change(new MainMenuState());
+		return;
 	}
-
-	return HostGameplay;
 }
 
 void HostGameplayState::Render() const
@@ -65,5 +77,5 @@ void HostGameplayState::Render() const
 	std::ostringstream ss;
 	ss << "Clients connected: " << PlayerCount;
 	std::string str = ss.str();
-	Renderer::DrawText(0, str, 24, 60, 100);
+	Renderer::DrawText(str, 24, 60, 100);
 }

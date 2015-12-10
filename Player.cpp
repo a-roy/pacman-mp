@@ -37,7 +37,7 @@ bool Player::CanGo(const Field *f, Position delta)
 	return (new_tile & move_flag) == move_flag;
 }
 
-Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
+Player::Event Player::Update(const Field *f, Field::PelletStatus &p)
 {
 	if (Paused == 0)
 	{

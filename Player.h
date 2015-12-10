@@ -8,7 +8,6 @@
 #include "Position.h"
 #include "Field.h"
 #include "Sprite.h"
-#include "Animation.h"
 
 class Player
 {
@@ -23,21 +22,13 @@ class Player
 		};
 
 		Position CurrentPos;
-		int Paused;
 		int Dying;
-		bool Cornering;
-		Position StartingPos;
-		Position CurrentDir;
-		Position NextDir;
-		int AnimFrame;
-		std::vector<Animation *> Animations;
-		Sprite PlayerSprite;
 
 		Player(const Sprite &playerSprite,
 				Position startingPos, Position startingDir);
 		void SetDirection(Position direction);
 		virtual bool CanGo(const Field *f, Position delta);
-		virtual Event Move(const Field *f, Field::PelletStatus &p);
+		virtual Event Update(const Field *f, Field::PelletStatus &p);
 		virtual int Speed(const Field *f) const = 0;
 		virtual int CornerRange() = 0;
 		virtual Field::TileType MoveFlag() = 0;
@@ -46,6 +37,14 @@ class Player
 		virtual void Reset() = 0;
 		virtual void Draw() const = 0;
 		virtual Player *Clone() = 0;
+	protected:
+		int Paused;
+		bool Cornering;
+		Position StartingPos;
+		Position CurrentDir;
+		Position NextDir;
+		int AnimFrame;
+		Sprite PlayerSprite;
 };
 
 class Pacman : public Player
@@ -53,7 +52,7 @@ class Pacman : public Player
 	public:
 		Pacman(const Sprite &playerSprite,
 				Position startingPos, Position startingDir);
-		Event Move(const Field *f, Field::PelletStatus &p);
+		Event Update(const Field *f, Field::PelletStatus &p);
 		int Speed(const Field *f) const;
 		int CornerRange() { return TILE_SIZE / 2; }
 		Field::TileType MoveFlag() { return Field::PacmanZone; }
@@ -72,7 +71,7 @@ class Ghost : public Player
 		Ghost(const Sprite &playerSprite,
 				Position startingPos, Position startingDir);
 		bool CanGo(const Field *f, Position delta);
-		Event Move(const Field *f, Field::PelletStatus &p);
+		Event Update(const Field *f, Field::PelletStatus &p);
 		int Speed(const Field *f) const;
 		int CornerRange() { return 0; }
 		Field::TileType MoveFlag() { return Field::GhostZone; }
@@ -89,5 +88,6 @@ enum Character
 	Blinky,
 	Inky,
 	Pinky,
-	Clyde
+	Clyde,
+	Character_NUMITEMS
 };

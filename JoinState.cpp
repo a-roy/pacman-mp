@@ -2,10 +2,32 @@
 //! JoinState class declaration
 
 #include "MainState.h"
+#include "StateMachine.h"
+#include "NetworkManager.h"
 #include <iomanip>
 #include <sstream>
 
-MainStateEnum JoinState::LocalUpdate()
+unsigned int JoinState::Index;
+unsigned char JoinState::IP[4];
+unsigned short JoinState::Port;
+
+void JoinState::Init()
+{
+	Index = 0;
+	std::string myAddress = NetworkManager::GetAddress();
+	std::stringstream addr(myAddress);
+	std::string part;
+	for (std::size_t i = 0; i < 4 && std::getline(addr, part, '.'); i++)
+	{
+		std::stringstream num(part);
+		unsigned short n;
+		num >> n;
+		IP[i] = n;
+	}
+	Port = 0;
+}
+
+void JoinState::LocalUpdate()
 {
 	if (InputHandler::InputTime == 0)
 	{
@@ -17,7 +39,7 @@ MainStateEnum JoinState::LocalUpdate()
 			}
 			else
 			{
-				return MainMenu;
+				StateMachine::Change(new MainMenuState());
 			}
 		}
 		else if (InputHandler::LastInput == Right)
@@ -35,7 +57,7 @@ MainStateEnum JoinState::LocalUpdate()
 					<< (unsigned short)IP[3];
 				NetworkManager::ResetConnections();
 				NetworkManager::GetConnection(ss.str(), Port);
-				return ClientWaiting;
+				StateMachine::Change(new ClientWaitingState());
 			}
 		}
 		else if (InputHandler::LastInput == Up)
@@ -47,8 +69,6 @@ MainStateEnum JoinState::LocalUpdate()
 			AddrIncrement(-1);
 		}
 	}
-
-	return Join;
 }
 
 void JoinState::Render() const
@@ -61,13 +81,13 @@ void JoinState::Render() const
 		<< std::setw(3) << (unsigned short)IP[3] << ":"
 		<< std::setw(5) << Port;
 	std::string disp = ss.str();
-	Renderer::DrawText(0, disp, 24, 60, 100);
+	Renderer::DrawText(disp, 24, 60, 100);
 	int iPos = Index;
 	if (Index > 2) iPos++;
 	if (Index > 5) iPos++;
 	if (Index > 8) iPos++;
 	if (Index > 11) iPos++;
-	Renderer::DrawText(0, "^", 24, 60 + 24 * iPos, 136);
+	Renderer::DrawText("^", 24, 60 + 24 * iPos, 136);
 }
 
 void JoinState::AddrIncrement(int amount)

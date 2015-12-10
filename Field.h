@@ -44,8 +44,6 @@ class Field
 		class PelletStatus
 		{
 			public:
-				std::array<uint32_t, FIELD_HEIGHT> Bitfield;
-
 				PelletStatus() { Bitfield.fill(0x00000000); }
 				bool IsEaten(int x, int y) const
 				{ return (Bitfield[y] & (1U << x)) != 0U; }
@@ -59,6 +57,8 @@ class Field
 					}
 					return equal;
 				}
+			private:
+				std::array<uint32_t, FIELD_HEIGHT> Bitfield;
 		};
 
 		std::array<std::array<TileType, FIELD_HEIGHT>, FIELD_WIDTH> Tiles;
