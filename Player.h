@@ -38,7 +38,7 @@ class Player
 		void SetDirection(Position direction);
 		virtual bool CanGo(const Field *f, Position delta);
 		virtual Event Move(const Field *f, Field::PelletStatus &p);
-		virtual int Speed() = 0;
+		virtual int Speed(const Field *f) const = 0;
 		virtual int CornerRange() = 0;
 		virtual Field::TileType MoveFlag() = 0;
 		virtual Event CollideWith(const Player *other) = 0;
@@ -54,7 +54,7 @@ class Pacman : public Player
 		Pacman(const Sprite &playerSprite,
 				Position startingPos, Position startingDir);
 		Event Move(const Field *f, Field::PelletStatus &p);
-		int Speed();
+		int Speed(const Field *f) const;
 		int CornerRange() { return TILE_SIZE / 2; }
 		Field::TileType MoveFlag() { return Field::PacmanZone; }
 		Event CollideWith(const Player *other);
@@ -73,7 +73,7 @@ class Ghost : public Player
 				Position startingPos, Position startingDir);
 		bool CanGo(const Field *f, Position delta);
 		Event Move(const Field *f, Field::PelletStatus &p);
-		int Speed();
+		int Speed(const Field *f) const;
 		int CornerRange() { return 0; }
 		Field::TileType MoveFlag() { return Field::GhostZone; }
 		Event CollideWith(const Player *other);

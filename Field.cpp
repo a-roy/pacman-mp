@@ -21,6 +21,10 @@ Field::Field(std::string file)
 				{
 					Tiles[j][i] = Empty;
 				}
+				else if (line[j] == TUNNEL_CHAR)
+				{
+					Tiles[j][i] = Tunnel;
+				}
 				else if (line[j] == EDGE_CHAR)
 				{
 					Tiles[j][i] = Edge;

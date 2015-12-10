@@ -40,11 +40,11 @@ Player::Event Ghost::Move(const Field *f, Field::PelletStatus &p)
 	return Player::Move(f, p);
 }
 
-int Ghost::Speed()
+int Ghost::Speed(const Field *f) const
 {
 	int x_tile = CurrentPos.X / TILE_SIZE;
 	int y_tile = CurrentPos.Y / TILE_SIZE;
-	if (y_tile == 14 && (x_tile < 5 || x_tile >= FIELD_WIDTH - 5))
+	if (f->Tiles[x_tile][y_tile] == Field::Tunnel)
 	{
 		return 5;
 	}

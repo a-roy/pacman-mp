@@ -50,7 +50,7 @@ Player::Event Pacman::Move(const Field *f, Field::PelletStatus &p)
 	return None;
 }
 
-int Pacman::Speed()
+int Pacman::Speed(const Field *f) const
 {
 	return 11;
 }

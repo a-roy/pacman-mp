@@ -4,8 +4,8 @@
 #pragma once
 
 #include <cstddef>
-#include <string>
 #include <vector>
+#include <string>
 
 #define NetworkTimeout 120
 #define NetworkDelay 2

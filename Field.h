@@ -14,6 +14,7 @@
 #define GBOX_CHAR    '='
 #define GZONE_CHAR   '~'
 #define GDOOR_CHAR   '%'
+#define TUNNEL_CHAR  '$'
 
 #include <cstdint>
 #include <array>
@@ -35,9 +36,10 @@ class Field
 			GhostZone = 0x02,
 			GhostDoor = 0x0A,
 			Empty = 0x03,
-			Edge = 0x0B,
+			Tunnel = 0x0B,
 			Pellet = 0x07,
-			PowerPellet = 0x0F
+			PowerPellet = 0x0F,
+			Edge = 0x10
 		};
 		class PelletStatus
 		{

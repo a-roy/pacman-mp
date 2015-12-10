@@ -43,7 +43,7 @@ Player::Event Player::Move(const Field *f, Field::PelletStatus &p)
 	{
 		int corner_range = CornerRange();
 		bool pos_changed = false;
-		for (int i = 0, distance = Speed(); i < distance; i++)
+		for (int i = 0, distance = Speed(f); i < distance; i++)
 		{
 			if (CanGo(f, NextDir))
 			{
