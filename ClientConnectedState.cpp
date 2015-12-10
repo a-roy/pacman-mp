@@ -3,6 +3,7 @@
 
 #include "MainState.h"
 #include "StateMachine.h"
+#include "Renderer.h"
 #include <sstream>
 
 unsigned int ClientConnectedState::Index;
@@ -13,6 +14,49 @@ Game *ClientConnectedState::StartingGame;
 Sprite ClientConnectedState::PacmanSprite;
 std::vector<Sprite> ClientConnectedState::GhostSprites;
 Menu ClientConnectedState::MenuItems;
+
+void ClientConnectedState::Init()
+{
+	MenuItems.AddItem(new CharacterMenuItem(&SelectedCharacter));
+	MenuItems.AddItem(new ReadyMenuItem(&Ready));
+
+	PacmanSprite.Index = Renderer::CreateSprite("../spritesheet.png");
+	Animation pac_move(4);
+	pac_move.AddFrame(1, 1, 16, 16);
+	pac_move.AddFrame(18, 1, 16, 16);
+	pac_move.AddFrame(35, 1, 16, 16);
+	pac_move.AddFrame(18, 1, 16, 16);
+	PacmanSprite.Animations.push_back(pac_move);
+	Animation pac_die(4);
+	for (int i = 3; i <= 15; i++)
+	{
+		pac_die.AddFrame(1 + 17 * i, 1, 16, 16);
+	}
+	PacmanSprite.Animations.push_back(pac_die);
+
+	GhostSprites.resize(4);
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		GhostSprites[i].Index =
+			Renderer::CreateSprite("../spritesheet.png");
+		Animation gho_hori(8);
+		gho_hori.AddFrame(1, 18 + 17 * i, 16, 16);
+		gho_hori.AddFrame(18, 18 + 17 * i, 16, 16);
+		GhostSprites[i].Animations.push_back(gho_hori);
+		Animation gho_up(8);
+		gho_up.AddFrame(35, 18 + 17 * i, 16, 16);
+		gho_up.AddFrame(52, 18 + 17 * i, 16, 16);
+		GhostSprites[i].Animations.push_back(gho_up);
+		Animation gho_down(8);
+		gho_down.AddFrame(69, 18 + 17 * i, 16, 16);
+		gho_down.AddFrame(86, 18 + 17 * i, 16, 16);
+		GhostSprites[i].Animations.push_back(gho_down);
+		Animation gho_fear(8);
+		gho_fear.AddFrame(205, 18 + 17 * i, 16, 16);
+		gho_fear.AddFrame(222, 18 + 17 * i, 16, 16);
+		GhostSprites[i].Animations.push_back(gho_fear);
+	}
+}
 
 void ClientConnectedState::Change()
 {

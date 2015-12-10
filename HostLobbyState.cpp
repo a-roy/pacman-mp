@@ -11,6 +11,15 @@ std::vector<bool> HostLobbyState::PlayersReady;
 std::vector<Character> HostLobbyState::Characters;
 Menu HostLobbyState::MenuItems;
 
+void HostLobbyState::Init()
+{
+	MenuItems.AddItem(new FieldMenuItem(&Field));
+	MenuItems.AddItem(
+			new FunctionalMenuItem("  Start Game >", &StartGame, [](){ }));
+	MenuItems.AddItem(
+			new FunctionalMenuItem("< Close Lobby", [](){ }, &CloseLobby));
+}
+
 void HostLobbyState::Change()
 {
 	PlayerCount = 0;

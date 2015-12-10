@@ -26,6 +26,7 @@ class MainMenuState : public MainState
 	public:
 		static Menu MenuItems;
 
+		static void Init();
 		void LocalUpdate();
 		void Render() const;
 };
@@ -37,6 +38,7 @@ class JoinState : public MainState
 		static unsigned char IP[4];
 		static unsigned short Port;
 
+		static void Init();
 		void LocalUpdate();
 		void Render() const;
 		void AddrIncrement(int amount);
@@ -51,6 +53,7 @@ class HostLobbyState : public MainState
 		static std::vector<Character> Characters;
 		static Menu MenuItems;
 
+		static void Init();
 		void Change();
 		void LocalUpdate();
 		void ProcessPacket(NetworkManager::MessageType mtype,
@@ -96,6 +99,7 @@ class ClientConnectedState : public MainState
 		static std::vector<Sprite> GhostSprites;
 		static Menu MenuItems;
 
+		static void Init();
 		void Change();
 		void LocalUpdate();
 		void ProcessPacket(NetworkManager::MessageType mtype,

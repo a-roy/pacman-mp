@@ -3,12 +3,29 @@
 
 #include "MainState.h"
 #include "StateMachine.h"
+#include "NetworkManager.h"
 #include <iomanip>
 #include <sstream>
 
 unsigned int JoinState::Index;
 unsigned char JoinState::IP[4];
 unsigned short JoinState::Port;
+
+void JoinState::Init()
+{
+	Index = 0;
+	std::string myAddress = NetworkManager::GetAddress();
+	std::stringstream addr(myAddress);
+	std::string part;
+	for (unsigned int i = 0; i < 4 && std::getline(addr, part, '.'); i++)
+	{
+		std::stringstream num(part);
+		unsigned short n;
+		num >> n;
+		IP[i] = n;
+	}
+	Port = 0;
+}
 
 void JoinState::LocalUpdate()
 {
