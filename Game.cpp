@@ -114,7 +114,6 @@ bool Game::update()
 					&& difference.X > -8 && difference.X < 8
 					&& difference.Y > -8 && difference.Y < 8)
 			{
-				Player::Event e;
 				Player *clone_i = Players[i]->Clone();
 				Player *clone_j = Players[j]->Clone();
 				event = (Player::Event)(event | Players[i]->CollideWith(clone_j));
