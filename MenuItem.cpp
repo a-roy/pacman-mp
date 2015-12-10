@@ -17,6 +17,22 @@ void FieldMenuItem::Render(int x, int y) const
 	Renderer::DrawText(str, 24, x, y);
 }
 
+void CharacterMenuItem::Forward()
+{
+	EnumMenuItem<Character>::Forward();
+	ClientConnectedState::Ready = false;
+	std::vector<char> data_s(PlayerNotReady_size);
+	NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
+}
+
+void CharacterMenuItem::Backward()
+{
+	EnumMenuItem<Character>::Backward();
+	ClientConnectedState::Ready = false;
+	std::vector<char> data_s(PlayerNotReady_size);
+	NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
+}
+
 void CharacterMenuItem::Render(int x, int y) const
 {
 	std::string text;

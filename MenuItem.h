@@ -82,6 +82,8 @@ class CharacterMenuItem : public EnumMenuItem<Character>
 	public:
 		CharacterMenuItem(Character *value) :
 			EnumMenuItem<Character>(value, Character_NUMITEMS) { }
+		void Forward();
+		void Backward();
 		void Render(int x, int y) const;
 };
 
