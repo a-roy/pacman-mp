@@ -27,6 +27,7 @@ class MainMenuState : public MainState
 		static Menu MenuItems;
 
 		static void Init();
+		virtual void Change() { }
 		void LocalUpdate();
 		void Render() const;
 };

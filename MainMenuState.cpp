@@ -6,6 +6,11 @@
 
 Menu MainMenuState::MenuItems;
 
+void MainMenuState::Change()
+{
+	NetworkManager::ResetConnections();
+}
+
 void MainMenuState::Init()
 {
 	MenuItems.AddItem(
