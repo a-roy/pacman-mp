@@ -49,7 +49,7 @@ void GameplayState::LocalUpdate()
 	}
 
 	unsigned int currentFrame = Local->CurrentFrame;
-	int f = currentFrame + NetworkDelay - 1;
+	int f = currentFrame + NetworkDelay;
 	ReceivedFrames[PlayerNumber] = f;
 
 	unsigned short all_received = *std::min_element(
