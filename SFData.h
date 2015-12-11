@@ -17,17 +17,17 @@ class SFData
 		static sf::RenderWindow *Window;
 		//! SFML RenderTexture for backgrounds
 		static sf::RenderTexture *FieldTexture;
-		//!
+		//! SFML Shader for drawing the field
 		static sf::Shader FieldShader;
-		//!
+		//! SFML Texture for masking pellets
 		static sf::Texture PelletTexture;
-		//!
+		//! SFML UDP socket
 		static sf::UdpSocket Socket;
 		//! SFML Texture database, where keys are file paths
 		static std::map<std::string, sf::Texture> Textures;
 		//! SFML Sprite database
 		static std::vector<sf::Sprite> Sprites;
-		//!
+		//! SFML font
 		static sf::Font Font;
 		//! SFML IP database
 		static std::vector<sf::IpAddress> Addresses;
