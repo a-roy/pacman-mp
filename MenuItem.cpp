@@ -66,9 +66,14 @@ void CharacterMenuItem::Render(int x, int y) const
 		text = "< Clyde      >";
 		sprite = &ClientConnectedState::GhostSprites[3];
 	}
-	Renderer::DrawText(text, 18, x, y);
-	int s_x = (x + 9 * 18 - 12) * TILE_SIZE / 24;
-	int s_y = (y - 24) * TILE_SIZE / 24;
+	int fx, fy;
+	Renderer::GetFieldPos(fx, fy);
+
+	int text_size = 18;
+	Renderer::DrawText(text, text_size, x, y);
+	int s_x =
+		(int)((x + 11 * text_size - fx + 8) * TILE_SIZE / 8 / Renderer::Scale);
+	int s_y = (int)((y - fy - text_size + 8) * TILE_SIZE / 8 / Renderer::Scale);
 	Renderer::DrawSprite(*sprite, s_x, s_y, 0.f, flip, 0, frame);
 }
 
