@@ -15,7 +15,7 @@ void Menu::Update()
 	{
 		if (InputHandler::LastInput == Down)
 		{
-			if (Index < Items.size())
+			if (Index < Items.size() - 1)
 			{
 				Index++;
 			}
