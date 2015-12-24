@@ -75,17 +75,9 @@ void HostLobbyState::ProcessPacket(NetworkManager::MessageType mtype,
 	}
 	else if (mtype == NetworkManager::PingServer)
 	{
-		// No action needed
-	}
-	else if (mtype == NetworkManager::PlayerReady)
-	{
 		Characters[id] =
-			static_cast<Character>(data_r[PlayerReady_Character]);
-		PlayersReady[id] = true;
-	}
-	else if (mtype == NetworkManager::PlayerNotReady)
-	{
-		PlayersReady[id] = false;
+			static_cast<Character>(data_r[PingServer_Character]);
+		PlayersReady[id] = (bool)data_r[PingServer_Ready];
 	}
 	else if (mtype == NetworkManager::DisconnectServer)
 	{
