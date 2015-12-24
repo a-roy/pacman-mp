@@ -82,6 +82,8 @@ void ClientConnectedState::LocalUpdate()
 
 	// ping server
 	std::vector<char> data_s(PingServer_size);
+	data_s[PingServer_Ready] = Ready;
+	data_s[PingServer_Character] = SelectedCharacter;
 	NetworkManager::Send(NetworkManager::PingServer, data_s, 0);
 }
 

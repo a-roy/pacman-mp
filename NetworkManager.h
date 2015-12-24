@@ -27,10 +27,9 @@
 #define EndGame_size 0
 #define DisconnectClient_size 0
 #define RequestServer_size 0
-#define PingServer_size 0
-#define PlayerReady_size 1
-#define PlayerReady_Character 0
-#define PlayerNotReady_size 0
+#define PingServer_size 2
+#define PingServer_Ready 0
+#define PingServer_Character 1
 #define OwnInputs_size (InputData_size + Frame_size)
 #define OwnInputs_Frame 0
 #define OwnInputs_InputData (Frame_size)
@@ -61,8 +60,6 @@ class NetworkManager
 			DisconnectClient,
 			RequestServer,
 			PingServer,
-			PlayerReady,
-			PlayerNotReady,
 			OwnInputs,
 			EndedGame,
 			DisconnectServer

@@ -21,16 +21,12 @@ void CharacterMenuItem::Forward()
 {
 	EnumMenuItem<Character>::Forward();
 	ClientConnectedState::Ready = false;
-	std::vector<char> data_s(PlayerNotReady_size);
-	NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
 }
 
 void CharacterMenuItem::Backward()
 {
 	EnumMenuItem<Character>::Backward();
 	ClientConnectedState::Ready = false;
-	std::vector<char> data_s(PlayerNotReady_size);
-	NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
 }
 
 void CharacterMenuItem::Render(int x, int y) const
@@ -82,10 +78,6 @@ void ReadyMenuItem::Forward()
 	if (!*Value)
 	{
 		*Value = true;
-		std::vector<char> data_s(PlayerReady_size);
-		data_s[PlayerReady_Character] = ClientConnectedState::SelectedCharacter;
-		NetworkManager::Send(
-				NetworkManager::PlayerReady, data_s, 0);
 	}
 }
 
@@ -94,8 +86,6 @@ void ReadyMenuItem::Backward()
 	if (*Value)
 	{
 		*Value = false;
-		std::vector<char> data_s(PlayerNotReady_size);
-		NetworkManager::Send(NetworkManager::PlayerNotReady, data_s, 0);
 	}
 }
 
