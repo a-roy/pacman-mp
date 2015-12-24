@@ -87,13 +87,16 @@ class CharacterMenuItem : public EnumMenuItem<Character>
 		void Render(int x, int y) const;
 };
 
-class ReadyMenuItem : public MenuItem
+class ToggleMenuItem : public MenuItem
 {
 	public:
-		ReadyMenuItem(bool *value) : Value(value) { }
+		ToggleMenuItem(bool *value, std::string active, std::string inactive) :
+			Value(value), Active(active), Inactive(inactive) { }
 		void Forward();
 		void Backward();
 		void Render(int x, int y) const;
 	private:
 		bool *Value;
+		std::string Active;
+		std::string Inactive;
 };

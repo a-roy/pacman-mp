@@ -18,7 +18,7 @@ Menu ClientConnectedState::MenuItems;
 void ClientConnectedState::Init()
 {
 	MenuItems.AddItem(new CharacterMenuItem(&SelectedCharacter));
-	MenuItems.AddItem(new ReadyMenuItem(&Ready));
+	MenuItems.AddItem(new ToggleMenuItem(&Ready, "< Ready!", "  Ready? >"));
 
 	PacmanSprite.Index = Renderer::CreateSprite("../spritesheet.png");
 	Animation pac_move(4);
