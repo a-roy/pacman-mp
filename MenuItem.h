@@ -42,27 +42,9 @@ class EnumMenuItem : public MenuItem
 		EnumMenuItem(T *value, int numItems) :
 			Value(value), NumItems(numItems) { }
 		virtual void Forward()
-		{
-			if ((int)(*Value) < NumItems - 1)
-			{
-				*Value = (T)(*Value + 1);
-			}
-			else
-			{
-				*Value = (T)0;
-			}
-		}
+		{ *Value = (T)(((int)(*Value) < NumItems - 1) ? (*Value + 1) : 0); }
 		virtual void Backward()
-		{
-			if ((int)(*Value) > 0)
-			{
-				*Value = (T)(*Value - 1);
-			}
-			else
-			{
-				*Value = (T)(NumItems - 1);
-			}
-		}
+		{ *Value = (T)(((int)(*Value) > 0) ? (*Value - 1) : (NumItems - 1)); }
 
 	protected:
 		T *Value;
