@@ -111,13 +111,13 @@ class ClientConnectedState : public MainState
 class GameplayState : public MainState
 {
 	public:
-		static Game *Local;
-		static Game *Synced;
-		static std::vector<std::vector<Position> > PlayerInputs;
-		static std::vector<unsigned short> ReceivedFrames;
-		static unsigned int PlayerNumber;
+		Game *Local;
+		Game *Synced;
+		std::vector<std::vector<Position> > PlayerInputs;
+		std::vector<unsigned short> ReceivedFrames;
+		unsigned int PlayerNumber;
 
-		void Change();
+		GameplayState(Game *startingGame, unsigned int playerNumber);
 		void LocalUpdate();
 		void ProcessPacket(NetworkManager::MessageType mtype,
 				std::vector<char> &data_r, unsigned int id);

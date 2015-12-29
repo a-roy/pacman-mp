@@ -168,7 +168,7 @@ void ClientConnectedState::ProcessPacket(NetworkManager::MessageType mtype,
 				}
 			}
 			StartingGame = new Game(gameField, players);
-			StateMachine::Change(new GameplayState());
+			StateMachine::Change(new GameplayState(StartingGame, PlayerNumber));
 		}
 	}
 }

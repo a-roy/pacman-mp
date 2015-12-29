@@ -5,18 +5,10 @@
 #include "StateMachine.h"
 #include <algorithm>
 
-Game *GameplayState::Local;
-Game *GameplayState::Synced;
-std::vector<std::vector<Position> > GameplayState::PlayerInputs;
-std::vector<unsigned short> GameplayState::ReceivedFrames;
-unsigned int GameplayState::PlayerNumber;
-
-void GameplayState::Change()
+GameplayState::GameplayState(Game *startingGame, unsigned int playerNumber) :
+	Local(startingGame), Synced(new Game(*Local)), PlayerNumber(playerNumber)
 {
-	Local = ClientConnectedState::StartingGame;
-	Synced = new Game(*GameplayState::Local);
-	PlayerNumber = ClientConnectedState::PlayerNumber;
-	unsigned int count = GameplayState::Local->Players.size();
+	unsigned int count = Local->Players.size();
 	PlayerInputs = std::vector<std::vector<Position> >(
 			count, std::vector<Position>(InputData_size, Left));
 	ReceivedFrames = std::vector<unsigned short>(count);
