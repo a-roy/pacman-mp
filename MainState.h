@@ -48,30 +48,32 @@ class JoinState : public MainState
 class HostLobbyState : public MainState
 {
 	public:
-		static unsigned int Field;
-		static unsigned int PlayerCount;
-		static std::vector<bool> PlayersReady;
-		static std::vector<Character> Characters;
-		static Menu MenuItems;
+		unsigned int Field;
+		unsigned int PlayerCount;
+		std::vector<bool> PlayersReady;
+		std::vector<Character> Characters;
+		Menu MenuItems;
 
-		static void Init();
+		HostLobbyState();
 		void Change();
 		void LocalUpdate();
 		void ProcessPacket(NetworkManager::MessageType mtype,
 				std::vector<char> &data_r, unsigned int id);
 		void Render() const;
-		static void StartGame();
-		static void CloseLobby();
+		static void StartGame(HostLobbyState *state);
+		static void CloseLobby(void *);
 };
 
 class HostGameplayState : public MainState
 {
 	public:
-		static unsigned int PlayerCount;
-		static std::vector<Character> Characters;
-		static std::vector<bool> GameEnded;
+		unsigned int PlayerCount;
+		std::vector<Character> Characters;
+		std::vector<bool> GameEnded;
 
-		void Change();
+		HostGameplayState(
+				unsigned int playerCount,
+				const std::vector<Character> &characters);
 		void ProcessPacket(NetworkManager::MessageType mtype,
 				std::vector<char> &data_r, unsigned int id);
 		void Render() const;

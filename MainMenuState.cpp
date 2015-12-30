@@ -14,17 +14,17 @@ void MainMenuState::Change()
 void MainMenuState::Init()
 {
 	MenuItems.AddItem(
-			new FunctionalMenuItem("Host game",
-			[](){ StateMachine::Change(new HostLobbyState()); },
-			[](){ }));
+			new FunctionalMenuItem<void>("Host game",
+			[](void *){ StateMachine::Change(new HostLobbyState()); },
+			[](void *){ }));
 	MenuItems.AddItem(
-			new FunctionalMenuItem("Join game",
-			[](){ StateMachine::Change(new JoinState()); },
-			[](){ }));
+			new FunctionalMenuItem<void>("Join game",
+			[](void *){ StateMachine::Change(new JoinState()); },
+			[](void *){ }));
 	MenuItems.AddItem(
-			new FunctionalMenuItem("Quit",
-			[](){ StateMachine::Change(new ExitingState()); },
-			[](){ }));
+			new FunctionalMenuItem<void>("Quit",
+			[](void *){ StateMachine::Change(new ExitingState()); },
+			[](void *){ }));
 }
 
 void MainMenuState::LocalUpdate()

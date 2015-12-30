@@ -4,11 +4,6 @@
 #include "MainState.h"
 #include <sstream>
 
-void FunctionalMenuItem::Render(int x, int y) const
-{
-	Renderer::DrawText(Text, 24, x, y);
-}
-
 void FieldMenuItem::Render(int x, int y) const
 {
 	std::ostringstream ss;

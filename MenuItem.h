@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "Player.h"
+#include "Renderer.h"
 
 class MenuItem
 {
@@ -15,24 +16,28 @@ class MenuItem
 		virtual void Render(int x, int y) const = 0;
 };
 
+template <class T>
 class FunctionalMenuItem : public MenuItem
 {
 	public:
 		FunctionalMenuItem(
 				std::string text,
-				void (*forwardFunction)(),
-				void (*backwardFunction)()) :
+				void (*forwardFunction)(T *),
+				void (*backwardFunction)(T *),
+				T *instance = NULL) :
 			Text(text),
 			ForwardFunction(forwardFunction),
-			BackwardFunction(backwardFunction) { }
-		void Forward() { ForwardFunction(); }
-		void Backward() { BackwardFunction(); }
-		void Render(int x, int y) const;
+			BackwardFunction(backwardFunction),
+			Instance(instance) { }
+		void Forward() { ForwardFunction(Instance); }
+		void Backward() { BackwardFunction(Instance); }
+		void Render(int x, int y) const { Renderer::DrawText(Text, 24, x, y); }
 
 	private:
 		std::string Text;
-		void (*ForwardFunction)();
-		void (*BackwardFunction)();
+		void (*ForwardFunction)(T *);
+		void (*BackwardFunction)(T *);
+		T *Instance;
 };
 
 template <class T>

@@ -5,19 +5,13 @@
 #include "StateMachine.h"
 #include <sstream>
 
-unsigned int HostLobbyState::Field;
-unsigned int HostLobbyState::PlayerCount;
-std::vector<bool> HostLobbyState::PlayersReady;
-std::vector<Character> HostLobbyState::Characters;
-Menu HostLobbyState::MenuItems;
-
-void HostLobbyState::Init()
+HostLobbyState::HostLobbyState() : Field(0), PlayerCount(0)
 {
 	MenuItems.AddItem(new FieldMenuItem(&Field));
-	MenuItems.AddItem(
-			new FunctionalMenuItem("  Start Game >", &StartGame, [](){ }));
-	MenuItems.AddItem(
-			new FunctionalMenuItem("< Close Lobby", [](){ }, &CloseLobby));
+	MenuItems.AddItem(new FunctionalMenuItem<HostLobbyState>(
+				"  Start Game >", &StartGame, [](HostLobbyState *){ }, this));
+	MenuItems.AddItem(new FunctionalMenuItem<void>(
+				"< Close Lobby", [](void *){ }, &CloseLobby));
 }
 
 void HostLobbyState::Change()
@@ -131,12 +125,12 @@ void HostLobbyState::Render() const
 	MenuItems.Render(20, 380);
 }
 
-void HostLobbyState::StartGame()
+void HostLobbyState::StartGame(HostLobbyState *state)
 {
-	bool ready = PlayerCount > 0;
-	for (std::size_t i = 0; i < PlayerCount; i++)
+	bool ready = state->PlayerCount > 0;
+	for (std::size_t i = 0; i < state->PlayerCount; i++)
 	{
-		if (!PlayersReady[i])
+		if (!state->PlayersReady[i])
 		{
 			ready = false;
 			break;
@@ -145,19 +139,20 @@ void HostLobbyState::StartGame()
 	if (ready)
 	{
 		std::vector<char> data_s(
-				StartGame_minsize + PlayerCount);
-		data_s[StartGame_PlayerCount] = (char)PlayerCount;
-		data_s[StartGame_Field] = Field;
-		std::copy(Characters.begin(),
-				Characters.end(),
+				StartGame_minsize + state->PlayerCount);
+		data_s[StartGame_PlayerCount] = (char)state->PlayerCount;
+		data_s[StartGame_Field] = state->Field;
+		std::copy(state->Characters.begin(),
+				state->Characters.end(),
 				&data_s[StartGame_Character]);
 		NetworkManager::Broadcast(
 				NetworkManager::StartGame, data_s);
-		StateMachine::Change(new HostGameplayState());
+		StateMachine::Change(
+				new HostGameplayState(state->PlayerCount, state->Characters));
 	}
 }
 
-void HostLobbyState::CloseLobby()
+void HostLobbyState::CloseLobby(void *)
 {
 	StateMachine::Change(new MainMenuState());
 }
