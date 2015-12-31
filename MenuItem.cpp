@@ -4,11 +4,6 @@
 #include "MainState.h"
 #include <sstream>
 
-void FunctionalMenuItem::Render(int x, int y) const
-{
-	Renderer::DrawText(Text, 24, x, y);
-}
-
 void FieldMenuItem::Render(int x, int y) const
 {
 	std::ostringstream ss;
@@ -73,7 +68,7 @@ void CharacterMenuItem::Render(int x, int y) const
 	Renderer::DrawSprite(*sprite, s_x, s_y, 0.f, flip, 0, frame);
 }
 
-void ReadyMenuItem::Forward()
+void ToggleMenuItem::Forward()
 {
 	if (!*Value)
 	{
@@ -81,7 +76,7 @@ void ReadyMenuItem::Forward()
 	}
 }
 
-void ReadyMenuItem::Backward()
+void ToggleMenuItem::Backward()
 {
 	if (*Value)
 	{
@@ -89,14 +84,14 @@ void ReadyMenuItem::Backward()
 	}
 }
 
-void ReadyMenuItem::Render(int x, int y) const
+void ToggleMenuItem::Render(int x, int y) const
 {
 	if (*Value)
 	{
-		Renderer::DrawText("< Ready!", 18, x, y);
+		Renderer::DrawText(Active, 18, x, y);
 	}
 	else
 	{
-		Renderer::DrawText("  Ready? >", 18, x, y);
+		Renderer::DrawText(Inactive, 18, x, y);
 	}
 }

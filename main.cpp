@@ -20,7 +20,6 @@ int main()
 
 	MainMenuState::Init();
 	JoinState::Init();
-	HostLobbyState::Init();
 	ClientConnectedState::Init();
 
 	NetworkManager::Init();

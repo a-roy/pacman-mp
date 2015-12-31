@@ -13,5 +13,5 @@ class Menu
 		void Render(int x, int y) const;
 	private:
 		std::vector<MenuItem *> Items;
-		std::size_t Index;
+		std::size_t Index = 0;
 };

@@ -5,16 +5,12 @@
 #include "StateMachine.h"
 #include <sstream>
 
-unsigned int HostGameplayState::PlayerCount;
-std::vector<Character> HostGameplayState::Characters;
-std::vector<bool> HostGameplayState::GameEnded;
-
-void HostGameplayState::Change()
-{
-	PlayerCount = HostLobbyState::PlayerCount;
-	Characters = HostLobbyState::Characters;
-	GameEnded = std::vector<bool>(PlayerCount);
-}
+HostGameplayState::HostGameplayState(
+		unsigned int playerCount,
+		const std::vector<Character> &characters) :
+	PlayerCount(playerCount),
+	Characters(characters),
+	GameEnded(playerCount, false) { }
 
 void HostGameplayState::ProcessPacket(
 		NetworkManager::MessageType mtype,

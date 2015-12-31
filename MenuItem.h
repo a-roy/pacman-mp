@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "Player.h"
+#include "Renderer.h"
 
 class MenuItem
 {
@@ -15,24 +16,28 @@ class MenuItem
 		virtual void Render(int x, int y) const = 0;
 };
 
+template <class T>
 class FunctionalMenuItem : public MenuItem
 {
 	public:
 		FunctionalMenuItem(
 				std::string text,
-				void (*forwardFunction)(),
-				void (*backwardFunction)()) :
+				void (*forwardFunction)(T *),
+				void (*backwardFunction)(T *),
+				T *instance = NULL) :
 			Text(text),
 			ForwardFunction(forwardFunction),
-			BackwardFunction(backwardFunction) { }
-		void Forward() { ForwardFunction(); }
-		void Backward() { BackwardFunction(); }
-		void Render(int x, int y) const;
+			BackwardFunction(backwardFunction),
+			Instance(instance) { }
+		void Forward() { ForwardFunction(Instance); }
+		void Backward() { BackwardFunction(Instance); }
+		void Render(int x, int y) const { Renderer::DrawText(Text, 24, x, y); }
 
 	private:
 		std::string Text;
-		void (*ForwardFunction)();
-		void (*BackwardFunction)();
+		void (*ForwardFunction)(T *);
+		void (*BackwardFunction)(T *);
+		T *Instance;
 };
 
 template <class T>
@@ -42,27 +47,9 @@ class EnumMenuItem : public MenuItem
 		EnumMenuItem(T *value, int numItems) :
 			Value(value), NumItems(numItems) { }
 		virtual void Forward()
-		{
-			if ((int)(*Value) < NumItems - 1)
-			{
-				*Value = (T)(*Value + 1);
-			}
-			else
-			{
-				*Value = (T)0;
-			}
-		}
+		{ *Value = (T)(((int)(*Value) < NumItems - 1) ? (*Value + 1) : 0); }
 		virtual void Backward()
-		{
-			if ((int)(*Value) > 0)
-			{
-				*Value = (T)(*Value - 1);
-			}
-			else
-			{
-				*Value = (T)(NumItems - 1);
-			}
-		}
+		{ *Value = (T)(((int)(*Value) > 0) ? (*Value - 1) : (NumItems - 1)); }
 
 	protected:
 		T *Value;
@@ -87,13 +74,16 @@ class CharacterMenuItem : public EnumMenuItem<Character>
 		void Render(int x, int y) const;
 };
 
-class ReadyMenuItem : public MenuItem
+class ToggleMenuItem : public MenuItem
 {
 	public:
-		ReadyMenuItem(bool *value) : Value(value) { }
+		ToggleMenuItem(bool *value, std::string active, std::string inactive) :
+			Value(value), Active(active), Inactive(inactive) { }
 		void Forward();
 		void Backward();
 		void Render(int x, int y) const;
 	private:
 		bool *Value;
+		std::string Active;
+		std::string Inactive;
 };
